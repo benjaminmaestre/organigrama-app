@@ -44,7 +44,7 @@ function App() {
             </div>
           </div>
 
-          <div className="flex flex-1 max-w-md relative group">
+          <div className="hidden md:flex flex-1 max-w-md relative group">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
             <input 
               type="text" 
@@ -64,8 +64,20 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-[1600px] mx-auto px-4 py-12 relative flex flex-col gap-24">
+      <main className="max-w-[1600px] mx-auto px-4 py-8 md:py-12 relative flex flex-col gap-16 md:gap-24">
         
+        {/* Mobile Search Bar (Only visible on small screens to avoid header squashing) */}
+        <div className="md:hidden relative group w-full max-w-sm mx-auto">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600 shadow-lg"
+          />
+        </div>
+
         {/* Section 1: Executive Dashboard (Fixed High-Level Roles) */}
         <section className="space-y-12">
           <div className="text-center">
@@ -172,8 +184,8 @@ function App() {
         className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:bg-[#128C7E] hover:scale-110 transition-all duration-300"
         aria-label="Contactar por WhatsApp"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-          <path d="M12.031 0C5.385 0 0 5.385 0 12.031 0 14.675 1.056 17.086 2.766 18.995L.5 24l5.247-2.149C7.545 23.23 9.71 24.062 12.031 24.062 18.677 24.062 24 18.677 24 12.031 24 5.385 18.677 0 12.031 0ZM12.031 22.067c-2.115 0-4.07-.63-5.719-1.718L4.2 21.2l.865-2.06c-1.155-1.554-1.849-3.473-1.849-5.362 0-5.36 4.359-9.721 9.715-9.721 5.358 0 9.721 4.36 9.721 9.721 0 5.36-4.361 9.721-9.721 9.721Zm5.356-7.394c-.29-.145-1.722-.848-1.99-.945-.262-.093-.456-.145-.649.145-.19.29-.75 .946-.92 1.139-.168.196-.341.222-.63.078-2.046-.985-3.696-2.613-4.665-4.629-.126-.263-.013-.404.133-.55.132-.132.29-.336.435-.506.145-.168.196-.29.29-.482.094-.195.047-.367-.024-.512-.073-.145-.649-1.572-.89-2.152-.236-.566-.475-.489-.649-.498-.168-.009-.362-.009-.554-.009-.193 0-.503.072-.767.362C5.992 6.643 5.304 7.29 5.304 8.608c0 1.317.979 2.593 1.115 2.775.136.183 1.895 2.894 4.593 4.057 1.696.732 2.658.749 3.551.628.988-.135 2.541-1.037 2.899-2.035.358-1 .358-1.859.251-2.036-.104-.177-.393-.284-.683-.432Z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.01 2.01c-5.52 0-9.99 4.47-9.99 9.99 0 1.96.55 3.8 1.5 5.37L2 22l4.82-1.52c1.51.87 3.25 1.34 5.17 1.34 5.51 0 9.98-4.47 9.98-9.99S17.52 2.01 12.01 2.01zm5.2 14.18c-.22.61-1.12 1.15-1.56 1.25-.41.09-1.02.24-3.17-.65-2.61-1.08-4.31-3.79-4.44-3.96-.13-.17-1.06-1.41-1.06-2.68 0-1.28.66-1.91.9-2.19.23-.28.53-.35.7-.35.17 0 .34 0 .49.01.16.01.38-.06.6.48.23.57.75 1.83.82 1.97.07.14.12.31.02.5-.1.19-.15.31-.3.48-.15.17-.32.37-.45.5-.15.16-.31.33-.13.64.18.31.81 1.33 1.73 2.15 1.18 1.06 2.19 1.39 2.5 1.53.31.14.49.12.67-.08.18-.21.78-.9.99-1.21.21-.31.43-.26.71-.15.28.1 1.8.85 2.1 1.01.3.16.51.24.58.37.07.13.07.76-.15 1.37z" />
         </svg>
       </a>
     </div>
