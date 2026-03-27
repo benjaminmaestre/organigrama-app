@@ -32,7 +32,7 @@ export const orgData: Member = {
         email: "1SergioAA@jwpub.org",
         phone: "300 783 0254",
         auxiliaries: [
-          { name: "Juan Fdo Ramirez", role: "Auxiliar del Coordinador", congregation: "LAURELES", email: "JRamirezGir18@jwpub.org", phone: "300 8172021" }
+          { name: "Juan Fernando Ramirez", role: "Auxiliar del Coordinador", congregation: "LAURELES", email: "JRamirezGir18@jwpub.org", phone: "300 8172021" }
         ],
         subDepartments: [
           { name: "Acomodadores", head: { name: "Alberto Sanchez", role: "Superintendente", congregation: "Napoles-Salgar", phone: "3165268674", auxiliaries: [

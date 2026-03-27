@@ -145,7 +145,7 @@ function App() {
                       <GraduationCap size={14} />
                       {dept.name}
                     </div>
-                    <MemberCard member={dept.head} initiallyExpanded={false} />
+                    <MemberCard member={dept.head} initiallyExpanded={true} />
                   </div>
                 ))}
               </motion.div>
@@ -154,7 +154,7 @@ function App() {
         </section>
 
         <footer className="pt-12 text-center text-slate-600 text-[10px] pb-12 tracking-[0.3em] uppercase font-bold border-t border-slate-800/20">
-          &copy; 2026 Asamblea Regional Medellin 4 • Diseño Felices Para Siempre
+          &copy; 2026 Asamblea Regional Medellin 4 • Felices Para Siempre
         </footer>
       </main>
     </div>

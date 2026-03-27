@@ -35,10 +35,13 @@ export const MemberCard: React.FC<MemberCardProps> = ({
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           "relative p-4 rounded-2xl border transition-all duration-300 w-full group overflow-hidden",
+          hasChildren && "cursor-pointer",
           isMain 
             ? "bg-slate-900/80 border-brand/50 shadow-[0_0_20px_rgba(30,144,255,0.2)]" 
             : "bg-slate-900/50 border-slate-800 hover:border-slate-700 hover:bg-slate-900/70"
         )}
+        onClick={() => hasChildren && setIsExpanded(!isExpanded)}
+
       >
         {/* Background Gradient Effect */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -69,28 +72,42 @@ export const MemberCard: React.FC<MemberCardProps> = ({
           {member.email && (
             <div className="flex items-center gap-2">
               <Mail size={14} className="text-slate-500" />
-              <a href={`mailto:${member.email}`} className="hover:text-brand truncate transition-colors">
+              <a 
+                href={`mailto:${member.email}`} 
+                onClick={(e) => e.stopPropagation()}
+                className="hover:text-brand truncate transition-colors"
+              >
                 {member.email}
               </a>
+
             </div>
           )}
           {member.phone && (
             <div className="flex items-center gap-2">
               <Phone size={14} className="text-slate-500" />
-              <a href={`tel:${member.phone}`} className="hover:text-brand truncate transition-colors">
+              <a 
+                href={`tel:${member.phone}`} 
+                onClick={(e) => e.stopPropagation()}
+                className="hover:text-brand truncate transition-colors"
+              >
                 {member.phone}
               </a>
+
             </div>
           )}
         </div>
 
         {hasChildren && (
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
             className="absolute top-4 right-4 p-1 rounded-lg hover:bg-slate-800 text-slate-500 transition-colors"
           >
             {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </button>
+
         )}
       </motion.div>
 
