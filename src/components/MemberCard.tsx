@@ -58,7 +58,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
             <User size={24} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-white truncate">{member.name}</h3>
+            <h3 className="text-lg font-bold text-white break-words">{member.name}</h3>
             <p className={cn(
               "text-sm font-medium uppercase tracking-wider",
               isMain ? "text-brand/80" : "text-slate-400"

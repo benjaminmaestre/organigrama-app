@@ -76,7 +76,7 @@ export const orgData: Member = {
           { 
             name: "Audio y Video", 
             head: {
-              name: "Jhon James Villamizar", 
+              name: "James Villamizar", 
               role: "Superintendente", 
               congregation: "Laureles", 
               email: "10JVillamizar@jwpub.org",

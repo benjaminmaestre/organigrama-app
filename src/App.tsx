@@ -44,7 +44,7 @@ function App() {
             </div>
           </div>
 
-          <div className="hidden md:flex flex-1 max-w-md relative group">
+          <div className="flex flex-1 max-w-md relative group">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
             <input 
               type="text" 
@@ -163,6 +163,19 @@ function App() {
           &copy; 2026 Asamblea Regional Medellin 4 • Felices Para Siempre
         </footer>
       </main>
+
+      {/* WhatsApp Floating Button */}
+      <a
+        href="https://wa.me/573007830254"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:bg-[#128C7E] hover:scale-110 transition-all duration-300"
+        aria-label="Contactar por WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+          <path d="M12.031 0C5.385 0 0 5.385 0 12.031 0 14.675 1.056 17.086 2.766 18.995L.5 24l5.247-2.149C7.545 23.23 9.71 24.062 12.031 24.062 18.677 24.062 24 18.677 24 12.031 24 5.385 18.677 0 12.031 0ZM12.031 22.067c-2.115 0-4.07-.63-5.719-1.718L4.2 21.2l.865-2.06c-1.155-1.554-1.849-3.473-1.849-5.362 0-5.36 4.359-9.721 9.715-9.721 5.358 0 9.721 4.36 9.721 9.721 0 5.36-4.361 9.721-9.721 9.721Zm5.356-7.394c-.29-.145-1.722-.848-1.99-.945-.262-.093-.456-.145-.649.145-.19.29-.75 .946-.92 1.139-.168.196-.341.222-.63.078-2.046-.985-3.696-2.613-4.665-4.629-.126-.263-.013-.404.133-.55.132-.132.29-.336.435-.506.145-.168.196-.29.29-.482.094-.195.047-.367-.024-.512-.073-.145-.649-1.572-.89-2.152-.236-.566-.475-.489-.649-.498-.168-.009-.362-.009-.554-.009-.193 0-.503.072-.767.362C5.992 6.643 5.304 7.29 5.304 8.608c0 1.317.979 2.593 1.115 2.775.136.183 1.895 2.894 4.593 4.057 1.696.732 2.658.749 3.551.628.988-.135 2.541-1.037 2.899-2.035.358-1 .358-1.859.251-2.036-.104-.177-.393-.284-.683-.432Z"/>
+        </svg>
+      </a>
     </div>
   );
 }
