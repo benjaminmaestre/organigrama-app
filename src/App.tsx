@@ -1,7 +1,7 @@
 import React from 'react';
 import { orgData } from './data';
 import { MemberCard } from './components/MemberCard';
-import { Layout, Search, Filter, Download, Users, Shield, Radio, Bed, GraduationCap } from 'lucide-react';
+import { Layout, Search, Download, Shield, Radio, Bed, GraduationCap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -140,7 +140,13 @@ function App() {
                 className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
                 {activeTabData?.head.subDepartments?.map((dept, idx) => (
-                  <div key={idx} className="group flex flex-col gap-3">
+                  <div 
+                    key={idx} 
+                    className={cn(
+                      "group flex flex-col gap-3 transition-all duration-500",
+                      dept.name === "Audio y Video" ? "lg:col-span-3 md:col-span-2" : "col-span-1"
+                    )}
+                  >
                     <div className="flex items-center gap-2 pl-4 text-[10px] font-black text-slate-500 uppercase tracking-[.2em] transition-colors group-hover:text-blue-400">
                       <GraduationCap size={14} />
                       {dept.name}
