@@ -25,7 +25,8 @@ export const MemberCard: React.FC<MemberCardProps> = ({
   const [isExpanded, setIsExpanded] = React.useState(initiallyExpanded ?? isMain);
 
   const hasChildren = (member.auxiliaries && member.auxiliaries.length > 0) || 
-                     (showDepartments && member.subDepartments && member.subDepartments.length > 0);
+                     (showDepartments && member.subDepartments && member.subDepartments.length > 0) ||
+                     (member.groups && member.groups.length > 0);
 
   return (
     <div className="flex flex-col items-center w-full max-w-sm mx-auto">
@@ -109,7 +110,21 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                 <div key={idx} className="relative">
                   {/* Horizontal Connector */}
                   <div className="absolute -left-3 top-1/2 w-3 h-px bg-slate-800" />
-                  <MemberCard member={aux} />
+                  <MemberCard member={aux} initiallyExpanded={false} />
+                </div>
+              ))}
+
+              {member.groups?.map((group, idx) => (
+                <div key={idx} className="relative mt-12 bg-slate-900/40 rounded-3xl p-6 border border-slate-800/50 shadow-inner">
+                  <div className="flex items-center gap-2 mb-6 text-xs font-black text-blue-400 uppercase tracking-[0.2em] bg-blue-500/10 w-fit px-3 py-1 rounded-full border border-blue-500/20">
+                    <Users size={12} />
+                    {group.name}
+                  </div>
+                  <div className="grid grid-cols-1 gap-6">
+                    {group.members.map((m, midx) => (
+                      <MemberCard key={midx} member={m} initiallyExpanded={false} />
+                    ))}
+                  </div>
                 </div>
               ))}
 

@@ -6,6 +6,7 @@ export interface Member {
   phone?: string;
   auxiliaries?: Member[];
   subDepartments?: Department[];
+  groups?: { name: string; members: Member[] }[];
 }
 
 export interface Department {
@@ -72,19 +73,43 @@ export const orgData: Member = {
           { name: "Jeickson Ramírez", role: "Auxiliar del Sup. Programa", congregation: "LA PRADERA", email: "JeiksonSR2@jwpub.org", phone: "311 7003405" }
         ],
         subDepartments: [
-          { name: "Audio y Video", head: { name: "Jhon James Villamizar", role: "Superintendente", congregation: "Laureles", phone: "3006080689", auxiliaries: [
-            { name: "Diego Amador", role: "Auxiliar", congregation: "San Javier", phone: "3194400214" },
-            { name: "Cristian Ochoa", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3015265710" },
-            { name: "Roddy Vargas", role: "Auxiliar", congregation: "San Javier", phone: "3006809460" },
-            { name: "Sebastian Uribe", role: "Auxiliar", congregation: "Girasoles-Caicedo", phone: "3508575555" },
-            { name: "Mateo Ramírez", role: "Auxiliar", congregation: "Laureles", phone: "3168272226" },
-            { name: "Jorge Blandón", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3122844627" },
-            { name: "Gonzalo Álvarez", role: "Auxiliar", congregation: "Violetas", phone: "3205398031" },
-            { name: "Jorge Ochoa", role: "Auxiliar", congregation: "Laureles", phone: "3148059988" },
-            { name: "Richard Bolaños", role: "Auxiliar", congregation: "La Divisa", phone: "3003250221" },
-            { name: "Christian Martínez", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3102766574" },
-            { name: "Jorge Taborda", role: "Auxiliar", congregation: "La Pradera-Carmen de Atrato", phone: "3103623977" }
-          ]}},
+          { 
+            name: "Audio y Video", 
+            head: {
+              name: "Jhon James Villamizar", 
+              role: "Superintendente", 
+              congregation: "Laureles", 
+              phone: "3006080689", 
+              groups: [
+                {
+                  name: "Audio",
+                  members: [
+                    { name: "Diego Amador", role: "Auxiliar", congregation: "San Javier", phone: "3194400214", email: "DiegoAmadorMata@jwpub.org" },
+                    { name: "Cristian Ochoa", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3015265710", email: "30Cristiano@jwpub.org" },
+                    { name: "Roddy Vargas", role: "Auxiliar", congregation: "San Javier", phone: "3006809460", email: "RoddyV@jwpub.org" },
+                    { name: "Sebastian Uribe", role: "Auxiliar", congregation: "Girasoles-Caicedo", phone: "3508575555", email: "USebastian19@jwpub.org" },
+                  ]
+                },
+                {
+                  name: "Video",
+                  members: [
+                    { name: "Mateo Ramírez", role: "Auxiliar", congregation: "Laureles", phone: "3168272226", email: "4MRAMIREZ@jwpub.org" },
+                    { name: "Jorge Blandón", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3122844627", email: "BJORGE28@jwpub.org" },
+                    { name: "Gonzalo Álvarez", role: "Auxiliar", congregation: "Violetas", phone: "3205398031", email: "2GonzaloAlvarez@jwpub.org" },
+                    { name: "Jorge Ochoa", role: "Auxiliar", congregation: "Laureles", phone: "3148059988", email: "20Jorge@jwpub.org" },
+                  ]
+                },
+                {
+                  name: "Plataforma",
+                  members: [
+                    { name: "Richard Bolaños", role: "Auxiliar", congregation: "La Divisa", phone: "3003250221", email: "56RichardB@jwpub.org" },
+                    { name: "Christian Martínez", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3102766574", email: "ChristianMartinez2@jwpub.org" },
+                    { name: "Jorge Taborda", role: "Auxiliar", congregation: "La Pradera-Carmen de Atrato", phone: "3103623977", email: "Jtaborda5@jwpub.org" },
+                  ]
+                }
+              ]
+            }
+          },
           { name: "Bautismo", head: { name: "Álvaro Ramírez", role: "Superintendente", congregation: "Entre Colinas-Amagá", phone: "3137080035", auxiliaries: [
             { name: "Humberto Gutierrez", role: "Auxiliar", congregation: "San Javier", phone: "3104105081" }
           ]}}
