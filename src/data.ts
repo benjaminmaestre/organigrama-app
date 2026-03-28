@@ -85,7 +85,7 @@ export const orgData: Member = {
                 {
                   name: "Audio",
                   members: [
-                    { name: "Diego Amador", role: "Auxiliar", congregation: "San Javier", phone: "3194400214", email: "DiegoAmadorMata@jwpub.org" },
+                    { name: "Diego Amador", role: "Superintendente", congregation: "San Javier", phone: "3194400214", email: "DiegoAmadorMata@jwpub.org" },
                     { name: "Cristian Ochoa", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3015265710", email: "30Cristiano@jwpub.org" },
                     { name: "Roddy Vargas", role: "Auxiliar", congregation: "San Javier", phone: "3006809460", email: "RoddyV@jwpub.org" },
                     { name: "Sebastian Uribe", role: "Auxiliar", congregation: "Girasoles-Caicedo", phone: "3508575555", email: "USebastian19@jwpub.org" },
@@ -94,7 +94,7 @@ export const orgData: Member = {
                 {
                   name: "Video",
                   members: [
-                    { name: "Mateo Ramírez", role: "Auxiliar", congregation: "Laureles", phone: "3168272226", email: "4MRAMIREZ@jwpub.org" },
+                    { name: "Mateo Ramírez", role: "Superintendente", congregation: "Laureles", phone: "3168272226", email: "4MRAMIREZ@jwpub.org" },
                     { name: "Jorge Blandón", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3122844627", email: "BJORGE28@jwpub.org" },
                     { name: "Gonzalo Álvarez", role: "Auxiliar", congregation: "Las Violetas", phone: "3205398031", email: "2GonzaloAlvarez@jwpub.org" },
                     { name: "Jorge Ochoa", role: "Auxiliar", congregation: "Laureles", phone: "3148059988", email: "20Jorge@jwpub.org" },
@@ -103,7 +103,7 @@ export const orgData: Member = {
                 {
                   name: "Plataforma",
                   members: [
-                    { name: "Richard Bolaños", role: "Auxiliar", congregation: "La Divisa", phone: "3003250221", email: "56RichardB@jwpub.org" },
+                    { name: "Richard Bolaños", role: "Superintendente", congregation: "La Divisa", phone: "3003250221", email: "56RichardB@jwpub.org" },
                     { name: "Christian Martínez", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3102766574", email: "ChristianMartinez2@jwpub.org" },
                     { name: "Jorge Taborda", role: "Auxiliar", congregation: "La Pradera-Carmen de Atrato", phone: "3103623977", email: "Jtaborda5@jwpub.org" },
                   ]
