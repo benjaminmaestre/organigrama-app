@@ -10,6 +10,7 @@ function App() {
   const [activeTab, setActiveTab] = React.useState<'coordination' | 'program' | 'accommodation'>('coordination');
   const [showWhatsAppTip, setShowWhatsAppTip] = React.useState(false);
   const [pendingScrollId, setPendingScrollId] = React.useState<string | null>(null);
+  const [isMobile, setIsMobile] = React.useState(false);
 
   const buildMemberId = (member: any) => {
     const raw = `${member.name ?? ''}-${member.role ?? ''}-${member.phone ?? ''}-${member.email ?? ''}`;
@@ -20,6 +21,34 @@ function App() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')}`;
   };
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isMobile) return;
+
+    const showTimer = window.setTimeout(() => {
+      setShowWhatsAppTip(true);
+    }, 5000);
+
+    const hideTimer = window.setTimeout(() => {
+      setShowWhatsAppTip(false);
+    }, 10000);
+
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [isMobile]);
 
   // Extract Committee members and their departments
   const coordinationDept = orgData.subDepartments?.find(d => d.name === 'Coordinación del Comité');
@@ -80,7 +109,6 @@ function App() {
     return subDepartmentsMatch;
   };
 
-  // Preview global de resultados
   const globalSearchResults = React.useMemo(() => {
     if (!normalizedSearch) return [];
 
@@ -169,7 +197,6 @@ function App() {
     return results;
   }, [normalizedSearch]);
 
-  // Navegación inteligente entre tabs
   React.useEffect(() => {
     if (!normalizedSearch || globalSearchResults.length === 0 || pendingScrollId) return;
 
@@ -179,7 +206,6 @@ function App() {
     }
   }, [normalizedSearch, globalSearchResults, activeTab, pendingScrollId]);
 
-  // Scroll al resultado seleccionado
   React.useEffect(() => {
     if (!pendingScrollId) return;
 
@@ -285,7 +311,7 @@ function App() {
 
             <input
               type="text"
-              placeholder="Buscar por nombre, cargo, correo, teléfono..."
+              placeholder="Buscar por nombre, departamento, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600"
@@ -337,7 +363,7 @@ function App() {
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
           <input
             type="text"
-            placeholder="Buscar por nombre, cargo, correo, teléfono..."
+            placeholder="Buscar por nombre, departamento, correo, teléfono..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600 shadow-lg"
@@ -488,11 +514,11 @@ function App() {
         </footer>
       </main>
 
-      {/* WhatsApp Floating Button + Hover Tooltip */}
+      {/* WhatsApp Floating Button + Tooltip */}
       <div
         className="fixed bottom-6 right-6 z-50"
-        onMouseEnter={() => setShowWhatsAppTip(true)}
-        onMouseLeave={() => setShowWhatsAppTip(false)}
+        onMouseEnter={() => !isMobile && setShowWhatsAppTip(true)}
+        onMouseLeave={() => !isMobile && setShowWhatsAppTip(false)}
       >
         {showWhatsAppTip && (
           <div className="absolute bottom-16 right-0 max-w-[260px] rounded-2xl border border-slate-700 bg-slate-900/95 px-4 py-3 text-sm text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md">
@@ -507,6 +533,9 @@ function App() {
           href="https://wa.me/573007830254"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            if (isMobile) setShowWhatsAppTip(false);
+          }}
           className="flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:bg-[#128C7E] hover:scale-110 transition-all duration-300"
           aria-label="Contactar por WhatsApp"
         >
