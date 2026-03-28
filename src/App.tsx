@@ -1,8 +1,9 @@
 import React from 'react';
 import { orgData } from './data';
 import { MemberCard } from './components/MemberCard';
+import { ExportMenu } from './components/ExportMenu';
 import { cn } from './lib/cn';
-import { Layout, Search, Download, Shield, Radio, Bed, GraduationCap } from 'lucide-react';
+import { Layout, Search, Shield, Radio, Bed, GraduationCap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -11,6 +12,11 @@ function App() {
   const [showWhatsAppTip, setShowWhatsAppTip] = React.useState(false);
   const [pendingScrollId, setPendingScrollId] = React.useState<string | null>(null);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [activeDeptIdxs, setActiveDeptIdxs] = React.useState<number[]>([]);
+  const deptRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+  const [activeCommitteeCards, setActiveCommitteeCards] = React.useState<string[]>([]);
+  const committeeRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+  const presidencyRef = React.useRef<HTMLDivElement | null>(null);
 
   const buildMemberId = (member: any) => {
     const raw = `${member.name ?? ''}-${member.role ?? ''}-${member.phone ?? ''}-${member.email ?? ''}`;
@@ -49,6 +55,51 @@ function App() {
       window.clearTimeout(hideTimer);
     };
   }, [isMobile]);
+
+  // IntersectionObserver: highlight department on scroll (all screens)
+  React.useEffect(() => {
+    const entries = new Map<Element, number>();
+    const observer = new IntersectionObserver(
+      (observed) => {
+        observed.forEach((e) => entries.set(e.target, e.intersectionRatio));
+        const active: number[] = [];
+        deptRefs.current.forEach((el, idx) => {
+          if (!el) return;
+          const ratio = entries.get(el) ?? 0;
+          if (ratio > 0.45) { active.push(idx); }
+        });
+        setActiveDeptIdxs(active);
+      },
+      { threshold: [0, 0.1, 0.25, 0.45, 0.75, 1] }
+    );
+    deptRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // IntersectionObserver: highlight committee + presidency (all screens)
+  React.useEffect(() => {
+    const entriesMap = new Map<Element, number>();
+    const ids = ['coordination', 'program', 'accommodation', 'presidency'];
+    const observer = new IntersectionObserver(
+      (observed) => {
+        observed.forEach((e) => entriesMap.set(e.target, e.intersectionRatio));
+        const active: string[] = [];
+        const allRefs = [...committeeRefs.current, presidencyRef.current];
+        allRefs.forEach((el, idx) => {
+          if (!el) return;
+          const ratio = entriesMap.get(el) ?? 0;
+          if (ratio > 0.5) { active.push(ids[idx]); }
+        });
+        setActiveCommitteeCards(active);
+      },
+      { threshold: [0, 0.1, 0.3, 0.5, 0.75, 1] }
+    );
+    [...committeeRefs.current, presidencyRef.current].forEach((el) => {
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
 
   // Extract Committee members and their departments
   const coordinationDept = orgData.subDepartments?.find(d => d.name === 'Coordinación del Comité');
@@ -349,10 +400,9 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-[0_4px_10px_rgba(30,144,255,0.3)] hover:scale-105 active:scale-95">
-              <Download size={18} />
-              <span>Exportar</span>
-            </button>
+            <div className="hidden sm:block">
+              <ExportMenu />
+            </div>
           </div>
         </div>
       </header>
@@ -407,8 +457,12 @@ function App() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {filteredTabs.map((tab) => (
-              <div key={tab.id} className="space-y-6">
+            {filteredTabs.map((tab, tabIdx) => (
+              <div
+                key={tab.id}
+                ref={(el) => { committeeRefs.current[tabIdx] = el; }}
+                className="space-y-6"
+              >
                 <div className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 py-2 rounded-xl border border-slate-800/50 shadow-inner">
                   {tab.label}
                 </div>
@@ -418,6 +472,7 @@ function App() {
                       member={tab.data.head}
                       showDepartments={false}
                       initiallyExpanded={true}
+                      isHighlighted={activeCommitteeCards.includes(tab.id)}
                     />
                   )}
                 </div>
@@ -426,7 +481,10 @@ function App() {
           </div>
 
           {memberMatchesSearch(presidencyData) && (
-            <div className="pt-12 border-t border-slate-800/20 max-w-4xl mx-auto w-full">
+            <div
+              ref={presidencyRef}
+              className="pt-12 border-t border-slate-800/20 max-w-4xl mx-auto w-full"
+            >
               <div className="text-center mb-8">
                 <h3 className="text-xl font-black text-white uppercase tracking-tight">Presidencia</h3>
               </div>
@@ -436,6 +494,7 @@ function App() {
                   member={presidencyData}
                   isMain={true}
                   initiallyExpanded={true}
+                  isHighlighted={activeCommitteeCards.includes('presidency')}
                 />
               </div>
             </div>
@@ -486,6 +545,7 @@ function App() {
                 {filteredActiveTabData?.head.subDepartments?.map((dept, idx) => (
                   <div
                     key={idx}
+                    ref={(el) => { deptRefs.current[idx] = el; }}
                     className={cn(
                       'group flex flex-col gap-3 transition-all duration-500',
                       dept.name === 'Audio y Video' ? 'lg:col-span-3 md:col-span-2' : 'col-span-1'
@@ -495,7 +555,11 @@ function App() {
                       <GraduationCap size={14} />
                       {dept.name}
                     </div>
-                    <MemberCard member={dept.head} initiallyExpanded={true} />
+                    <MemberCard
+                      member={dept.head}
+                      initiallyExpanded={true}
+                      isHighlighted={activeDeptIdxs.includes(idx)}
+                    />
                   </div>
                 ))}
               </motion.div>
@@ -509,6 +573,11 @@ function App() {
           </div>
         </section>
 
+        {/* Mobile export button */}
+        <div className="sm:hidden flex justify-center">
+          <ExportMenu dropDirection="up" fullWidth />
+        </div>
+
         <footer className="pt-12 text-center text-slate-600 text-[10px] pb-12 tracking-[0.3em] uppercase font-bold border-t border-slate-800/20">
           &copy; 2026 Asamblea Regional Medellin 4 • Felices Para Siempre
         </footer>
@@ -520,14 +589,23 @@ function App() {
         onMouseEnter={() => !isMobile && setShowWhatsAppTip(true)}
         onMouseLeave={() => !isMobile && setShowWhatsAppTip(false)}
       >
-        {showWhatsAppTip && (
-          <div className="absolute bottom-16 right-0 max-w-[260px] rounded-2xl border border-slate-700 bg-slate-900/95 px-4 py-3 text-sm text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md">
-            <p className="leading-relaxed">
-              ¿Tienes alguna pregunta sobre este departamento? Escríbenos por WhatsApp.
-            </p>
-            <div className="absolute bottom-[-6px] right-5 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-slate-700" />
-          </div>
-        )}
+        <AnimatePresence>
+          {showWhatsAppTip && (
+            <motion.div
+              initial={{ opacity: 0, scale: 1.3, y: 6 }}
+              animate={{ opacity: 1, scale: 1.3, y: 0 }}
+              exit={{ opacity: 0, scale: 1.3, y: 6 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22, mass: 0.9 }}
+              style={{ transformOrigin: 'bottom right' }}
+              className="absolute bottom-16 right-0 max-w-[260px] rounded-2xl border border-slate-700 bg-slate-900/95 px-4 py-3 text-sm text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
+            >
+              <p className="leading-relaxed">
+                ¿Tienes alguna pregunta sobre un departamento? Escríbenos por WhatsApp.
+              </p>
+              <div className="absolute bottom-[-6px] right-5 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-slate-700" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <a
           href="https://wa.me/573007830254"

@@ -9,13 +9,15 @@ interface MemberCardProps {
   isMain?: boolean;
   initiallyExpanded?: boolean;
   showDepartments?: boolean;
+  isHighlighted?: boolean;
 }
 
 export const MemberCard: React.FC<MemberCardProps> = ({
   member,
   isMain,
   initiallyExpanded,
-  showDepartments = true
+  showDepartments = true,
+  isHighlighted = false,
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(initiallyExpanded ?? isMain);
 
@@ -44,36 +46,40 @@ export const MemberCard: React.FC<MemberCardProps> = ({
         isExpanded ? 'items-center mx-auto' : 'items-start ml-0 mr-auto'
       )}
     >
+      {/* Animated border wrapper — always present for transition; dept-highlighted activates gradient */}
+      <div className={cn('w-full max-w-sm dept-highlight-wrapper', isHighlighted && 'dept-highlighted')}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          'relative p-4 rounded-2xl border transition-all duration-300 w-full group overflow-hidden',
-          'max-w-sm',
+          'relative p-3 sm:p-4 rounded-2xl border transition-all duration-300 w-full group overflow-hidden',
           hasChildren && 'cursor-pointer',
           isMain
             ? 'bg-slate-900/80 border-brand/50 shadow-[0_0_20px_rgba(30,144,255,0.2)]'
-            : 'bg-slate-900/50 border-slate-800 hover:border-slate-700 hover:bg-slate-900/70'
+            : isHighlighted
+              ? 'bg-slate-900/80 border-transparent'
+              : 'bg-slate-900/50 border-slate-800 hover:border-slate-700 hover:bg-slate-900/70'
         )}
         onClick={() => hasChildren && setIsExpanded(!isExpanded)}
       >
         {/* Background Gradient Effect */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div
             className={cn(
-              'p-3 rounded-xl',
+              'p-2 sm:p-3 rounded-xl',
               isMain ? 'bg-brand/20 text-brand' : 'bg-slate-800 text-slate-400 group-hover:text-slate-300'
             )}
           >
-            <User size={24} />
+            <User size={20} className="sm:hidden" />
+            <User size={24} className="hidden sm:block" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-white break-words">{member.name}</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white break-words">{member.name}</h3>
             <p
               className={cn(
-                'text-sm font-medium uppercase tracking-wider',
+                'text-xs sm:text-sm font-medium uppercase tracking-normal sm:tracking-wider break-words',
                 isMain ? 'text-brand/80' : 'text-slate-400'
               )}
             >
@@ -96,7 +102,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               <a
                 href={`mailto:${member.email}`}
                 onClick={(e) => e.stopPropagation()}
-                className="hover:text-brand truncate transition-colors"
+                className="hover:text-brand break-all sm:truncate transition-colors"
               >
                 {member.email}
               </a>
@@ -109,7 +115,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               <a
                 href={`tel:${member.phone}`}
                 onClick={(e) => e.stopPropagation()}
-                className="hover:text-brand truncate transition-colors"
+                className="hover:text-brand break-all sm:truncate transition-colors"
               >
                 {member.phone}
               </a>
@@ -129,6 +135,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
           </button>
         )}
       </motion.div>
+      </div>
 
       <AnimatePresence>
         {isExpanded && hasChildren && (
@@ -146,7 +153,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                 <div key={idx} className="relative">
                   {/* Horizontal Connector */}
                   <div className="absolute -left-3 top-1/2 w-3 h-px bg-slate-800" />
-                  <MemberCard member={aux} initiallyExpanded={initiallyExpanded} />
+                  <MemberCard member={aux} initiallyExpanded={initiallyExpanded} isHighlighted={isHighlighted} />
                 </div>
               ))}
 
@@ -163,7 +170,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                       </div>
                       <div className="grid grid-cols-1 gap-6">
                         {group.members.map((m, midx) => (
-                          <MemberCard key={midx} member={m} initiallyExpanded={initiallyExpanded} />
+                          <MemberCard key={midx} member={m} initiallyExpanded={initiallyExpanded} isHighlighted={isHighlighted} />
                         ))}
                       </div>
                     </div>
@@ -179,7 +186,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                       <Users size={12} />
                       {dept.name}
                     </div>
-                    <MemberCard member={dept.head} />
+                    <MemberCard member={dept.head} isHighlighted={isHighlighted} />
                   </div>
                 ))}
             </div>

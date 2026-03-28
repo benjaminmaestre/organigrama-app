@@ -5,3 +5,51 @@ body {
   color: #e2e8f0;
 }
 
+/* ── Animated department border (mobile only) ── */
+
+@property --dept-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes dept-spin {
+  to { --dept-angle: 360deg; }
+}
+
+@keyframes dept-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0  0px 0px rgba(59, 130, 246, 0.00),
+      0 0  0px 0px rgba(139, 92, 246, 0.00);
+  }
+  50% {
+    box-shadow:
+      0 0 18px 2px rgba(59, 130, 246, 0.22),
+      0 0  8px 1px rgba(139, 92, 246, 0.14);
+  }
+}
+
+/* Base wrapper — always present, owns the fade-in transition */
+.dept-highlight-wrapper {
+  border-radius: 1rem;
+  transition: padding 0.9s ease;
+  padding: 0;
+}
+
+/* Active state — gradient border + pulse shadow */
+.dept-highlighted {
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--dept-angle),
+    transparent        0deg,
+    rgba(59,130,246,0.65)   55deg,
+    rgba(139,92,246,0.48)  115deg,
+    transparent       175deg
+  );
+  animation:
+    dept-spin  7s linear      infinite,
+    dept-pulse 3s ease-in-out infinite;
+}
+
+
