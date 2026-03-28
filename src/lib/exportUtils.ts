@@ -577,7 +577,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
   const bautismo = section.departments.find(d => d.name === 'Bautismo');
 
   if (av) {
-    drawMiniPersonBlock(doc, PAGE.mx, y, PAGE.w - PAGE.mx * 2, 'Superintendente de Audio y Video', av.head, section.color);
+    drawMiniPersonBlock(doc, PAGE.mx, y, PAGE.w - PAGE.mx * 2, 'Audio y Video', av.head, section.color);
     y += 36;
 
     const groups = av.head.groups ?? [];
