@@ -18,6 +18,9 @@ function App() {
   const committeeRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const presidencyRef = React.useRef<HTMLDivElement | null>(null);
 
+  // Estado añadido para sincronizar el observer con framer-motion
+  const [observerTrigger, setObserverTrigger] = React.useState(0);
+
   const buildMemberId = (member: any) => {
     const raw = `${member.name ?? ''}-${member.role ?? ''}-${member.phone ?? ''}-${member.email ?? ''}`;
     return `member-${raw
@@ -66,16 +69,20 @@ function App() {
         deptRefs.current.forEach((el, idx) => {
           if (!el) return;
           const ratio = entries.get(el) ?? 0;
-          if (ratio > 0.45) { active.push(idx); }
+          if (ratio > 0.45) {
+            active.push(idx);
+          }
         });
         setActiveDeptIdxs(active);
       },
       { threshold: [0, 0.1, 0.25, 0.45, 0.75, 1] }
     );
-    deptRefs.current.forEach((el) => { if (el) observer.observe(el); });
+    deptRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
     return () => observer.disconnect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, observerTrigger]);
 
   // IntersectionObserver: highlight committee + presidency (all screens)
   React.useEffect(() => {
@@ -89,7 +96,9 @@ function App() {
         allRefs.forEach((el, idx) => {
           if (!el) return;
           const ratio = entriesMap.get(el) ?? 0;
-          if (ratio > 0.5) { active.push(ids[idx]); }
+          if (ratio > 0.5) {
+            active.push(ids[idx]);
+          }
         });
         setActiveCommitteeCards(active);
       },
@@ -102,9 +111,9 @@ function App() {
   }, []);
 
   // Extract Committee members and their departments
-  const coordinationDept = orgData.subDepartments?.find(d => d.name === 'Coordinación del Comité');
-  const programDept = orgData.subDepartments?.find(d => d.name === 'Programa');
-  const accommodationDept = orgData.subDepartments?.find(d => d.name === 'Alojamiento y Servicios');
+  const coordinationDept = orgData.subDepartments?.find((d) => d.name === 'Coordinación del Comité');
+  const programDept = orgData.subDepartments?.find((d) => d.name === 'Programa');
+  const accommodationDept = orgData.subDepartments?.find((d) => d.name === 'Alojamiento y Servicios');
 
   // Section 2 Data: President only (without repeating the committee departments)
   const presidencyData = { ...orgData, subDepartments: [] };
@@ -184,7 +193,7 @@ function App() {
         const memberId = buildMemberId(member);
 
         const alreadyExists = results.some(
-          item =>
+          (item) =>
             item.memberId === memberId &&
             item.department === department &&
             item.tabId === tabId
@@ -216,7 +225,7 @@ function App() {
           const memberId = buildMemberId(dept.head);
 
           const exists = results.some(
-            item =>
+            (item) =>
               item.memberId === memberId &&
               item.department === dept.name &&
               item.tabId === tabId
@@ -239,7 +248,7 @@ function App() {
       });
     };
 
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       if (tab.data?.head) {
         pushIfMatch(tab.data.head, tab.id, tab.label);
       }
@@ -252,6 +261,7 @@ function App() {
     if (!normalizedSearch || globalSearchResults.length === 0 || pendingScrollId) return;
 
     const firstMatchTab = globalSearchResults[0].tabId;
+
     if (activeTab !== firstMatchTab) {
       setActiveTab(firstMatchTab);
     }
@@ -292,13 +302,13 @@ function App() {
   }, [pendingScrollId, activeTab]);
 
   const filteredTabs = tabs
-    .map(tab => {
+    .map((tab) => {
       if (!tab.data) return tab;
 
       if (!normalizedSearch) return tab;
 
       const filteredSubDepartments =
-        tab.data.head.subDepartments?.filter(dept => {
+        tab.data.head.subDepartments?.filter((dept) => {
           return matchesText(dept.name) || memberMatchesSearch(dept.head);
         }) ?? [];
 
@@ -323,9 +333,9 @@ function App() {
         },
       };
     })
-    .filter(tab => !normalizedSearch || tab.data);
+    .filter((tab) => !normalizedSearch || tab.data);
 
-  const filteredActiveTabData = filteredTabs.find(t => t.id === activeTab)?.data;
+  const filteredActiveTabData = filteredTabs.find((t) => t.id === activeTab)?.data;
 
   const handleSearchResultClick = (item: {
     memberId: string;
@@ -460,7 +470,9 @@ function App() {
             {filteredTabs.map((tab, tabIdx) => (
               <div
                 key={tab.id}
-                ref={(el) => { committeeRefs.current[tabIdx] = el; }}
+                ref={(el) => {
+                  committeeRefs.current[tabIdx] = el;
+                }}
                 className="space-y-6"
               >
                 <div className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 py-2 rounded-xl border border-slate-800/50 shadow-inner">
@@ -540,12 +552,15 @@ function App() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
+                onAnimationStart={() => setObserverTrigger((prev) => prev + 1)}
                 className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
                 {filteredActiveTabData?.head.subDepartments?.map((dept, idx) => (
                   <div
                     key={idx}
-                    ref={(el) => { deptRefs.current[idx] = el; }}
+                    ref={(el) => {
+                      deptRefs.current[idx] = el;
+                    }}
                     className={cn(
                       'group flex flex-col gap-3 transition-all duration-500',
                       dept.name === 'Audio y Video' ? 'lg:col-span-3 md:col-span-2' : 'col-span-1'
@@ -565,11 +580,12 @@ function App() {
               </motion.div>
             </AnimatePresence>
 
-            {normalizedSearch && (!filteredActiveTabData?.head.subDepartments || filteredActiveTabData.head.subDepartments.length === 0) && (
-              <div className="text-center text-slate-400 mt-4">
-                No se encontraron resultados en esta categoría.
-              </div>
-            )}
+            {normalizedSearch &&
+              (!filteredActiveTabData?.head.subDepartments || filteredActiveTabData.head.subDepartments.length === 0) && (
+                <div className="text-center text-slate-400 mt-4">
+                  No se encontraron resultados en esta categoría.
+                </div>
+              )}
           </div>
         </section>
 

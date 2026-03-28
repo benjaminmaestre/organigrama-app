@@ -32,12 +32,12 @@ export const orgData: Member = {
         email: "1SergioAA@jwpub.org",
         phone: "300 783 0254",
         auxiliaries: [
-          { name: "Juan Fernando Ramirez", role: "Auxiliar del Coordinador", congregation: "LAURELES", email: "JRamirezGir18@jwpub.org", phone: "300 8172021" }
+          { name: "Juan Fernando Ramírez", role: "Auxiliar del Coordinador", congregation: "LAURELES", email: "JRamirezGir18@jwpub.org", phone: "300 8172021" }
         ],
         subDepartments: [
-          { name: "Acomodadores", head: { name: "Alberto Sanchez", role: "Superintendente", congregation: "Napoles-Salgar", phone: "3165268674", email: "lsanchez@jwpub.org", auxiliaries: [
-            { name: "Alejandro Flórez", role: "Auxiliar", congregation: "Laureles", phone: "3136857191", email: "FlorezpatiJuan1@jwpub.org" },
-            { name: "Hernando Davila", role: "Auxiliar", congregation: "Villanueva-Betulia", phone: "3127167890", email: "HernandoDavila@jwpub.org" },
+          { name: "Acomodadores", head: { name: "Alberto Sánchez", role: "Superintendente", congregation: "Napoles-Salgar", phone: "3165268674", email: "lsanchez@jwpub.org", auxiliaries: [
+            { name: "Juan Alejandro Flórez", role: "Auxiliar", congregation: "Laureles", phone: "3136857191", email: "FlorezpatiJuan1@jwpub.org" },
+            { name: "Hernando Dávila", role: "Auxiliar", congregation: "Villanueva-Betulia", phone: "3127167890", email: "HernandoDavila@jwpub.org" },
             { name: "Omar Ramírez", role: "Auxiliar", congregation: "La Divisa", phone: "3176466610", email: "OmaR2@jwpub.org" }
           ]}},
           { name: "Coordinador de Seguridad", head: { name: "Juan Diego Mejía", role: "Superintendente", congregation: "Farallones-Betania", phone: "3003723319", email: "JuanM10@jwpub.org", auxiliaries: [
@@ -126,7 +126,7 @@ export const orgData: Member = {
         email: "JhonnyFlorezEstr@jwpub.org",
         phone: "300 614 6808",
         auxiliaries: [
-          { name: "Benjamin Perez", role: "Auxiliar Sup. Alojamiento", congregation: "Las Violetas", email: "BenjaminP21@jwpub.org", phone: "310 7379163" }
+          { name: "Benjamín Pérez", role: "Auxiliar Sup. Alojamiento", congregation: "Las Violetas", email: "BenjaminP21@jwpub.org", phone: "310 7379163" }
         ],
         subDepartments: [
           { name: "Alojamiento", head: { name: "Félix Pérez", role: "Superintendente", congregation: "Las Violetas", phone: "3107407493", email: "FelixPerez32@jwpub.org", auxiliaries: [
