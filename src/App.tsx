@@ -18,7 +18,6 @@ function App() {
   const committeeRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const presidencyRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Estado añadido para sincronizar el observer con framer-motion
   const [observerTrigger, setObserverTrigger] = React.useState(0);
 
   const buildMemberId = (member: any) => {
@@ -59,7 +58,6 @@ function App() {
     };
   }, [isMobile]);
 
-  // IntersectionObserver: highlight department on scroll (all screens)
   React.useEffect(() => {
     const entries = new Map<Element, number>();
     const observer = new IntersectionObserver(
@@ -69,22 +67,21 @@ function App() {
         deptRefs.current.forEach((el, idx) => {
           if (!el) return;
           const ratio = entries.get(el) ?? 0;
-          if (ratio > 0.45) {
+          const threshold = el.offsetHeight > window.innerHeight * 0.6 ? 0.08 : 0.45;
+          if (ratio > threshold) {
             active.push(idx);
           }
         });
         setActiveDeptIdxs(active);
       },
-      { threshold: [0, 0.1, 0.25, 0.45, 0.75, 1] }
+      { threshold: [0, 0.05, 0.08, 0.1, 0.25, 0.45, 0.75, 1] }
     );
     deptRefs.current.forEach((el) => {
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, observerTrigger]);
 
-  // IntersectionObserver: highlight committee + presidency (all screens)
   React.useEffect(() => {
     const entriesMap = new Map<Element, number>();
     const ids = ['coordination', 'program', 'accommodation', 'presidency'];
@@ -110,12 +107,10 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  // Extract Committee members and their departments
   const coordinationDept = orgData.subDepartments?.find((d) => d.name === 'Coordinación del Comité');
   const programDept = orgData.subDepartments?.find((d) => d.name === 'Programa');
   const accommodationDept = orgData.subDepartments?.find((d) => d.name === 'Alojamiento y Servicios');
 
-  // Section 2 Data: President only (without repeating the committee departments)
   const presidencyData = { ...orgData, subDepartments: [] };
 
   const tabs = [
@@ -349,7 +344,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 overflow-x-hidden font-sans pb-20">
-      {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
@@ -418,67 +412,71 @@ function App() {
       </header>
 
       <main className="max-w-[1600px] mx-auto px-4 py-8 md:py-12 relative flex flex-col gap-16 md:gap-24">
-        {/* Mobile Search Bar */}
-        <div className="md:hidden relative group w-full max-w-sm mx-auto">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
-          <input
-            type="text"
-            placeholder="Buscar por nombre, departamento, correo, teléfono..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600 shadow-lg"
-          />
+        <div className="md:hidden flex items-center gap-2 w-full">
+          <div className="relative group flex-1">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
+            <input
+              type="text"
+              placeholder="Buscar nombre, correo, teléfono..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600 shadow-lg"
+            />
 
-          {normalizedSearch && (
-            <div className="absolute top-full mt-2 w-full bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
-              {globalSearchResults.length > 0 ? (
-                <div className="max-h-80 overflow-y-auto">
-                  {globalSearchResults.map((item, idx) => (
-                    <button
-                      key={`${item.memberId}-${idx}-mobile`}
-                      onClick={() => handleSearchResultClick(item)}
-                      className="w-full text-left px-4 py-3 hover:bg-slate-800/80 transition-colors border-b border-slate-800 last:border-b-0"
-                    >
-                      <div className="text-white text-sm font-semibold">{item.name}</div>
-                      <div className="text-xs text-slate-400 mt-1">
-                        {item.role} • {item.department}
-                      </div>
-                      {(item.phone || item.email) && (
-                        <div className="text-[11px] text-slate-500 mt-1">
-                          {item.phone ? item.phone : item.email}
+            {normalizedSearch && (
+              <div className="absolute top-full mt-2 w-full bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
+                {globalSearchResults.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto">
+                    {globalSearchResults.map((item, idx) => (
+                      <button
+                        key={`${item.memberId}-${idx}-mobile`}
+                        onClick={() => handleSearchResultClick(item)}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-800/80 transition-colors border-b border-slate-800 last:border-b-0"
+                      >
+                        <div className="text-white text-sm font-semibold">{item.name}</div>
+                        <div className="text-xs text-slate-400 mt-1">
+                          {item.role} • {item.department}
                         </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="px-4 py-4 text-sm text-slate-400">
-                  No se encontraron resultados.
-                </div>
-              )}
-            </div>
-          )}
+                        {(item.phone || item.email) && (
+                          <div className="text-[11px] text-slate-500 mt-1">
+                            {item.phone ? item.phone : item.email}
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-4 py-4 text-sm text-slate-400">
+                    No se encontraron resultados.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="shrink-0">
+            <ExportMenu dropDirection="down" />
+          </div>
         </div>
 
-        {/* Section 1: Executive Dashboard */}
         <section className="space-y-12">
           <div className="text-center">
             <h2 className="text-3xl font-black text-white tracking-tight uppercase">Comité de Asamblea</h2>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {filteredTabs.map((tab, tabIdx) => (
               <div
                 key={tab.id}
                 ref={(el) => {
                   committeeRefs.current[tabIdx] = el;
                 }}
-                className="space-y-6"
+                className="space-y-4 md:space-y-6"
               >
                 <div className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 py-2 rounded-xl border border-slate-800/50 shadow-inner">
                   {tab.label}
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   {tab.data && (
                     <MemberCard
                       member={tab.data.head}
@@ -495,7 +493,7 @@ function App() {
           {memberMatchesSearch(presidencyData) && (
             <div
               ref={presidencyRef}
-              className="pt-12 border-t border-slate-800/20 max-w-4xl mx-auto w-full"
+              className="pt-12 border-t border-slate-800/20 max-w-6xl mx-auto w-full"
             >
               <div className="text-center mb-8">
                 <h3 className="text-xl font-black text-white uppercase tracking-tight">Presidencia</h3>
@@ -507,26 +505,25 @@ function App() {
                   isMain={true}
                   initiallyExpanded={true}
                   isHighlighted={activeCommitteeCards.includes('presidency')}
+                  desktopHorizontalAuxiliaries={true}
                 />
               </div>
             </div>
           )}
         </section>
 
-        {/* Section 2: Department Explorer */}
-        <section className="bg-slate-900/30 rounded-[2.5rem] border border-slate-800/50 p-8 lg:p-12 relative overflow-hidden">
+        <section className="bg-slate-900/30 rounded-[2.5rem] border border-slate-800/50 mx-[-1rem] px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full" />
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="text-center mb-10">
+            <div className="text-center mb-10 px-4 md:px-0">
               <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Explorador de Departamentos</h2>
               <p className="text-slate-400 text-sm max-w-md mx-auto">
                 Selecciona una categoría para ver los departamentos correspondientes y sus superintendentes.
               </p>
             </div>
 
-            {/* Tab Selector */}
-            <div className="flex flex-wrap justify-center gap-3 p-2 bg-slate-950/80 rounded-2xl border border-slate-800 mb-16 shadow-2xl">
+            <div className="flex flex-wrap justify-center gap-3 p-2 bg-slate-950/80 rounded-2xl border border-slate-800 mb-16 shadow-2xl mx-4 md:mx-0">
               {filteredTabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -544,7 +541,6 @@ function App() {
               ))}
             </div>
 
-            {/* Department Grid */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -553,7 +549,7 @@ function App() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 onAnimationStart={() => setObserverTrigger((prev) => prev + 1)}
-                className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-0 md:px-0"
               >
                 {filteredActiveTabData?.head.subDepartments?.map((dept, idx) => (
                   <div
@@ -566,15 +562,17 @@ function App() {
                       dept.name === 'Audio y Video' ? 'lg:col-span-3 md:col-span-2' : 'col-span-1'
                     )}
                   >
-                    <div className="flex items-center gap-2 pl-4 text-[10px] font-black text-slate-500 uppercase tracking-[.2em] transition-colors group-hover:text-blue-400">
+                    <div className="flex items-center gap-2 px-4 md:pl-4 text-[10px] font-black text-slate-500 uppercase tracking-[.2em] transition-colors group-hover:text-blue-400">
                       <GraduationCap size={14} />
                       {dept.name}
                     </div>
-                    <MemberCard
-                      member={dept.head}
-                      initiallyExpanded={true}
-                      isHighlighted={activeDeptIdxs.includes(idx)}
-                    />
+                    <div className="px-0 md:px-0">
+                      <MemberCard
+                        member={dept.head}
+                        initiallyExpanded={true}
+                        isHighlighted={activeDeptIdxs.includes(idx)}
+                      />
+                    </div>
                   </div>
                 ))}
               </motion.div>
@@ -582,24 +580,18 @@ function App() {
 
             {normalizedSearch &&
               (!filteredActiveTabData?.head.subDepartments || filteredActiveTabData.head.subDepartments.length === 0) && (
-                <div className="text-center text-slate-400 mt-4">
+                <div className="text-center text-slate-400 mt-4 px-4">
                   No se encontraron resultados en esta categoría.
                 </div>
               )}
           </div>
         </section>
 
-        {/* Mobile export button */}
-        <div className="sm:hidden flex justify-center">
-          <ExportMenu dropDirection="up" fullWidth />
-        </div>
-
         <footer className="pt-12 text-center text-slate-600 text-[10px] pb-12 tracking-[0.3em] uppercase font-bold border-t border-slate-800/20">
           &copy; 2026 Asamblea Regional Medellin 4 • Felices Para Siempre
         </footer>
       </main>
 
-      {/* WhatsApp Floating Button + Tooltip */}
       <div
         className="fixed bottom-6 right-6 z-50"
         onMouseEnter={() => !isMobile && setShowWhatsAppTip(true)}
@@ -613,7 +605,7 @@ function App() {
               exit={{ opacity: 0, scale: 1.3, y: 6 }}
               transition={{ type: 'spring', stiffness: 260, damping: 22, mass: 0.9 }}
               style={{ transformOrigin: 'bottom right' }}
-              className="absolute bottom-16 right-0 max-w-[260px] rounded-2xl border border-slate-700 bg-slate-900/95 px-4 py-3 text-sm text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
+              className="absolute bottom-16 right-0 max-w-[260px] rounded-2xl border border-slate-700 bg-slate-900/95 px-4 py-3 text-xs text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
             >
               <p className="leading-relaxed">
                 ¿Tienes alguna pregunta sobre un departamento? Escríbenos por WhatsApp.

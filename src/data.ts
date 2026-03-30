@@ -52,12 +52,12 @@ export const orgData: Member = {
             { name: "Luis Miguel Martínez", role: "Auxiliar", congregation: "Andes-Central Andina", phone: "3182759445", email: "34LuisM@jwpub.org" }
           ]}},
           { name: "Primeros Auxilios", head: { name: "Santiago Guapachá", role: "Superintendente", congregation: "La Aldea-Jericó", phone: "3116331401", email: "55GSantiago@jwpub.org", auxiliaries: [
-            { name: "Alberto Centeno", role: "Auxiliar", congregation: "La Divisa", phone: "3105028815", email: "9CAlberto@jwpub.org" }
+            { name: "Alberto Centeno", role: "Auxiliar", congregation: "La Divisa", phone: "3105028815", email: "9CAlberto@jwpub.org" },
+            { name: "Jaime Gil", role: "Auxiliar", congregation: "La Divisa", phone: "3004081464", email: "LeonJaimeG@jwpub.org" },
           ]}},
           { name: "Seguridad", head: { name: "Luis Ardila", role: "Superintendente", congregation: "San Javier", phone: "3196197782", email: "ArdilaL@jwpub.org", auxiliaries: [
             { name: "Andrés Piedrahita", role: "Auxiliar", congregation: "Agualinda-Hispania", phone: "3122486566", email: "11JorgeP@jwpub.org" },
             { name: "Mauricio Serna", role: "Auxiliar", congregation: "La Divisa", phone: "3006454489", email: "MAURICIOS7@jwpub.org" },
-            { name: "Jaime Gil", role: "Auxiliar", congregation: "La Divisa", phone: "3004081464", email: "LeonJaimeG@jwpub.org" },
           ]}}
         ]
       }

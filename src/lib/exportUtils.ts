@@ -577,9 +577,6 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
   const bautismo = section.departments.find(d => d.name === 'Bautismo');
 
   if (av) {
-    drawMiniPersonBlock(doc, PAGE.mx, y, PAGE.w - PAGE.mx * 2, 'Audio y Video', av.head, section.color);
-    y += 36;
-
     const groups = av.head.groups ?? [];
     const colGap = 4;
     const colW = (PAGE.w - PAGE.mx * 2 - colGap * 2) / 3;
@@ -602,11 +599,42 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     const video = getGroup('Video');
     const plataforma = getGroup('Plataforma');
 
-    drawMiniPersonBlock(doc, PAGE.mx, y, colW, 'Audio', audio.head, section.color);
-    drawMiniPersonBlock(doc, PAGE.mx + colW + colGap, y, colW, 'Video', video.head, section.color);
-    drawMiniPersonBlock(doc, PAGE.mx + (colW + colGap) * 2, y, colW, 'Plataforma', plataforma.head, section.color);
+    // Card principal pequeña y centrada para James Villamizar
+    const parentW = 96;
+    const parentX = (PAGE.w - parentW) / 2;
+    const parentY = y;
 
-    y += 34;
+    drawMiniPersonBlock(doc, parentX, parentY, parentW, 'Audio y Video', av.head, section.color);
+
+    // Cards hijas
+    const audioX = PAGE.mx;
+    const videoX = PAGE.mx + colW + colGap;
+    const plataformaX = PAGE.mx + (colW + colGap) * 2;
+    const childY = parentY + 42;
+
+    // Conectores
+    const parentCenterX = parentX + parentW / 2;
+    const parentBottomY = parentY + 30;
+    const connectorTopY = parentBottomY + 4;
+    const connectorLineY = childY - 6;
+    const audioCenterX = audioX + colW / 2;
+    const videoCenterX = videoX + colW / 2;
+    const plataformaCenterX = plataformaX + colW / 2;
+
+    setDraw(doc, COLORS.slate300);
+    doc.setLineWidth(0.6);
+    doc.line(parentCenterX, parentBottomY, parentCenterX, connectorTopY);
+    doc.line(audioCenterX, connectorLineY, plataformaCenterX, connectorLineY);
+    doc.line(parentCenterX, connectorTopY, parentCenterX, connectorLineY);
+    doc.line(audioCenterX, connectorLineY, audioCenterX, childY);
+    doc.line(videoCenterX, connectorLineY, videoCenterX, childY);
+    doc.line(plataformaCenterX, connectorLineY, plataformaCenterX, childY);
+
+    drawMiniPersonBlock(doc, audioX, childY, colW, 'Audio', audio.head, section.color);
+    drawMiniPersonBlock(doc, videoX, childY, colW, 'Video', video.head, section.color);
+    drawMiniPersonBlock(doc, plataformaX, childY, colW, 'Plataforma', plataforma.head, section.color);
+
+    y = childY + 34;
 
     // Draw auxiliaries as full rows in a single combined table per group
     const buildGroupAuxRows = (members: Member[], groupLabel: string) =>
