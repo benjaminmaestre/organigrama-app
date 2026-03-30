@@ -56,7 +56,8 @@ export const orgData: Member = {
           ]}},
           { name: "Seguridad", head: { name: "Luis Ardila", role: "Superintendente", congregation: "San Javier", phone: "3196197782", email: "ArdilaL@jwpub.org", auxiliaries: [
             { name: "Andrés Piedrahita", role: "Auxiliar", congregation: "Agualinda-Hispania", phone: "3122486566", email: "11JorgeP@jwpub.org" },
-            { name: "Mauricio Serna", role: "Auxiliar", congregation: "La Divisa", phone: "3006454489", email: "MAURICIOS7@jwpub.org" }
+            { name: "Mauricio Serna", role: "Auxiliar", congregation: "La Divisa", phone: "3006454489", email: "MAURICIOS7@jwpub.org" },
+            { name: "Jaime Gil", role: "Auxiliar", congregation: "La Divisa", phone: "3004081464", email: "LeonJaimeG@jwpub.org" },
           ]}}
         ]
       }
@@ -106,6 +107,7 @@ export const orgData: Member = {
                     { name: "Richard Bolaños", role: "Superintendente", congregation: "La Divisa", phone: "3003250221", email: "56RichardB@jwpub.org" },
                     { name: "Christian Martínez", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3102766574", email: "ChristianMartinez2@jwpub.org" },
                     { name: "Jorge Taborda", role: "Auxiliar", congregation: "La Pradera-Carmen de Atrato", phone: "3103623977", email: "Jtaborda5@jwpub.org" },
+                    { name: "Camilo Mateus", role: "Auxiliar", congregation: "Betania-Antioquia", phone: "3045212640", email: "1MateusCamilo@jwpub.org" },
                   ]
                 }
               ]
