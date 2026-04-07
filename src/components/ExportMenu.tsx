@@ -2,7 +2,6 @@ import React from 'react';
 import { Download, FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/cn';
-import { flattenOrgData, exportToXlsx, exportToPdf } from '../lib/exportUtils';
 
 interface ExportMenuProps {
   className?: string;
@@ -29,14 +28,26 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
 
   const handleXlsx = async () => {
     setLoading('xlsx');
-    try { await exportToXlsx(flattenOrgData()); }
-    finally { setLoading(null); setIsOpen(false); }
+    try {
+      // Carga dinámica de la utilidad y sus librerías pesadas
+      const { flattenOrgData, exportToXlsx } = await import('../lib/exportUtils');
+      await exportToXlsx(flattenOrgData());
+    } finally {
+      setLoading(null);
+      setIsOpen(false);
+    }
   };
 
   const handlePdf = async () => {
     setLoading('pdf');
-    try { await exportToPdf(flattenOrgData()); }
-    finally { setLoading(null); setIsOpen(false); }
+    try {
+      // Carga dinámica para no saturar el bundle inicial
+      const { flattenOrgData, exportToPdf } = await import('../lib/exportUtils');
+      await exportToPdf(flattenOrgData());
+    } finally {
+      setLoading(null);
+      setIsOpen(false);
+    }
   };
 
   const dropdownStyle = dropDirection === 'up'
