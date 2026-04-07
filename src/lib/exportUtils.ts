@@ -578,8 +578,8 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
 
   if (av) {
     const groups = av.head.groups ?? [];
-    const colGap = 4;
-    const colW = (PAGE.w - PAGE.mx * 2 - colGap * 2) / 3;
+    const colGap = 3;
+    const colW = (PAGE.w - PAGE.mx * 2 - colGap * 3) / 4;
 
     const getGroup = (name: string) => {
       const g = groups.find(gr => gr.name === name);
@@ -598,6 +598,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     const audio = getGroup('Audio');
     const video = getGroup('Video');
     const plataforma = getGroup('Plataforma');
+    const jwStream = getGroup('JW Stream');
 
     // Card principal pequeña y centrada para James Villamizar
     const parentW = 96;
@@ -610,6 +611,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     const audioX = PAGE.mx;
     const videoX = PAGE.mx + colW + colGap;
     const plataformaX = PAGE.mx + (colW + colGap) * 2;
+    const jwStreamX = PAGE.mx + (colW + colGap) * 3;
     const childY = parentY + 42;
 
     // Conectores
@@ -620,19 +622,22 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     const audioCenterX = audioX + colW / 2;
     const videoCenterX = videoX + colW / 2;
     const plataformaCenterX = plataformaX + colW / 2;
+    const jwStreamCenterX = jwStreamX + colW / 2;
 
     setDraw(doc, COLORS.slate300);
     doc.setLineWidth(0.6);
     doc.line(parentCenterX, parentBottomY, parentCenterX, connectorTopY);
-    doc.line(audioCenterX, connectorLineY, plataformaCenterX, connectorLineY);
+    doc.line(audioCenterX, connectorLineY, jwStreamCenterX, connectorLineY);
     doc.line(parentCenterX, connectorTopY, parentCenterX, connectorLineY);
     doc.line(audioCenterX, connectorLineY, audioCenterX, childY);
     doc.line(videoCenterX, connectorLineY, videoCenterX, childY);
     doc.line(plataformaCenterX, connectorLineY, plataformaCenterX, childY);
+    doc.line(jwStreamCenterX, connectorLineY, jwStreamCenterX, childY);
 
     drawMiniPersonBlock(doc, audioX, childY, colW, 'Audio', audio.head, section.color);
     drawMiniPersonBlock(doc, videoX, childY, colW, 'Video', video.head, section.color);
     drawMiniPersonBlock(doc, plataformaX, childY, colW, 'Plataforma', plataforma.head, section.color);
+    drawMiniPersonBlock(doc, jwStreamX, childY, colW, 'JW Stream', jwStream.head, section.color);
 
     y = childY + 34;
 
@@ -650,10 +655,11 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
       ...buildGroupAuxRows(audio.aux, 'Audio'),
       ...buildGroupAuxRows(video.aux, 'Video'),
       ...buildGroupAuxRows(plataforma.aux, 'Plataforma'),
+      ...buildGroupAuxRows(jwStream.aux, 'JW Stream'),
     ];
 
     if (allAuxRows.length > 0) {
-      drawModernDepartmentTable(doc, y, 'Auxiliares — Audio, Video y Plataforma', allAuxRows, section.color);
+      drawModernDepartmentTable(doc, y, 'Auxiliares — Audio, Video, Plataforma y JW Stream', allAuxRows, section.color);
       // @ts-expect-error plugin property
       y = doc.lastAutoTable.finalY + 4;
     } else {

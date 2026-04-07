@@ -63,7 +63,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
           )}
           onClick={() => hasChildren && setIsExpanded(!isExpanded)}
         >
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-brand/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
           <div className="flex items-start gap-3 sm:gap-4">
             <div
@@ -76,10 +76,10 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               <User size={24} className="hidden sm:block" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-white break-words">{member.name}</h3>
+              <h3 className="text-base sm:text-lg font-bold text-white wrap-break-word">{member.name}</h3>
               <p
                 className={cn(
-                  'text-xs sm:text-sm font-medium uppercase tracking-normal sm:tracking-wider break-words',
+                  'text-xs sm:text-sm font-medium uppercase tracking-normal sm:tracking-wider wrap-break-word',
                   isMain ? 'text-brand/80' : 'text-slate-400'
                 )}
               >
@@ -211,7 +211,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               )}
 
               {member.groups && member.groups.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 w-full">
                   {member.groups.map((group, idx) => (
                     <div
                       key={idx}

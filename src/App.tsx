@@ -512,7 +512,7 @@ function App() {
           )}
         </section>
 
-        <section className="bg-slate-900/30 rounded-[2.5rem] border border-slate-800/50 mx-[-1rem] px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden">
+        <section className="bg-slate-900/30 rounded-[2.5rem] border border-slate-800/50 -mx-4 px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full" />
 
           <div className="relative z-10 flex flex-col items-center">

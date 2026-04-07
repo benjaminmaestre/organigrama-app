@@ -107,7 +107,13 @@ export const orgData: Member = {
                     { name: "Richard Bolaños", role: "Superintendente", congregation: "La Divisa", phone: "3003250221", email: "56RichardB@jwpub.org" },
                     { name: "Christian Martínez", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3102766574", email: "ChristianMartinez2@jwpub.org" },
                     { name: "Jorge Taborda", role: "Auxiliar", congregation: "La Pradera-Carmen de Atrato", phone: "3103623977", email: "Jtaborda5@jwpub.org" },
-                    { name: "Camilo Mateus", role: "Auxiliar", congregation: "Betania-Antioquia", phone: "3045212640", email: "1MateusCamilo@jwpub.org" },
+                  ]
+                },
+                {
+                  name: "JW Stream",
+                  members: [
+                    { name: "Camilo Mateus", role: "Superintendente", congregation: "Betania-Antioquia", phone: "3045212640", email: "1MateusCamilo@jwpub.org" },
+                    { name: "Juan Andrés Rojas", role: "Auxiliar", congregation: "La Divisa", phone: "3168382090", email: "Rojascuellj9@jwpub.org" },
                   ]
                 }
               ]
