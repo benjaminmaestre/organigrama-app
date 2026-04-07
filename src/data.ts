@@ -17,7 +17,7 @@ export interface Department {
 export const orgData: Member = {
   name: "Juan Carlos Rossero",
   role: "Presidente de la Asamblea",
-  congregation: "SC",
+  congregation: "SC", email: "5996428@jwpub.org", phone: "3148513915",
   auxiliaries: [
     { name: "Mauricio Ortíz", role: "Auxiliar del Presidente", congregation: "CENTRAL ANDINA", email: "MOrtiz42@jwpub.org", phone: "310 4950905" },
     { name: "Carlos Mario Alzate", role: "Auxiliar del Presidente", congregation: "BOLÍVAR", email: "AlzateRodrC@jwpub.org", phone: "318 7162558" },
@@ -128,7 +128,7 @@ export const orgData: Member = {
     {
       name: "Alojamiento y Servicios",
       head: {
-        name: "Jhony Florez",
+        name: "Jhonny Florez",
         role: "Superintendente de Alojamiento",
         congregation: "SAN JAVIER",
         email: "JhonnyFlorezEstr@jwpub.org",
