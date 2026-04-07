@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --page-bg: #f0f4f8;
+  --page-text: #1a1a2e;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+}
+
+.dark {
+  --page-bg: #020617;
+  --page-text: #f1f5f9;
+  --card-bg: rgba(15, 23, 42, 0.3);
+  --border-color: rgba(30, 41, 59, 0.5);
+}
+
 body {
-  background-color: #020617;
-  color: #e2e8f0;
+  background-color: var(--page-bg);
+  color: var(--page-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ── Animated department border (mobile only) ── */

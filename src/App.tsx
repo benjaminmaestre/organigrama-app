@@ -3,10 +3,19 @@ import { orgData } from './data';
 import { MemberCard } from './components/MemberCard';
 import { ExportMenu } from './components/ExportMenu';
 import { cn } from './lib/cn';
-import { Layout, Search, Shield, Radio, Bed, GraduationCap } from 'lucide-react';
+import { Search, Shield, Radio, Bed, GraduationCap, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
+  const [theme, setTheme] = React.useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved as 'light' | 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'dark';
+  });
+
   const [searchTerm, setSearchTerm] = React.useState('');
   const [activeTab, setActiveTab] = React.useState<'coordination' | 'program' | 'accommodation'>('coordination');
   const [showWhatsAppTip, setShowWhatsAppTip] = React.useState(false);
@@ -19,6 +28,18 @@ function App() {
   const presidencyRef = React.useRef<HTMLDivElement | null>(null);
 
   const [observerTrigger, setObserverTrigger] = React.useState(0);
+
+  React.useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
   const buildMemberId = (member: any) => {
     const raw = `${member.name ?? ''}-${member.role ?? ''}-${member.phone ?? ''}-${member.email ?? ''}`;
@@ -343,51 +364,51 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 overflow-x-hidden font-sans pb-20">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 overflow-x-hidden font-sans transition-colors duration-300">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full dark:opacity-100 opacity-50" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full dark:opacity-100 opacity-50" />
       </div>
 
-      <header className="sticky top-0 z-50 bg-slate-950/50 backdrop-blur-xl border-b border-slate-800/50">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/50 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/50 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(30,144,255,0.4)]">
-              <Layout className="text-white" size={24} />
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.1)] overflow-hidden border border-slate-200 dark:border-transparent">
+              <img src="/jwevent.png" alt="JW.ORG Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight leading-tight">Asamblea Regional 2026</h1>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Medellín 4 • Felices Para Siempre</p>
+              <h1 className="text-xl font-bold text-[#1a1a2e] dark:text-white tracking-tight leading-tight transition-colors">Asamblea Regional 2026</h1>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] transition-colors">Medellín 4 • Felices Para Siempre</p>
             </div>
           </div>
 
           <div className="hidden md:flex flex-1 max-w-md relative group">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-400 dark:group-focus-within:text-blue-400 transition-colors z-10" />
 
             <input
               type="text"
               placeholder="Buscar por nombre, departamento, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600"
+              className="w-full bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/50 dark:focus:ring-blue-500/50 focus:border-blue-600 dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-600 shadow-sm"
             />
 
             {normalizedSearch && (
-              <div className="absolute top-full mt-2 w-full bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
+              <div className="absolute top-full mt-2 w-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
                 {globalSearchResults.length > 0 ? (
                   <div className="max-h-96 overflow-y-auto">
                     {globalSearchResults.map((item, idx) => (
                       <button
                         key={`${item.memberId}-${idx}`}
                         onClick={() => handleSearchResultClick(item)}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-800/80 transition-colors border-b border-slate-800 last:border-b-0"
+                        className="w-full text-left px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors border-b border-slate-100 dark:border-slate-800 last:border-b-0"
                       >
-                        <div className="text-white text-sm font-semibold">{item.name}</div>
-                        <div className="text-xs text-slate-400 mt-1">
+                        <div className="text-slate-900 dark:text-white text-sm font-semibold">{item.name}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                           {item.role} • {item.department}
                         </div>
                         {(item.phone || item.email) && (
-                          <div className="text-[11px] text-slate-500 mt-1">
+                          <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
                             {item.phone ? item.phone : item.email}
                           </div>
                         )}
@@ -395,7 +416,7 @@ function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="px-4 py-4 text-sm text-slate-400">
+                  <div className="px-4 py-4 text-sm text-slate-500 dark:text-slate-400">
                     No se encontraron resultados.
                   </div>
                 )}
@@ -404,6 +425,14 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950 transition-all shadow-sm active:scale-95 flex items-center justify-center min-w-[44px] min-h-[44px]"
+              aria-label="Cambiar tema"
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
             <div className="hidden sm:block">
               <ExportMenu />
             </div>
@@ -411,7 +440,7 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-[1600px] mx-auto px-4 py-8 md:py-12 relative flex flex-col gap-16 md:gap-24">
+      <main className="grow max-w-[1600px] mx-auto px-4 py-8 md:py-12 relative flex flex-col gap-16 md:gap-24 w-full">
         <div className="md:hidden flex items-center gap-2 w-full">
           <div className="relative group flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
@@ -420,7 +449,7 @@ function App() {
               placeholder="Buscar nombre, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-white placeholder:text-slate-600 shadow-lg"
+              className="w-full bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-600 shadow-lg"
             />
 
             {normalizedSearch && (
@@ -460,8 +489,11 @@ function App() {
         </div>
 
         <section className="space-y-12">
-          <div className="text-center">
-            <h2 className="text-3xl font-black text-white tracking-tight uppercase">Comité de Asamblea</h2>
+          <div className="text-center mb-12 relative">
+            <h2 className="text-xl md:text-2xl font-black text-[#1a1a2e] dark:text-white mb-4 tracking-tight uppercase transition-colors">
+              Comité de Asamblea
+            </h2>
+            <div className="w-16 h-1 bg-blue-600 mx-auto rounded-full shadow-[0_2px_10px_rgba(30,144,255,0.3)]" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
@@ -473,7 +505,7 @@ function App() {
                 }}
                 className="space-y-4 md:space-y-6"
               >
-                <div className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 py-2 rounded-xl border border-slate-800/50 shadow-inner">
+                <div className="text-center text-sm md:text-base font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-8 pt-6 border-t border-slate-200 dark:border-slate-800 transition-colors">
                   {tab.label}
                 </div>
                 <div className="space-y-4 md:space-y-6">
@@ -493,10 +525,10 @@ function App() {
           {memberMatchesSearch(presidencyData) && (
             <div
               ref={presidencyRef}
-              className="pt-12 border-t border-slate-800/20 max-w-6xl mx-auto w-full"
+              className="pt-12 border-t border-slate-200 dark:border-slate-800/20 max-w-6xl mx-auto w-full transition-colors"
             >
               <div className="text-center mb-8">
-                <h3 className="text-xl font-black text-white uppercase tracking-tight">Presidencia</h3>
+                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white uppercase tracking-tight transition-colors">Presidencia</h3>
               </div>
 
               <div className="flex justify-center">
@@ -512,27 +544,27 @@ function App() {
           )}
         </section>
 
-        <section className="bg-slate-900/30 rounded-[2.5rem] border border-slate-800/50 -mx-4 px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden">
+        <section className="bg-white/50 dark:bg-slate-900/30 rounded-[2.5rem] border border-slate-200 dark:border-slate-800/50 -mx-4 px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden transition-all duration-300">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full" />
 
           <div className="relative z-10 flex flex-col items-center">
             <div className="text-center mb-10 px-4 md:px-0">
-              <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Explorador de Departamentos</h2>
-              <p className="text-slate-400 text-sm max-w-md mx-auto">
+              <h2 className="text-2xl font-black text-[#1a1a2e] dark:text-white mb-2 uppercase tracking-tight transition-colors">Explorador de Departamentos</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto transition-colors">
                 Selecciona una categoría para ver los departamentos correspondientes y sus superintendentes.
               </p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-3 p-2 bg-slate-950/80 rounded-2xl border border-slate-800 mb-16 shadow-2xl mx-4 md:mx-0">
+            <div className="flex flex-wrap justify-center gap-3 p-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 mb-16 shadow-lg mx-4 md:mx-0 transition-all duration-300">
               {filteredTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'coordination' | 'program' | 'accommodation')}
                   className={cn(
-                    'flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300 whitespace-nowrap',
+                    'flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300 whitespace-nowrap border-2',
                     activeTab === tab.id
-                      ? 'bg-blue-600 text-white shadow-[0_4px_15px_rgba(30,144,255,0.4)] scale-105'
-                      : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900'
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-[0_4px_15px_rgba(30,144,255,0.4)] scale-105'
+                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-blue-300 hover:text-blue-700 dark:hover:text-white'
                   )}
                 >
                   <tab.icon size={20} className={activeTab === tab.id ? 'text-white' : tab.color} />
@@ -586,11 +618,19 @@ function App() {
               )}
           </div>
         </section>
-
-        <footer className="pt-12 text-center text-slate-600 text-[10px] pb-12 tracking-[0.3em] uppercase font-bold border-t border-slate-800/20">
-          &copy; 2026 Asamblea Regional Medellin 4 • Felices Para Siempre
-        </footer>
       </main>
+
+      <footer className="w-full mt-auto bg-[#1e2a4a] text-slate-300 py-12 px-4 transition-colors">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="flex flex-col items-center gap-4">
+            <h4 className="text-white font-bold tracking-widest uppercase text-sm">Asamblea Regional 2026</h4>
+            <div className="w-12 h-0.5 bg-blue-500/50" />
+            <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
+              Medellín 4 • Felices Para Siempre
+            </p>
+          </div>
+        </div>
+      </footer>
 
       <div
         className="fixed bottom-6 right-6 z-50"
@@ -622,9 +662,10 @@ function App() {
           onClick={() => {
             if (isMobile) setShowWhatsAppTip(false);
           }}
-          className="flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:bg-[#128C7E] hover:scale-110 transition-all duration-300"
+          className="relative flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_8px_30px_rgba(37,211,102,0.5)] hover:bg-[#128C7E] hover:scale-110 active:scale-95 transition-all duration-300 group"
           aria-label="Contactar por WhatsApp"
         >
+          <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20 group-hover:hidden" />
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12.01 2.01c-5.52 0-9.99 4.47-9.99 9.99 0 1.96.55 3.8 1.5 5.37L2 22l4.82-1.52c1.51.87 3.25 1.34 5.17 1.34 5.51 0 9.98-4.47 9.98-9.99S17.52 2.01 12.01 2.01zm5.2 14.18c-.22.61-1.12 1.15-1.56 1.25-.41.09-1.02.24-3.17-.65-2.61-1.08-4.31-3.79-4.44-3.96-.13-.17-1.06-1.41-1.06-2.68 0-1.28.66-1.91.9-2.19.23-.28.53-.35.7-.35.17 0 .34 0 .49.01.16.01.38-.06.6.48.23.57.75 1.83.82 1.97.07.14.12.31.02.5-.1.19-.15.31-.3.48-.15.17-.32.37-.45.5-.15.16-.31.33-.13.64.18.31.81 1.33 1.73 2.15 1.18 1.06 2.19 1.39 2.5 1.53.31.14.49.12.67-.08.18-.21.78-.9.99-1.21.21-.31.43-.26.71-.15.28.1 1.8.85 2.1 1.01.3.16.51.24.58.37.07.13.07.76-.15 1.37z" />
           </svg>
