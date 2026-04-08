@@ -1,19 +1,29 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
-  --page-bg: #f0f4f8;
-  --page-text: #1a1a2e;
+  --page-bg: #f8fafc;
+  --page-text: #0f172a;
+  --text-muted: #64748b;
   --card-bg: #ffffff;
-  --border-color: #e2e8f0;
+  --border-color: #f1f5f9;
+  --institutional-blue: #4a6da7;
+  --header-bg: rgba(255, 255, 255, 0.7);
+  --header-border: rgba(241, 245, 249, 0.6);
+  --input-bg: #ffffff;
+  --blob-opacity: 0.5;
 }
 
 .dark {
   --page-bg: #020617;
   --page-text: #f1f5f9;
+  --text-muted: #94a3b8;
   --card-bg: rgba(15, 23, 42, 0.3);
   --border-color: rgba(30, 41, 59, 0.5);
+  --institutional-blue: #5b7bb1;
+  --header-bg: rgba(2, 6, 23, 0.4);
+  --header-border: rgba(30, 41, 59, 0.4);
+  --input-bg: rgba(15, 23, 42, 0.5);
+  --blob-opacity: 1;
 }
 
 body {

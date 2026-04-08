@@ -11,7 +11,7 @@ function App() {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
       if (saved) return saved as 'light' | 'dark';
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      return 'dark';
     }
     return 'dark';
   });
@@ -364,21 +364,21 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 overflow-x-hidden font-sans transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-(--page-bg) text-(--page-text) overflow-x-hidden font-sans transition-colors duration-300">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full dark:opacity-100 opacity-50" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full dark:opacity-100 opacity-50" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full opacity-(--blob-opacity)" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full opacity-(--blob-opacity)" />
       </div>
 
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/50 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/50 transition-colors duration-300">
+      <header className="sticky top-0 z-50 bg-(--header-bg) backdrop-blur-xl border-b border-(--header-border) transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.1)] overflow-hidden border border-slate-200 dark:border-transparent">
+            <div className="w-12 h-12 flex items-center justify-center overflow-hidden transition-colors">
               <img src="/jwevent.png" alt="JW.ORG Logo" className="w-full h-full object-contain" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-[#1a1a2e] dark:text-white tracking-tight leading-tight transition-colors">Asamblea Regional 2026</h1>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] transition-colors">Medellín 4 • Felices Para Siempre</p>
+            <div className="flex flex-col justify-center">
+              <h1 className="text-base sm:text-lg md:text-xl font-bold text-(--page-text) tracking-tight leading-tight transition-colors">Organigrama Asamblea Regional 2026</h1>
+              <p className="text-[9px] md:text-xs text-(--text-muted) font-bold uppercase tracking-[0.2em] transition-colors">Medellín 4 • Felices Para Siempre</p>
             </div>
           </div>
 
@@ -390,7 +390,7 @@ function App() {
               placeholder="Buscar por nombre, departamento, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/50 dark:focus:ring-blue-500/50 focus:border-blue-600 dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-600 shadow-sm"
+              className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/20 focus:border-(--institutional-blue)/50 transition-all text-(--page-text) placeholder:text-(--text-muted)"
             />
 
             {normalizedSearch && (
@@ -427,7 +427,7 @@ function App() {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950 transition-all shadow-sm active:scale-95 flex items-center justify-center min-w-[44px] min-h-[44px]"
+              className="p-2.5 rounded-xl bg-(--input-bg) border border-slate-300 dark:border-(--border-color) text-(--page-text) hover:bg-(--page-bg) hover:text-(--institutional-blue) focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/30 transition-all shadow-sm active:scale-95 flex items-center justify-center min-w-[44px] min-h-[44px]"
               aria-label="Cambiar tema"
             >
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
@@ -440,7 +440,7 @@ function App() {
         </div>
       </header>
 
-      <main className="grow max-w-[1600px] mx-auto px-4 py-8 md:py-12 relative flex flex-col gap-16 md:gap-24 w-full">
+      <main className="grow max-w-[1600px] mx-auto px-4 py-6 md:py-12 relative flex flex-col gap-8 md:gap-24 w-full">
         <div className="md:hidden flex items-center gap-2 w-full">
           <div className="relative group flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
@@ -449,25 +449,25 @@ function App() {
               placeholder="Buscar nombre, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-600 shadow-lg"
+              className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/20 focus:border-(--institutional-blue)/50 transition-all text-(--page-text) placeholder:text-(--text-muted)"
             />
 
             {normalizedSearch && (
-              <div className="absolute top-full mt-2 w-full bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
+              <div className="absolute top-full mt-2 w-full bg-(--card-bg) border border-(--border-color) rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
                 {globalSearchResults.length > 0 ? (
                   <div className="max-h-80 overflow-y-auto">
                     {globalSearchResults.map((item, idx) => (
                       <button
                         key={`${item.memberId}-${idx}-mobile`}
                         onClick={() => handleSearchResultClick(item)}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-800/80 transition-colors border-b border-slate-800 last:border-b-0"
+                        className="w-full text-left px-4 py-3 hover:bg-(--page-bg) transition-colors border-b border-(--border-color) last:border-b-0"
                       >
-                        <div className="text-white text-sm font-semibold">{item.name}</div>
-                        <div className="text-xs text-slate-400 mt-1">
+                        <div className="text-(--page-text) text-sm font-semibold">{item.name}</div>
+                        <div className="text-xs text-(--text-muted) mt-1">
                           {item.role} • {item.department}
                         </div>
                         {(item.phone || item.email) && (
-                          <div className="text-[11px] text-slate-500 mt-1">
+                          <div className="text-[11px] text-(--text-muted) mt-1">
                             {item.phone ? item.phone : item.email}
                           </div>
                         )}
@@ -475,7 +475,7 @@ function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="px-4 py-4 text-sm text-slate-400">
+                  <div className="px-4 py-4 text-sm text-(--text-muted)">
                     No se encontraron resultados.
                   </div>
                 )}
@@ -488,12 +488,12 @@ function App() {
           </div>
         </div>
 
-        <section className="space-y-12">
-          <div className="text-center mb-12 relative">
-            <h2 className="text-xl md:text-2xl font-black text-[#1a1a2e] dark:text-white mb-4 tracking-tight uppercase transition-colors">
+        <section className="space-y-8 md:space-y-12">
+          <div className="text-center mb-6 md:mb-12 relative">
+            <h2 className="text-xl md:text-2xl font-black text-(--page-text) mb-3 md:mb-4 tracking-tight uppercase transition-colors">
               Comité de Asamblea
             </h2>
-            <div className="w-16 h-1 bg-blue-600 mx-auto rounded-full shadow-[0_2px_10px_rgba(30,144,255,0.3)]" />
+            <div className="w-16 h-1 bg-(--institutional-blue) mx-auto rounded-full shadow-[0_2px_10px_rgba(74,109,167,0.3)]" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
@@ -505,7 +505,7 @@ function App() {
                 }}
                 className="space-y-4 md:space-y-6"
               >
-                <div className="text-center text-sm md:text-base font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-8 pt-6 border-t border-slate-200 dark:border-slate-800 transition-colors">
+                <div className="text-center text-sm md:text-base font-black text-(--institutional-blue) uppercase tracking-widest mb-8 pt-6 border-t border-(--border-color) transition-colors">
                   {tab.label}
                 </div>
                 <div className="space-y-4 md:space-y-6">
@@ -544,27 +544,27 @@ function App() {
           )}
         </section>
 
-        <section className="bg-white/50 dark:bg-slate-900/30 rounded-[2.5rem] border border-slate-200 dark:border-slate-800/50 -mx-4 px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden transition-all duration-300">
+        <section className="bg-(--card-bg) rounded-[2.5rem] border border-(--border-color) -mx-4 px-1 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden transition-all duration-300">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full" />
 
           <div className="relative z-10 flex flex-col items-center">
             <div className="text-center mb-10 px-4 md:px-0">
-              <h2 className="text-2xl font-black text-[#1a1a2e] dark:text-white mb-2 uppercase tracking-tight transition-colors">Explorador de Departamentos</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto transition-colors">
+              <h2 className="text-2xl font-black text-(--page-text) mb-2 uppercase tracking-tight transition-colors">Explorador de Departamentos</h2>
+              <p className="text-(--text-muted) text-sm max-w-md mx-auto transition-colors">
                 Selecciona una categoría para ver los departamentos correspondientes y sus superintendentes.
               </p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-3 p-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 mb-16 shadow-lg mx-4 md:mx-0 transition-all duration-300">
+            <div className="grid grid-cols-1 md:flex md:flex-wrap justify-center gap-3 p-2 bg-(--card-bg) rounded-2xl border border-(--border-color) mb-16 shadow-lg mx-4 md:mx-0 transition-all duration-300 w-full md:w-auto">
               {filteredTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'coordination' | 'program' | 'accommodation')}
                   className={cn(
-                    'flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300 whitespace-nowrap border-2',
+                    'flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300 whitespace-nowrap border-2 w-full md:w-auto',
                     activeTab === tab.id
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-[0_4px_15px_rgba(30,144,255,0.4)] scale-105'
-                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-blue-300 hover:text-blue-700 dark:hover:text-white'
+                      ? 'bg-(--institutional-blue) border-(--institutional-blue) text-white shadow-lg active:scale-95'
+                      : 'bg-(--card-bg) border-(--border-color) text-(--page-text) hover:border-(--institutional-blue) hover:text-(--institutional-blue) active:scale-95'
                   )}
                 >
                   <tab.icon size={20} className={activeTab === tab.id ? 'text-white' : tab.color} />
@@ -662,10 +662,10 @@ function App() {
           onClick={() => {
             if (isMobile) setShowWhatsAppTip(false);
           }}
-          className="relative flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_8px_30px_rgba(37,211,102,0.5)] hover:bg-[#128C7E] hover:scale-110 active:scale-95 transition-all duration-300 group"
+          className="relative flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_8px_30px_rgba(37,211,102,0.3)] hover:brightness-110 active:scale-95 transition-all duration-300 group"
           aria-label="Contactar por WhatsApp"
         >
-          <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20 group-hover:hidden" />
+          <div className="absolute inset-0 rounded-full bg-[#25D366]/20 blur-md group-hover:bg-[#25D366]/30 transition-all" />
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12.01 2.01c-5.52 0-9.99 4.47-9.99 9.99 0 1.96.55 3.8 1.5 5.37L2 22l4.82-1.52c1.51.87 3.25 1.34 5.17 1.34 5.51 0 9.98-4.47 9.98-9.99S17.52 2.01 12.01 2.01zm5.2 14.18c-.22.61-1.12 1.15-1.56 1.25-.41.09-1.02.24-3.17-.65-2.61-1.08-4.31-3.79-4.44-3.96-.13-.17-1.06-1.41-1.06-2.68 0-1.28.66-1.91.9-2.19.23-.28.53-.35.7-.35.17 0 .34 0 .49.01.16.01.38-.06.6.48.23.57.75 1.83.82 1.97.07.14.12.31.02.5-.1.19-.15.31-.3.48-.15.17-.32.37-.45.5-.15.16-.31.33-.13.64.18.31.81 1.33 1.73 2.15 1.18 1.06 2.19 1.39 2.5 1.53.31.14.49.12.67-.08.18-.21.78-.9.99-1.21.21-.31.43-.26.71-.15.28.1 1.8.85 2.1 1.01.3.16.51.24.58.37.07.13.07.76-.15 1.37z" />
           </svg>

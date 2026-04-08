@@ -56,31 +56,31 @@ export const MemberCard: React.FC<MemberCardProps> = ({
             'relative p-3 sm:p-4 rounded-2xl border transition-all duration-300 w-full group overflow-hidden',
             hasChildren && 'cursor-pointer',
             isMain
-              ? 'bg-white dark:bg-slate-900/80 border-blue-600/50 dark:border-brand/50 shadow-[0_4px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_0_20px_rgba(30,144,255,0.2)]'
+              ? 'bg-(--card-bg) border-(--institutional-blue)/50 shadow-xl'
               : isHighlighted
-                ? 'bg-white dark:bg-slate-900/80 border-transparent shadow-[0_2px_12px_rgba(0,0,0,0.08)] dark:shadow-none'
-                : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-blue-600/30 dark:hover:border-slate-700 hover:shadow-[0_4px_15px_rgba(0,0,0,0.1)] dark:hover:bg-slate-900/70 shadow-[0_2px_12px_rgba(0,0,0,0.08)] dark:shadow-none transition-all duration-300'
+                ? 'bg-(--card-bg) border-transparent shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all'
+                : 'bg-(--card-bg) border-(--border-color) hover:border-(--institutional-blue)/30 hover:shadow-[0_4px_15px_rgba(0,0,0,0.1)] shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all duration-300'
           )}
           onClick={() => hasChildren && setIsExpanded(!isExpanded)}
         >
-          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-brand/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-(--institutional-blue)/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
           <div className="flex items-start gap-3 sm:gap-4">
             <div
               className={cn(
                 'p-2 sm:p-3 rounded-full transition-all duration-300',
-                isMain ? 'bg-brand/20 text-brand' : 'bg-blue-600/10 dark:bg-slate-800 text-blue-600 dark:text-slate-400 group-hover:scale-110'
+                isMain ? 'bg-(--institutional-blue)/20 text-(--institutional-blue)' : 'bg-(--institutional-blue)/15 text-(--institutional-blue) group-hover:scale-110'
               )}
             >
               <User size={20} className="sm:hidden" />
               <User size={24} className="hidden sm:block" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white transition-colors wrap-break-word">{member.name}</h3>
+              <h3 className="text-base sm:text-lg font-bold text-(--page-text) transition-colors wrap-break-word">{member.name}</h3>
               <p
                 className={cn(
                   'text-xs sm:text-sm font-medium uppercase tracking-normal sm:tracking-wider transition-colors wrap-break-word',
-                  isMain ? 'text-brand/80' : 'text-slate-500 dark:text-slate-400'
+                  isMain ? 'text-(--institutional-blue)/80' : 'text-(--text-muted)'
                 )}
               >
                 {member.role}
@@ -88,7 +88,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
             </div>
           </div>
 
-          <div className="mt-4 space-y-2 text-sm text-slate-500 dark:text-slate-400 transition-colors">
+          <div className="mt-4 space-y-2 text-sm text-(--text-muted) transition-colors">
             {member.congregation && (
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-slate-500" />
@@ -150,7 +150,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
           >
             {(!desktopHorizontalAuxiliaries || desktopHorizontalAuxiliaries) && (
               <div className={cn(
-                'absolute left-3 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800 transition-colors',
+                'absolute left-3 top-0 bottom-0 w-px bg-(--text-muted)/30 transition-colors',
                 desktopHorizontalAuxiliaries && 'md:hidden'
               )} />
             )}
@@ -164,7 +164,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                       <div className="md:hidden space-y-6">
                         {member.auxiliaries.map((aux, idx) => (
                           <div key={idx} className="relative">
-                            <div className="absolute -left-3 top-1/2 w-3 h-px bg-slate-200 dark:bg-slate-800 transition-colors" />
+                            <div className="absolute -left-3 top-1/2 w-3 h-px bg-(--text-muted)/30 transition-colors" />
                             <MemberCard
                               member={aux}
                               initiallyExpanded={initiallyExpanded}
@@ -176,13 +176,13 @@ export const MemberCard: React.FC<MemberCardProps> = ({
 
                       {/* TABLET / PC: horizontal only for presidency */}
                       <div className="hidden md:block relative w-full pt-12">
-                        <div className="absolute left-1/2 top-0 h-8 w-px -translate-x-1/2 bg-slate-200 dark:bg-slate-800 transition-colors" />
-                        <div className="absolute top-8 left-1/4 right-1/4 h-px bg-slate-200 dark:bg-slate-800 transition-colors" />
+                        <div className="absolute left-1/2 top-0 h-8 w-px -translate-x-1/2 bg-(--text-muted)/30 transition-colors" />
+                        <div className="absolute top-8 left-1/4 right-1/4 h-px bg-(--text-muted)/30 transition-colors" />
 
                         <div className="grid grid-cols-2 gap-10 lg:gap-12 items-start relative">
                           {member.auxiliaries.map((aux, idx) => (
                             <div key={idx} className="relative flex justify-center pt-6">
-                              <div className="absolute top-0 left-1/2 h-6 w-px -translate-x-1/2 bg-slate-200 dark:bg-slate-800 transition-colors" />
+                              <div className="absolute top-0 left-1/2 h-6 w-px -translate-x-1/2 bg-(--text-muted)/30 transition-colors" />
                               <div className="w-full max-w-sm">
                                 <MemberCard
                                   member={aux}
@@ -198,7 +198,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                   ) : (
                     member.auxiliaries.map((aux, idx) => (
                       <div key={idx} className="relative">
-                        <div className="absolute -left-3 top-1/2 w-3 h-px bg-slate-200 dark:bg-slate-800 transition-colors" />
+                        <div className="absolute -left-3 top-1/2 w-3 h-px bg-(--text-muted)/30 transition-colors" />
                         <MemberCard
                           member={aux}
                           initiallyExpanded={initiallyExpanded}
@@ -215,9 +215,9 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                   {member.groups.map((group, idx) => (
                     <div
                       key={idx}
-                      className="relative bg-slate-50/50 dark:bg-slate-900/40 rounded-3xl p-6 border border-slate-200 dark:border-slate-800/50 shadow-inner h-full transition-colors"
+                      className="relative bg-(--page-bg) rounded-3xl p-6 border border-(--border-color) shadow-inner h-full transition-colors"
                     >
-                      <div className="flex items-center gap-2 mb-6 text-sm font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest border-l-4 border-blue-600 pl-3 py-1 transition-colors">
+                      <div className="flex items-center gap-2 mb-6 text-sm font-black text-(--institutional-blue) uppercase tracking-widest border-l-4 border-(--institutional-blue) pl-3 py-1 transition-colors">
                         <Users size={14} />
                         {group.name}
                       </div>
@@ -234,8 +234,8 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               {showDepartments &&
                 member.subDepartments?.map((dept, idx) => (
                   <div key={idx} className="relative mt-8">
-                    <div className="absolute -left-3 top-8 w-3 h-px bg-slate-200 dark:bg-slate-800 transition-colors" />
-                    <div className="flex items-center gap-2 mb-4 text-sm font-black text-blue-600 dark:text-slate-400 border-l-4 border-blue-600 dark:border-slate-700 pl-3 py-1 transition-colors uppercase tracking-widest">
+                    <div className="absolute -left-3 top-8 w-3 h-px bg-(--text-muted)/30 transition-colors" />
+                    <div className="flex items-center gap-2 mb-4 text-sm font-black text-(--institutional-blue) border-l-4 border-(--institutional-blue) pl-3 py-1 transition-colors uppercase tracking-widest">
                       <Users size={14} />
                       {dept.name}
                     </div>

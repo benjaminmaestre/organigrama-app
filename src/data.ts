@@ -27,7 +27,7 @@ export const orgData: Member = {
       name: "Coordinación del Comité",
       head: {
         name: "Sergio Amador",
-        role: "Coordinador del Comité",
+        role: "Coordinador del Comité de Asamblea",
         congregation: "SAN JAVIER",
         email: "1SergioAA@jwpub.org",
         phone: "300 783 0254",
