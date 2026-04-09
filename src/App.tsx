@@ -528,7 +528,7 @@ function App() {
               className="pt-12 border-t border-slate-200 dark:border-slate-800/20 max-w-6xl mx-auto w-full transition-colors"
             >
               <div className="text-center mb-8">
-                <h3 className="text-xl font-black text-[#1a1a2e] dark:text-white uppercase tracking-tight transition-colors">Presidencia</h3>
+                <h3 className="text-xl font-black text-(--page-text) uppercase tracking-tight transition-colors">Presidencia</h3>
               </div>
 
               <div className="flex justify-center">
