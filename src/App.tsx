@@ -2,12 +2,22 @@ import React from 'react';
 import { orgData } from './data';
 import { MemberCard } from './components/MemberCard';
 import { ExportMenu } from './components/ExportMenu';
+import { MapasSection } from './components/MapasSection';
+import { ScrollingPlaceholder } from './components/ScrollingPlaceholder';
 import { cn } from './lib/cn';
 import { 
   Search, Shield, Radio, Bed, Sun, Moon
 } from 'lucide-react';
 import { getDeptIcon } from './lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const SEARCH_HINTS = [
+  'Buscar por nombre...',
+  'Buscar por departamento...',
+  'Buscar por correo...',
+  'Buscar por teléfono...',
+  'Buscar por congregación...',
+];
 
 function App() {
   const [theme, setTheme] = React.useState<'light' | 'dark'>(() => {
@@ -397,11 +407,16 @@ function App() {
 
             <input
               type="text"
-              placeholder="Buscar por nombre, departamento, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/20 focus:border-(--institutional-blue)/50 transition-all text-(--page-text) placeholder:text-(--text-muted)"
+              className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/20 focus:border-(--institutional-blue)/50 transition-all text-(--page-text)"
             />
+
+            {!searchTerm && (
+              <div className="absolute left-10 right-4 top-1/2 -translate-y-1/2 text-sm text-(--text-muted) pointer-events-none z-10 overflow-hidden mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                <ScrollingPlaceholder texts={SEARCH_HINTS} />
+              </div>
+            )}
 
             {normalizedSearch && (
               <div className="absolute top-full mt-2 w-full bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
@@ -456,11 +471,16 @@ function App() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors z-10" />
             <input
               type="text"
-              placeholder="Buscar nombre, correo, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/20 focus:border-(--institutional-blue)/50 transition-all text-(--page-text) placeholder:text-(--text-muted)"
+              className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--institutional-blue)/20 focus:border-(--institutional-blue)/50 transition-all text-(--page-text)"
             />
+
+            {!searchTerm && (
+              <div className="absolute left-10 right-4 top-1/2 -translate-y-1/2 text-sm text-(--text-muted) pointer-events-none z-10 overflow-hidden mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                <ScrollingPlaceholder texts={SEARCH_HINTS} />
+              </div>
+            )}
 
             {normalizedSearch && (
               <div className="absolute top-full mt-2 w-full bg-(--card-bg) border border-(--border-color) rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
@@ -630,6 +650,8 @@ function App() {
               )}
           </div>
         </section>
+
+        <MapasSection />
       </main>
 
       <footer className="w-full mt-auto bg-[#1e2a4a] text-slate-300 py-12 px-4 transition-colors">

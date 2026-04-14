@@ -21,7 +21,14 @@ export const getDeptIcon = (name: string, size: number = 20) => {
   if (n.includes('estacionamiento')) return <Car size={size} />;
   if (n.includes('primeros auxilios')) return <HeartPulse size={size} />;
   if (n.includes('seguridad')) return <Shield size={size} />;
-  if (n.includes('audio') || n.includes('video')) return <Video size={size} />;
+  if (n.includes('audio') && n.includes('video')) return (
+    <div className="flex items-center gap-1">
+      <Volume2 size={size} />
+      <Video size={size} />
+    </div>
+  );
+  if (n.includes('audio')) return <Volume2 size={size} />;
+  if (n.includes('video')) return <Video size={size} />;
   if (n.includes('bautismo')) return <Droplets size={size} />;
   if (n.includes('alojamiento')) return <Home size={size} />;
   if (n.includes('información')) return <Info size={size} />;
