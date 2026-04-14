@@ -66,6 +66,13 @@ function App() {
   }, []);
 
   React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setShowWhatsAppTip(true);
+    }, 2000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  React.useEffect(() => {
     if (!isMobile) return;
 
     const showTimer = window.setTimeout(() => {
@@ -379,9 +386,9 @@ function App() {
             <div className="w-12 h-12 flex items-center justify-center overflow-hidden transition-colors">
               <img src="/jwevent.png" alt="JW.ORG Logo" className="w-full h-full object-contain" />
             </div>
-            <div className="flex flex-col justify-center">
-              <h1 className="text-base sm:text-lg md:text-xl font-bold text-(--page-text) tracking-tight leading-tight transition-colors">Organigrama Asamblea Regional 2026</h1>
-              <p className="text-[9px] md:text-xs text-(--text-muted) font-bold uppercase tracking-[0.2em] transition-colors">Medellín 4 • Felices Para Siempre</p>
+            <div className="flex flex-col justify-center gap-0.5 md:gap-1.5">
+              <h1 className="text-base sm:text-lg md:text-2xl font-black text-(--page-text) tracking-tight leading-tight transition-colors">Organigrama Asamblea Regional 2026</h1>
+              <p className="text-[9px] md:text-[11px] text-(--text-muted) font-bold uppercase tracking-[0.2em] transition-colors">Medellín 4 • Felices Para Siempre</p>
             </div>
           </div>
 
@@ -637,44 +644,84 @@ function App() {
         </div>
       </footer>
 
-      <div
-        className="fixed bottom-6 right-6 z-50"
-        onMouseEnter={() => !isMobile && setShowWhatsAppTip(true)}
-        onMouseLeave={() => !isMobile && setShowWhatsAppTip(false)}
-      >
-        <AnimatePresence>
-          {showWhatsAppTip && (
-            <motion.div
-              initial={{ opacity: 0, scale: 1.3, y: 6 }}
-              animate={{ opacity: 1, scale: 1.3, y: 0 }}
-              exit={{ opacity: 0, scale: 1.3, y: 6 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 22, mass: 0.9 }}
-              style={{ transformOrigin: 'bottom right' }}
-              className="absolute bottom-16 right-0 max-w-[260px] rounded-2xl border border-slate-700 bg-slate-900/95 px-4 py-3 text-xs text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
-            >
-              <p className="leading-relaxed">
-                ¿Tienes alguna pregunta sobre un departamento? Escríbenos por WhatsApp.
-              </p>
-              <div className="absolute bottom-[-6px] right-5 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-slate-700" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <a
-          href="https://wa.me/573007830254"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => {
-            if (isMobile) setShowWhatsAppTip(false);
-          }}
-          className="relative flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-[0_8px_30px_rgba(37,211,102,0.3)] hover:brightness-110 active:scale-95 transition-all duration-300 group"
-          aria-label="Contactar por WhatsApp"
+      <div className="fixed bottom-4 right-2 md:bottom-6 md:right-6 z-50">
+        <div
+          onMouseEnter={() => !isMobile && setShowWhatsAppTip(true)}
+          onMouseLeave={() => !isMobile && setShowWhatsAppTip(false)}
         >
-          <div className="absolute inset-0 rounded-full bg-[#25D366]/20 blur-md group-hover:bg-[#25D366]/30 transition-all" />
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.01 2.01c-5.52 0-9.99 4.47-9.99 9.99 0 1.96.55 3.8 1.5 5.37L2 22l4.82-1.52c1.51.87 3.25 1.34 5.17 1.34 5.51 0 9.98-4.47 9.98-9.99S17.52 2.01 12.01 2.01zm5.2 14.18c-.22.61-1.12 1.15-1.56 1.25-.41.09-1.02.24-3.17-.65-2.61-1.08-4.31-3.79-4.44-3.96-.13-.17-1.06-1.41-1.06-2.68 0-1.28.66-1.91.9-2.19.23-.28.53-.35.7-.35.17 0 .34 0 .49.01.16.01.38-.06.6.48.23.57.75 1.83.82 1.97.07.14.12.31.02.5-.1.19-.15.31-.3.48-.15.17-.32.37-.45.5-.15.16-.31.33-.13.64.18.31.81 1.33 1.73 2.15 1.18 1.06 2.19 1.39 2.5 1.53.31.14.49.12.67-.08.18-.21.78-.9.99-1.21.21-.31.43-.26.71-.15.28.1 1.8.85 2.1 1.01.3.16.51.24.58.37.07.13.07.76-.15 1.37z" />
-          </svg>
-        </a>
+          <AnimatePresence>
+            {showWhatsAppTip && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.96, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: 8, scale: 0.98, filter: "blur(6px)" }}
+                transition={{
+                  type: "spring",
+                  stiffness: 220,
+                  damping: 26,
+                  mass: 1,
+                }}
+                className={cn(
+                  "absolute bottom-18 right-0 w-[260px] rounded-[22px] border border-white/10 px-4 py-3 text-[12px] leading-relaxed text-white shadow-[0_20px_60px_rgba(0,0,0,0.35)]",
+                  theme === 'light' ? "bg-slate-900" : "bg-white/10 backdrop-blur-2xl supports-backdrop-filter:bg-white/10"
+                )}
+              >
+                <div className={cn("pointer-events-none absolute inset-0 rounded-[22px] bg-linear-to-b from-white/18 to-white/4", theme === 'light' ? "hidden" : "block")} />
+                
+                <p className="relative pr-2 text-white/90">
+                  ¿Tienes alguna pregunta sobre un departamento? Escríbenos por WhatsApp.
+                </p>
+
+                <div className={cn("absolute bottom-[-6px] right-6 h-3 w-3 rotate-45 border-r border-b border-white/10", theme === 'light' ? "bg-slate-900" : "bg-white/10 backdrop-blur-2xl")} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <a
+            href="https://wa.me/573007830254"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              if (isMobile) setShowWhatsAppTip(false);
+            }}
+            className={cn(
+              "group relative flex h-12 w-12 md:h-14 md:w-14 items-center justify-center overflow-hidden rounded-full border border-black/5 dark:border-white/10 text-white transition-all duration-500 hover:scale-110 active:scale-95",
+              theme === 'dark' ? "bg-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-2xl" : "shadow-[0_12px_40px_rgba(37,211,102,0.3)]"
+            )}
+            style={{ 
+              backgroundColor: theme === 'light' ? '#25D366' : undefined 
+            }}
+            aria-label="Contactar por WhatsApp"
+          >
+            {/* Premium background effects */}
+            <div className={cn(
+              "absolute inset-0 transition-all duration-500",
+              theme === 'light' 
+                ? "bg-[#25D366] group-hover:bg-[#22bf5c]" 
+                : "bg-white/10 backdrop-blur-2xl group-hover:bg-white/20"
+            )} />
+            
+            {/* Glossy overlay - only in dark mode or on hover */}
+            <div className={cn(
+              "absolute inset-0 bg-linear-to-br from-white/20 via-transparent to-transparent opacity-80",
+              theme === 'light' ? "opacity-30" : "opacity-100"
+            )} />
+            
+            <div className={cn("absolute inset-px rounded-full bg-black/5", theme === 'light' ? "hidden" : "block")} />
+
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="relative z-10 text-white/90 transition-all duration-300 group-hover:text-[#25D366] group-hover:scale-110"
+            >
+              <path d="M12.01 2.01c-5.52 0-9.99 4.47-9.99 9.99 0 1.96.55 3.8 1.5 5.37L2 22l4.82-1.52c1.51.87 3.25 1.34 5.17 1.34 5.51 0 9.98-4.47 9.98-9.99S17.52 2.01 12.01 2.01zm5.2 14.18c-.22.61-1.12 1.15-1.56 1.25-.41.09-1.02.24-3.17-.65-2.61-1.08-4.31-3.79-4.44-3.96-.13-.17-1.06-1.41-1.06-2.68 0-1.28.66-1.91.9-2.19.23-.28.53-.35.7-.35.17 0 .34 0 .49.01.16.01.38-.06.6.48.23.57.75 1.83.82 1.97.07.14.12.31.02.5-.1.19-.15.31-.3.48-.15.17-.32.37-.45.5-.15.16-.31.33-.13.64.18.31.81 1.33 1.73 2.15 1.18 1.06 2.19 1.39 2.5 1.53.31.14.49.12.67-.08.18-.21.78-.9.99-1.21.21-.31.43-.26.71-.15.28.1 1.8.85 2.1 1.01.3.16.51.24.58.37.07.13.07.76-.15 1.37z" />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   );

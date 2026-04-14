@@ -220,7 +220,8 @@ function drawMiniPersonBlock(
   w: number,
   label: string,
   member: Member,
-  color: [number, number, number]
+  color: [number, number, number],
+  showIcon: boolean = false
 ) {
   const h = 30;
 
@@ -235,7 +236,14 @@ function drawMiniPersonBlock(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   setText(doc, COLORS.white);
-  doc.text(label, x + 4, y + 4.8);
+
+  if (showIcon) {
+    const iconSize = 2.8;
+    drawDeptIcon(doc, label, x + 2.5, y + (7 - iconSize) / 2, iconSize);
+    doc.text(label, x + 2.5 + iconSize + 1.2, y + 4.8);
+  } else {
+    doc.text(label, x + 4, y + 4.8);
+  }
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
@@ -339,7 +347,7 @@ function drawVenueBlock(doc: jsPDF, x: number, y: number, w: number) {
   doc.roundedRect(imgX - 0.5, imgY - 0.5, imgW + 1, imgH + 1, 3, 3, 'F');
 
   try {
-    doc.addImage(COLISEO_B64, 'PNG', imgX, imgY, imgW, imgH, undefined, 'FAST');
+    doc.addImage(COLISEO_B64, 'JPEG', imgX, imgY, imgW, imgH, undefined, 'FAST');
   } catch (_) {
     // fallback: just the dark rect
   }
@@ -469,7 +477,11 @@ function drawModernDepartmentTable(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
   setText(doc, COLORS.white);
-  doc.text(title, PAGE.mx + 4, startY + 5.3);
+  
+  // Draw Icon
+  const iconSize = 3.5;
+  drawDeptIcon(doc, title, PAGE.mx + 4, startY + (8 - iconSize) / 2, iconSize);
+  doc.text(title, PAGE.mx + 4 + iconSize + 1.5, startY + 5.3);
 
   autoTable(doc, {
     startY: startY + 10,
@@ -605,7 +617,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     const parentX = (PAGE.w - parentW) / 2;
     const parentY = y;
 
-    drawMiniPersonBlock(doc, parentX, parentY, parentW, 'Audio y Video', av.head, section.color);
+    drawMiniPersonBlock(doc, parentX, parentY, parentW, 'Audio y Video', av.head, section.color, true);
 
     // Cards hijas
     const audioX = PAGE.mx;
@@ -634,10 +646,10 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     doc.line(plataformaCenterX, connectorLineY, plataformaCenterX, childY);
     doc.line(jwStreamCenterX, connectorLineY, jwStreamCenterX, childY);
 
-    drawMiniPersonBlock(doc, audioX, childY, colW, 'Audio', audio.head, section.color);
-    drawMiniPersonBlock(doc, videoX, childY, colW, 'Video', video.head, section.color);
-    drawMiniPersonBlock(doc, plataformaX, childY, colW, 'Plataforma', plataforma.head, section.color);
-    drawMiniPersonBlock(doc, jwStreamX, childY, colW, 'JW Stream', jwStream.head, section.color);
+    drawMiniPersonBlock(doc, audioX, childY, colW, 'Audio', audio.head, section.color, true);
+    drawMiniPersonBlock(doc, videoX, childY, colW, 'Video', video.head, section.color, true);
+    drawMiniPersonBlock(doc, plataformaX, childY, colW, 'Plataforma', plataforma.head, section.color, true);
+    drawMiniPersonBlock(doc, jwStreamX, childY, colW, 'JW Stream', jwStream.head, section.color, true);
 
     y = childY + 34;
 
@@ -707,4 +719,171 @@ export async function exportToPdf(sections: ExportSection[]) {
   addFooter(doc);
 
   doc.save('Organigrama_AR2026.pdf');
+}
+
+// --- PDF ICON UTILITIES ---
+
+function drawDeptIcon(doc: jsPDF, name: string, x: number, y: number, size: number) {
+  const n = name.toLowerCase();
+
+  doc.setDrawColor(255, 255, 255);
+  doc.setFillColor(255, 255, 255);
+  doc.setLineWidth(Math.max(0.18, size * 0.06));
+
+  const midX = x + size / 2;
+  const midY = y + size / 2;
+
+  const line = (x1: number, y1: number, x2: number, y2: number) => {
+    doc.line(x1, y1, x2, y2);
+  };
+
+  const rect = (rx: number, ry: number, rw: number, rh: number, style: 'S' | 'F' | 'FD' = 'S') => {
+    doc.rect(rx, ry, rw, rh, style);
+  };
+
+  const rounded = (rx: number, ry: number, rw: number, rh: number, r = 0.35, style: 'S' | 'F' | 'FD' = 'S') => {
+    doc.roundedRect(rx, ry, rw, rh, r, r, style);
+  };
+
+  const circle = (cx: number, cy: number, r: number, style: 'S' | 'F' | 'FD' = 'S') => {
+    doc.circle(cx, cy, r, style);
+  };
+
+  const ellipse = (cx: number, cy: number, rx: number, ry: number, style: 'S' | 'F' | 'FD' = 'S') => {
+    doc.ellipse(cx, cy, rx, ry, style);
+  };
+
+  try {
+    // AUDIO Y VIDEO
+    if (n.includes('audio') || n.includes('video')) {
+      rounded(x + size * 0.1, y + size * 0.25, size * 0.45, size * 0.4, 0.2, 'S');
+      doc.triangle(x + size * 0.6, midY, x + size * 0.85, y + size * 0.2, x + size * 0.85, y + size * 0.8, 'S');
+      return;
+    }
+
+    // ACOMODADORES
+    if (n.includes('acomodador')) {
+      circle(x + size * 0.3, y + size * 0.3, size * 0.12, 'F');
+      circle(x + size * 0.7, y + size * 0.3, size * 0.12, 'F');
+      ellipse(x + size * 0.3, y + size * 0.75, size * 0.2, size * 0.1, 'F');
+      ellipse(x + size * 0.7, y + size * 0.75, size * 0.2, size * 0.1, 'F');
+      return;
+    }
+
+    // SEGURIDAD
+    if (n.includes('seguridad')) {
+      line(midX, y + size * 0.1, x + size * 0.8, y + size * 0.3);
+      line(x + size * 0.8, y + size * 0.3, x + size * 0.8, y + size * 0.7);
+      line(x + size * 0.8, y + size * 0.7, midX, y + size * 0.9);
+      line(midX, y + size * 0.9, x + size * 0.2, y + size * 0.7);
+      line(x + size * 0.2, y + size * 0.7, x + size * 0.2, y + size * 0.3);
+      line(x + size * 0.2, y + size * 0.3, midX, y + size * 0.1);
+      return;
+    }
+
+    // PLATAFORMA
+    if (n.includes('plataforma')) {
+      rounded(x + size * 0.1, y + size * 0.2, size * 0.8, size * 0.5, 0.2, 'S');
+      rect(midX - size * 0.05, y + size * 0.7, size * 0.1, size * 0.15, 'F');
+      line(x + size * 0.25, y + size * 0.85, x + size * 0.75, y + size * 0.85);
+      return;
+    }
+
+    // JW STREAM
+    if (n.includes('stream')) {
+      circle(midX, midY, size * 0.1, 'F');
+      circle(midX, midY, size * 0.25, 'S');
+      circle(midX, midY, size * 0.4, 'S');
+      return;
+    }
+
+    // INFORMACIÓN / SERVICIO VOLUNTARIO
+    if (n.includes('información') || n.includes('informacion') || n.includes('servicio voluntario')) {
+      circle(midX, midY, size * 0.45, 'S');
+      circle(midX, y + size * 0.3, size * 0.06, 'F');
+      rect(midX - size * 0.04, y + size * 0.45, size * 0.08, size * 0.3, 'F');
+      return;
+    }
+
+    // ALOJAMIENTO
+    if (n.includes('alojamiento')) {
+      rect(x + size * 0.15, y + size * 0.5, size * 0.7, size * 0.1, 'F');
+      rect(x + size * 0.15, y + size * 0.3, size * 0.25, size * 0.2, 'F');
+      line(x + size * 0.15, y + size * 0.25, x + size * 0.15, y + size * 0.85);
+      line(x + size * 0.85, y + size * 0.45, x + size * 0.85, y + size * 0.85);
+      return;
+    }
+
+    // LIMPIEZA
+    if (n.includes('limpieza')) {
+      line(midX, y, midX, y + size);
+      line(x, midY, x + size, midY);
+      line(x + size * 0.2, y + size * 0.2, x + size * 0.8, y + size * 0.8);
+      line(x + size * 0.8, y + size * 0.2, x + size * 0.2, y + size * 0.8);
+      return;
+    }
+
+    // PRIMEROS AUXILIOS
+    if (n.includes('primeros auxilios')) {
+      rect(midX - size * 0.12, y + size * 0.1, size * 0.24, size * 0.8, 'F');
+      rect(x + size * 0.1, midY - size * 0.12, size * 0.8, size * 0.24, 'F');
+      return;
+    }
+
+    // BAUTISMO
+    if (n.includes('bautismo')) {
+      circle(midX, y + size * 0.65, size * 0.25, 'F');
+      doc.triangle(midX, y + size * 0.15, x + size * 0.27, y + size * 0.6, x + size * 0.73, y + size * 0.6, 'F');
+      return;
+    }
+
+    // OBJETOS PERDIDOS / GUARDARROPA
+    if (n.includes('objetos perdidos') || n.includes('guardarropa')) {
+      rounded(x + size * 0.15, y + size * 0.35, size * 0.7, size * 0.45, 0.2, 'S');
+      rect(x + size * 0.35, y + size * 0.2, size * 0.3, size * 0.15, 'S');
+      line(x + size * 0.15, y + size * 0.55, x + size * 0.85, y + size * 0.55);
+      return;
+    }
+
+    // TRANSPORTE / MATERIALES
+    if (n.includes('transporte') || n.includes('materiales')) {
+      rect(x + size * 0.1, y + size * 0.4, size * 0.5, size * 0.3, 'F');
+      rect(x + size * 0.6, y + size * 0.45, size * 0.25, size * 0.25, 'F');
+      circle(x + size * 0.3, y + size * 0.8, size * 0.1, 'F');
+      circle(x + size * 0.7, y + size * 0.8, size * 0.1, 'F');
+      return;
+    }
+
+    // INSTALACIÓN
+    if (n.includes('instalación') || n.includes('instalacion')) {
+      line(x + size * 0.2, y + size * 0.8, x + size * 0.8, y + size * 0.2);
+      circle(x + size * 0.2, y + size * 0.8, size * 0.08, 'F');
+      line(x + size * 0.6, y + size * 0.1, x + size * 0.9, y + size * 0.4);
+      return;
+    }
+
+    // ESTACIONAMIENTO
+    if (n.includes('estacionamiento')) {
+      rounded(x + size * 0.2, y + size * 0.4, size * 0.6, size * 0.3, 0.2, 'F');
+      circle(x + size * 0.35, y + size * 0.75, size * 0.1, 'F');
+      circle(x + size * 0.65, y + size * 0.75, size * 0.1, 'F');
+      return;
+    }
+
+    // CONTABILIDAD
+    if (n.includes('contabilidad')) {
+      rect(x + size * 0.2, y + size * 0.1, size * 0.6, size * 0.8, 'S');
+      line(x + size * 0.3, y + size * 0.3, x + size * 0.7, y + size * 0.3);
+      line(x + size * 0.3, y + size * 0.5, x + size * 0.7, y + size * 0.5);
+      line(x + size * 0.3, y + size * 0.7, x + size * 0.5, y + size * 0.7);
+      return;
+    }
+
+    // DEFAULT
+    circle(midX, y + size * 0.32, size * 0.18, 'F');
+    ellipse(midX, y + size * 0.8, size * 0.32, size * 0.15, 'F');
+
+  } catch {
+    circle(midX, midY, size * 0.1, 'F');
+  }
 }

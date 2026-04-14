@@ -5,8 +5,12 @@
     <script>
       (function() {
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'light' || (!savedTheme && !systemPrefersDark)) {
           document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
         }
       })();
     </script>
