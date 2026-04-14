@@ -1,5 +1,6 @@
 import React from 'react';
-import { Mail, Phone, MapPin, User, ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { Mail, Phone, MapPin, User, ChevronDown, ChevronRight } from 'lucide-react';
+import { getDeptIcon } from '../lib/icons';
 import type { Member } from '../data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/cn';
@@ -211,14 +212,14 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               )}
 
               {member.groups && member.groups.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 w-full">
                   {member.groups.map((group, idx) => (
                     <div
                       key={idx}
                       className="relative bg-(--page-bg) rounded-3xl p-6 border border-(--border-color) shadow-inner h-full transition-colors"
                     >
-                      <div className="flex items-center gap-2 mb-6 text-sm font-black text-(--institutional-blue) uppercase tracking-widest border-l-4 border-(--institutional-blue) pl-3 py-1 transition-colors">
-                        <Users size={14} />
+                      <div className="flex items-center gap-3 mb-6 text-sm font-black text-(--institutional-blue) uppercase tracking-widest border-l-4 border-(--institutional-blue) pl-3 py-1.5 transition-colors">
+                        {getDeptIcon(group.name, 18)}
                         {group.name}
                       </div>
                       <div className="grid grid-cols-1 gap-6">
@@ -233,10 +234,10 @@ export const MemberCard: React.FC<MemberCardProps> = ({
 
               {showDepartments &&
                 member.subDepartments?.map((dept, idx) => (
-                  <div key={idx} className="relative mt-8">
+                  <div key={idx} className="relative mt-12">
                     <div className="absolute -left-3 top-8 w-3 h-px bg-(--text-muted)/30 transition-colors" />
-                    <div className="flex items-center gap-2 mb-4 text-sm font-black text-(--institutional-blue) border-l-4 border-(--institutional-blue) pl-3 py-1 transition-colors uppercase tracking-widest">
-                      <Users size={14} />
+                    <div className="flex items-center gap-3 mb-4 text-sm font-black text-(--institutional-blue) border-l-4 border-(--institutional-blue) pl-3 py-1.5 transition-colors uppercase tracking-widest">
+                      {getDeptIcon(dept.name, 18)}
                       {dept.name}
                     </div>
                     <MemberCard member={dept.head} isHighlighted={isHighlighted} />

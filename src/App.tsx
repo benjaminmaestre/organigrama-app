@@ -3,7 +3,10 @@ import { orgData } from './data';
 import { MemberCard } from './components/MemberCard';
 import { ExportMenu } from './components/ExportMenu';
 import { cn } from './lib/cn';
-import { Search, Shield, Radio, Bed, GraduationCap, Sun, Moon } from 'lucide-react';
+import { 
+  Search, Shield, Radio, Bed, Sun, Moon
+} from 'lucide-react';
+import { getDeptIcon } from './lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -581,7 +584,7 @@ function App() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
                 onAnimationStart={() => setObserverTrigger((prev) => prev + 1)}
-                className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-0 md:px-0"
+                className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-6 px-0 md:px-0"
               >
                 {filteredActiveTabData?.head.subDepartments?.map((dept, idx) => (
                   <div
@@ -594,8 +597,10 @@ function App() {
                       dept.name === 'Audio y Video' ? 'lg:col-span-3 md:col-span-2' : 'col-span-1'
                     )}
                   >
-                    <div className="flex items-center gap-2 px-4 md:pl-4 text-[10px] font-black text-slate-500 uppercase tracking-[.2em] transition-colors group-hover:text-blue-400">
-                      <GraduationCap size={14} />
+                    <div className="flex items-center gap-3 px-4 md:px-0 text-[13px] font-black text-slate-500 uppercase tracking-[.15em] transition-colors group-hover:text-blue-500">
+                      <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:text-blue-500 transition-all">
+                        {getDeptIcon(dept.name)}
+                      </div>
                       {dept.name}
                     </div>
                     <div className="px-0 md:px-0">

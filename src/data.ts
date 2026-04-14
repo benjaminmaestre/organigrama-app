@@ -141,18 +141,18 @@ export const orgData: Member = {
             { name: "Javier Osorio", role: "Auxiliar", congregation: "Entre Colinas-Amagá", phone: "3164418886", email: "josorio@jwpub.org" },
             { name: "Luis Castrillo", role: "Auxiliar", congregation: "Las Violetas", phone: "35070441608", email: "LuisCastrilloG20@jwpub.org" }
           ]}},
-          { name: "Información y Servicio Voluntario", head: { name: "Ronald Velásquez", role: "Superintendente", congregation: "La Aldea-Jericó", phone: "3054691917", email: "RonaldV8@jwpub.org", auxiliaries: [
-            { name: "Jeison Morales", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3052484323", email: "JeisonM14@jwpub.org" }
+          { name: "Limpieza", head: { name: "Andrés López", role: "Superintendente", congregation: "Laureles", phone: "3226264301", email: "AndresLopez@jwpub.org", auxiliaries: [
+            { name: "Jhon Jairo Quiróz", role: "Auxiliar", congregation: "Entre Colinas-Amagá", phone: "3132560170", email: "QJhon18@jwpub.org" },
+            { name: "Cristóbal Mejías", role: "Auxiliar", congregation: "San Javier", phone: "319 4649436", email: "MCristobal35@jwpub.org" },
+            { name: "Santiago Giraldo", role: "Auxiliar", congregation: "San Javier", phone: "3137216901", email: "SGiraldoAco7@jwpub.org" }
           ]}},
           { name: "Instalación", head: { name: "Alfredo Ramírez", role: "Superintendente", congregation: "San Javier", phone: "314 8187746", email: "RamirezAlfredo@jwpub.org", auxiliaries: [
             { name: "Jhon Deibis Montoya", role: "Auxiliar", congregation: "Penderisco-Urrao", phone: "3502091697", email: "MJhon31@jwpub.org" },
             { name: "Jhonatan Zabala", role: "Auxiliar", congregation: "Bolivar-Ciudad Bolívar", phone: "3176236235", email: "JonatanZ1@jwpub.org" },
             { name: "Victor Balza", role: "Auxiliar", congregation: "Los Girasoles-Caicedo", phone: "3247140377", email: "19BVictor@jwpub.org" }
           ]}},
-          { name: "Limpieza", head: { name: "Andrés López", role: "Superintendente", congregation: "Laureles", phone: "3226264301", email: "AndresLopez@jwpub.org", auxiliaries: [
-            { name: "Jhon Jairo Quiróz", role: "Auxiliar", congregation: "Entre Colinas-Amagá", phone: "3132560170", email: "QJhon18@jwpub.org" },
-            { name: "Cristóbal Mejías", role: "Auxiliar", congregation: "San Javier", phone: "319 4649436", email: "MCristobal35@jwpub.org" },
-            { name: "Santiago Giraldo", role: "Auxiliar", congregation: "San Javier", phone: "3137216901", email: "SGiraldoAco7@jwpub.org" }
+          { name: "Información y Servicio Voluntario", head: { name: "Ronald Velásquez", role: "Superintendente", congregation: "La Aldea-Jericó", phone: "3054691917", email: "RonaldV8@jwpub.org", auxiliaries: [
+            { name: "Jeison Morales", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3052484323", email: "JeisonM14@jwpub.org" }
           ]}},
           { name: "Objetos Perdidos y Guardarropa", head: { name: "David Campos", role: "Superintendente", congregation: "La Divisa", phone: "3043290556", email: "DavidCampos12@jwpub.org", auxiliaries: [
             { name: "Bayron Cañas", role: "Auxiliar", congregation: "Agualinda-Hispania", phone: "3173642605", email: "ECanas1@jwpub.org" },
