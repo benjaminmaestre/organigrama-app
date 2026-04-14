@@ -71,7 +71,7 @@ export const orgData: Member = {
         email: "1BRAYANRINCON@jwpub.org",
         phone: "321 3362241",
         auxiliaries: [
-          { name: "Jeickson Ramírez", role: "Auxiliar del Sup. Programa", congregation: "LA PRADERA", email: "JeiksonSR2@jwpub.org", phone: "311 7003405" }
+          { name: "Jeikson Ramírez", role: "Auxiliar del Sup. Programa", congregation: "LA PRADERA", email: "JeiksonSR2@jwpub.org", phone: "311 7003405" }
         ],
         subDepartments: [
           { 
