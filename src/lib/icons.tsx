@@ -1,8 +1,7 @@
-import React from 'react';
 import { 
-  Shield, Radio, Bed, GraduationCap, Users, ShieldCheck, 
+  Shield, GraduationCap, Users, ShieldCheck, 
   Calculator, Car, HeartPulse, Video, Droplets, Home, 
-  Info, Hammer, Sparkles, Archive, Truck, Mic2, Monitor, 
+  Info, Hammer, Sparkles, Archive, Truck, 
   Wifi, Volume2, AppWindow
 } from 'lucide-react';
 
