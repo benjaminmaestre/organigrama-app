@@ -11,7 +11,7 @@ export function ScrollingPlaceholder({
   className = '',
 }: ScrollingPlaceholderProps) {
   // Unimos los textos con un separador elegante
-  const scrollingText = texts.join('  ') + '  ';
+  const scrollingText = texts.join(' • ') + ' • ';
 
   return (
     <div className={`pointer-events-none overflow-hidden whitespace-nowrap relative ${className}`}>

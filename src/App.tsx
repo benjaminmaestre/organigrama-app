@@ -12,11 +12,11 @@ import { getDeptIcon } from './lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SEARCH_HINTS = [
-  'Buscar por nombre...',
-  'Buscar por departamento...',
-  'Buscar por correo...',
-  'Buscar por teléfono...',
-  'Buscar por congregación...',
+  'Buscar por nombre',
+  'Buscar por departamento',
+  'Buscar por correo',
+  'Buscar por teléfono',
+  'Buscar por congregación',
 ];
 
 function App() {
