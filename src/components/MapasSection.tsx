@@ -55,6 +55,7 @@ export function MapasSection() {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [direction, setDirection] = React.useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = React.useState(false);
+  const [showControls, setShowControls] = React.useState(true);
 
   const currentMap = MAP_TABS[activeIndex];
 
@@ -153,10 +154,10 @@ export function MapasSection() {
               disabled={activeIndex === 0}
               aria-label="Imagen anterior"
               className={cn(
-                'absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200',
-                'bg-white/95 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.25)]',
+                'absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300',
+                'bg-white/95 backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.15)]',
                 'hover:scale-110 active:scale-95',
-                activeIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'opacity-100'
+                activeIndex === 0 || !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
               )}
             >
               <ChevronLeft size={20} className="text-slate-700" />
@@ -168,10 +169,10 @@ export function MapasSection() {
               disabled={activeIndex === MAP_TABS.length - 1}
               aria-label="Siguiente imagen"
               className={cn(
-                'absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200',
-                'bg-white/95 backdrop-blur-sm shadow-[0_2px_12px_rgba(0,0,0,0.25)]',
+                'absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300',
+                'bg-white/95 backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.15)]',
                 'hover:scale-110 active:scale-95',
-                activeIndex === MAP_TABS.length - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-100'
+                activeIndex === MAP_TABS.length - 1 || !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
               )}
             >
               <ChevronRight size={20} className="text-slate-700" />
@@ -207,7 +208,10 @@ export function MapasSection() {
               </AnimatePresence>
 
               {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center pointer-events-none z-10">
+              <div className={cn(
+                "absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center pointer-events-none z-10",
+                !showControls && "opacity-0"
+              )}>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm text-slate-700 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-[0_2px_12px_rgba(0,0,0,0.25)]">
                   <ZoomIn size={16} />
                   Ver en pantalla completa
@@ -216,7 +220,10 @@ export function MapasSection() {
             </div>
 
             {/* Dots + caption */}
-            <div className="mt-4 flex flex-col items-center gap-3">
+            <div className={cn(
+              "mt-4 flex flex-col items-center gap-3 transition-opacity duration-300",
+              !showControls && "opacity-0 pointer-events-none"
+            )}>
               <div className="flex items-center gap-2">
                 {MAP_TABS.map((_, idx) => (
                   <button
@@ -259,7 +266,10 @@ export function MapasSection() {
               exit={{ scale: 0.92, opacity: 0 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="relative max-w-6xl w-full"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowControls(!showControls);
+              }}
             >
               {/* Close button */}
               <button
@@ -270,40 +280,51 @@ export function MapasSection() {
                 <X size={18} />
               </button>
 
-              {/* Lightbox prev/next */}
-              <button
-                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                disabled={activeIndex === 0}
-                aria-label="Imagen anterior"
-                className={cn(
-                  'absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 text-white transition-all',
-                  activeIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'opacity-100'
-                )}
-              >
-                <ChevronLeft size={22} />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                disabled={activeIndex === MAP_TABS.length - 1}
-                aria-label="Siguiente imagen"
-                className={cn(
-                  'absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 text-white transition-all',
-                  activeIndex === MAP_TABS.length - 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-100'
-                )}
-              >
-                <ChevronRight size={22} />
-              </button>
-
               <img
                 src={currentMap.src}
                 alt={currentMap.label}
-                className="w-full h-auto rounded-2xl shadow-2xl object-contain max-h-[85vh]"
+                className="w-full h-auto rounded-2xl shadow-2xl object-contain max-h-[75vh]"
                 draggable={false}
               />
 
-              <p className="text-center text-white/60 text-xs mt-3 flex items-center justify-center gap-1.5">
-                {currentMap.icon}
-                {currentMap.label} · {currentMap.subtitle}
+              {/* Lightbox Navigation - Repositioned to bottom to avoid overlapping content */}
+              <div className={cn(
+                "mt-6 flex items-center justify-between gap-4 transition-all duration-300",
+                !showControls && "opacity-0 pointer-events-none translate-y-4"
+              )}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+                  disabled={activeIndex === 0}
+                  className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10",
+                    activeIndex === 0 && "opacity-20 cursor-not-allowed"
+                  )}
+                >
+                  <ChevronLeft size={24} />
+                </button>
+
+                <p className="text-center text-white/80 text-sm font-medium flex items-center justify-center gap-1.5 px-4 py-2 bg-white/5 rounded-full backdrop-blur-sm border border-white/5">
+                  {currentMap.icon}
+                  {currentMap.label}
+                </p>
+
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                  disabled={activeIndex === MAP_TABS.length - 1}
+                  className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10",
+                    activeIndex === MAP_TABS.length - 1 && "opacity-20 cursor-not-allowed"
+                  )}
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+
+              <p className={cn(
+                "text-center text-white/40 text-[10px] mt-4 uppercase tracking-widest transition-opacity duration-300",
+                !showControls && "opacity-0"
+              )}>
+                {currentMap.subtitle}
               </p>
             </motion.div>
           </motion.div>

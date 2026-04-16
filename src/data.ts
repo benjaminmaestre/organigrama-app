@@ -45,7 +45,7 @@ export const orgData: Member = {
           ]}},
           { name: "Contabilidad", head: { name: "Gildardo Toro", role: "Superintendente", congregation: "San Javier", phone: "3104136783", email: "GToroLopez@jwpub.org", auxiliaries: [
             { name: "Javier Villa", role: "Auxiliar", congregation: "Guayacanes-Jardín", phone: "3014501710", email: "JVilla3@jwpub.org" },
-            { name: "Alexander Castrillón", role: "Auxiliar", congregation: "San Javier", phone: "3126866457", email: "JohnC40@jwpub.org" },
+            { name: "Alexander Castrillón", role: "Auxiliar", congregation: "La Divisa", phone: "3126866457", email: "JohnC40@jwpub.org" },
             { name: "Alexander Uribe", role: "Auxiliar", congregation: "Girasoles-Caicedo", phone: "3006176931", email: "UribeA@jwpub.org" }
           ]}},
           { name: "Estacionamiento", head: { name: "Fernando Cardona", role: "Superintendente", congregation: "San Javier", phone: "3187820076", email: "CardonaL@jwpub.org", auxiliaries: [
