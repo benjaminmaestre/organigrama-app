@@ -17,7 +17,7 @@ export interface Department {
 export const orgData: Member = {
   name: "Juan Carlos Rossero",
   role: "Presidente de la Asamblea",
-  congregation: "SC", email: "5996428@jwpub.org", phone: "3148513915",
+  congregation: "SC", email: "5996428@jwpub.org", phone: "3174407009",
   auxiliaries: [
     { name: "Mauricio Ortíz", role: "Auxiliar del Presidente", congregation: "CENTRAL ANDINA", email: "MOrtiz42@jwpub.org", phone: "310 4950905" },
     { name: "Carlos Mario Alzate", role: "Auxiliar del Presidente", congregation: "BOLÍVAR", email: "AlzateRodrC@jwpub.org", phone: "318 7162558" },
@@ -38,7 +38,7 @@ export const orgData: Member = {
           { name: "Acomodadores", head: { name: "Alberto Sánchez", role: "Superintendente", congregation: "Napoles-Salgar", phone: "3165268674", email: "lsanchez@jwpub.org", auxiliaries: [
             { name: "Juan Alejandro Flórez", role: "Auxiliar", congregation: "Laureles", phone: "3136857191", email: "FlorezpatiJuan1@jwpub.org" },
             { name: "Hernando Dávila", role: "Auxiliar", congregation: "Villanueva-Betulia", phone: "3127167890", email: "HernandoDavila@jwpub.org" },
-            { name: "Omar Ramírez", role: "Auxiliar", congregation: "La Divisa", phone: "3176466610", email: "OmaR2@jwpub.org" }
+            { name: "Omar Ramírez", role: "Auxiliar", congregation: "La Divisa", phone: "3246744348", email: "Omarr2@jwpub.org" }
           ]}},
           { name: "Coordinador de Seguridad", head: { name: "Juan Diego Mejía", role: "Superintendente", congregation: "Farallones-Betania", phone: "3003723319", email: "JuanM10@jwpub.org", auxiliaries: [
             { name: "Widmar Grisales", role: "Auxiliar", congregation: "Las Violetas", phone: "3148059978", email: "WidmarG3@jwpub.org" }
@@ -48,7 +48,7 @@ export const orgData: Member = {
             { name: "Alexander Castrillón", role: "Auxiliar", congregation: "La Divisa", phone: "3126866457", email: "JohnC40@jwpub.org" },
             { name: "Alexander Uribe", role: "Auxiliar", congregation: "Girasoles-Caicedo", phone: "3006176931", email: "UribeA@jwpub.org" }
           ]}},
-          { name: "Estacionamiento", head: { name: "Fernando Cardona", role: "Superintendente", congregation: "San Javier", phone: "3187820076", email: "CardonaL@jwpub.org", auxiliaries: [
+          { name: "Estacionamiento", head: { name: "Fernando Cardona", role: "Superintendente", congregation: "San Javier", phone: "3053789889", email: "CardonaL@jwpub.org", auxiliaries: [
             { name: "Luis Miguel Martínez", role: "Auxiliar", congregation: "Andes-Central Andina", phone: "3182759445", email: "34LuisM@jwpub.org" }
           ]}},
           { name: "Primeros Auxilios", head: { name: "Santiago Guapachá", role: "Superintendente", congregation: "La Aldea-Jericó", phone: "3116331401", email: "55GSantiago@jwpub.org", auxiliaries: [
@@ -98,7 +98,7 @@ export const orgData: Member = {
                     { name: "Mateo Ramírez", role: "Superintendente", congregation: "Laureles", phone: "3168272226", email: "4MRAMIREZ@jwpub.org" },
                     { name: "Jorge Blandón", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3122844627", email: "BJORGE28@jwpub.org" },
                     { name: "Gonzalo Álvarez", role: "Auxiliar", congregation: "Las Violetas", phone: "3205398031", email: "2GonzaloAlvarez@jwpub.org" },
-                    { name: "Jorge Ochoa", role: "Auxiliar", congregation: "Laureles", phone: "3148059988", email: "20Jorge@jwpub.org" },
+                    { name: "Jorge Ochoa", role: "Auxiliar", congregation: "Laureles", phone: "3148059988", email: "2OJorge@jwpub.org" },
                   ]
                 },
                 {
@@ -139,7 +139,7 @@ export const orgData: Member = {
         subDepartments: [
           { name: "Alojamiento", head: { name: "Félix Pérez", role: "Superintendente", congregation: "Las Violetas", phone: "3107407493", email: "FelixPerez32@jwpub.org", auxiliaries: [
             { name: "Javier Osorio", role: "Auxiliar", congregation: "Entre Colinas-Amagá", phone: "3164418886", email: "josorio@jwpub.org" },
-            { name: "Luis Castrillo", role: "Auxiliar", congregation: "Las Violetas", phone: "35070441608", email: "LuisCastrilloG20@jwpub.org" }
+            { name: "Luis Castrillo", role: "Auxiliar", congregation: "Las Violetas", phone: "3507041608", email: "LuisCastrilloG20@jwpub.org" }
           ]}},
           { name: "Limpieza", head: { name: "Andrés López", role: "Superintendente", congregation: "Laureles", phone: "3226264301", email: "AndresLopez@jwpub.org", auxiliaries: [
             { name: "Jhon Jairo Quiróz", role: "Auxiliar", congregation: "Entre Colinas-Amagá", phone: "3132560170", email: "QJhon18@jwpub.org" },
@@ -152,7 +152,7 @@ export const orgData: Member = {
             { name: "Victor Balza", role: "Auxiliar", congregation: "Los Girasoles-Caicedo", phone: "3247140377", email: "19BVictor@jwpub.org" }
           ]}},
           { name: "Información y Servicio Voluntario", head: { name: "Ronald Velásquez", role: "Superintendente", congregation: "La Aldea-Jericó", phone: "3054691917", email: "RonaldV8@jwpub.org", auxiliaries: [
-            { name: "Jeison Morales", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3052484323", email: "JeisonM14@jwpub.org" }
+            { name: "Jeison Morales", role: "Auxiliar", congregation: "Páramo-Urrao", phone: "3052484323", email: "JeysonM14@jwpub.org" }
           ]}},
           { name: "Objetos Perdidos y Guardarropa", head: { name: "David Campos", role: "Superintendente", congregation: "La Divisa", phone: "3043290556", email: "DavidCampos12@jwpub.org", auxiliaries: [
             { name: "Bayron Cañas", role: "Auxiliar", congregation: "Agualinda-Hispania", phone: "3173642605", email: "ECanas1@jwpub.org" },
