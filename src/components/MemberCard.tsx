@@ -4,6 +4,7 @@ import { getDeptIcon } from '../lib/icons';
 import type { Member } from '../data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/cn';
+import { formatPhoneForDisplay } from '../lib/formatUtils';
 
 interface MemberCardProps {
   member: Member;
@@ -118,7 +119,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
                   onClick={(e) => e.stopPropagation()}
                   className="hover:text-brand break-all sm:truncate transition-colors"
                 >
-                  {member.phone}
+                  {formatPhoneForDisplay(member.phone)}
                 </a>
               </div>
             )}
@@ -212,7 +213,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               )}
 
               {member.groups && member.groups.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mt-12 w-full">
                   {member.groups.map((group, idx) => (
                     <div
                       key={idx}

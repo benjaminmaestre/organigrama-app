@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { orgData, type Member, type Department } from '../data';
+import { formatPhoneForDisplay } from './formatUtils';
 
 type SectionKey = 'coordination' | 'program' | 'accommodation';
 
@@ -115,7 +116,7 @@ function memberToExcelRow(section: string, responsibility: string, member: Membe
     Nombre: safe(member.name),
     Cargo: safe(member.role),
     Congregación: safe(member.congregation),
-    Teléfono: safe(member.phone),
+    Teléfono: formatPhoneForDisplay(member.phone),
     Email: safe(member.email),
   };
 }
@@ -255,7 +256,7 @@ function drawMiniPersonBlock(
   setText(doc, COLORS.slate600);
   doc.text(safe(member.role), x + 4, y + 17.2);
 
-  const line1 = [safe(member.congregation), safe(member.phone)].filter(Boolean).join(' - ');
+  const line1 = [safe(member.congregation), formatPhoneForDisplay(member.phone)].filter(Boolean).join(' - ');
   const line2 = safe(member.email);
 
   if (line1) doc.text(line1, x + 4, y + 22.1);
@@ -540,7 +541,7 @@ function buildDepartmentRows(dept: Department) {
       nombre: safe(dept.head.name),
       responsabilidad: safe(dept.head.role),
       congregacion: safe(dept.head.congregation),
-      telefono: safe(dept.head.phone),
+      telefono: formatPhoneForDisplay(dept.head.phone),
       email: safe(dept.head.email),
     },
   ];
@@ -550,7 +551,7 @@ function buildDepartmentRows(dept: Department) {
       nombre: safe(aux.name),
       responsabilidad: safe(aux.role),
       congregacion: safe(aux.congregation),
-      telefono: safe(aux.phone),
+      telefono: formatPhoneForDisplay(aux.phone),
       email: safe(aux.email),
     });
   });
@@ -659,7 +660,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
         nombre: safe(m.name),
         responsabilidad: `Auxiliar ${groupLabel}`,
         congregacion: safe(m.congregation),
-        telefono: safe(m.phone),
+        telefono: formatPhoneForDisplay(m.phone),
         email: safe(m.email),
       }));
 
