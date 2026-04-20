@@ -467,25 +467,34 @@ function drawModernDepartmentTable(
     email: string;
   }>,
   color: [number, number, number]
-) {
+): number {
+  const HEADER_H = 7;
+  const MIN_TABLE_H = 18; // Enough for head + 2 rows
+  
+  // 1. Ensure space for header + start of table
+  if (startY + HEADER_H + MIN_TABLE_H > PAGE.h - 12) {
+    doc.addPage();
+    drawPageBackground(doc);
+    startY = 14;
+  }
+
   setFill(doc, COLORS.white);
   setDraw(doc, COLORS.slate200);
-  doc.roundedRect(PAGE.mx, startY, PAGE.w - PAGE.mx * 2, 8, 3, 3, 'FD');
+  doc.roundedRect(PAGE.mx, startY, PAGE.w - PAGE.mx * 2, HEADER_H, 3, 3, 'FD');
 
   setFill(doc, color);
-  doc.roundedRect(PAGE.mx, startY, PAGE.w - PAGE.mx * 2, 8, 3, 3, 'F');
+  doc.roundedRect(PAGE.mx, startY, PAGE.w - PAGE.mx * 2, HEADER_H, 3, 3, 'F');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
   setText(doc, COLORS.white);
   
-  // Draw Icon
   const iconSize = 3.5;
-  drawDeptIcon(doc, title, PAGE.mx + 4, startY + (8 - iconSize) / 2, iconSize);
+  drawDeptIcon(doc, title, PAGE.mx + 4, startY + (HEADER_H - iconSize) / 2, iconSize);
   doc.text(title, PAGE.mx + 4 + iconSize + 1.5, startY + 5.3);
 
   autoTable(doc, {
-    startY: startY + 10,
+    startY: startY + HEADER_H + 2,
     margin: { left: PAGE.mx, right: PAGE.mx, bottom: 16 },
     head: [['Nombre', 'Responsabilidad', 'Congregación', 'Teléfono', 'Email']],
     body: rows.map(r => [
@@ -496,6 +505,7 @@ function drawModernDepartmentTable(
       r.email,
     ]),
     theme: 'plain',
+    rowPageBreak: 'avoid',
     styles: {
       font: 'helvetica',
       fontSize: 7.5,
@@ -533,6 +543,9 @@ function drawModernDepartmentTable(
       4: { cellWidth: 56 },
     },
   });
+
+  // @ts-expect-error plugin property
+  return doc.lastAutoTable.finalY + 4;
 }
 
 function buildDepartmentRows(dept: Department) {
@@ -564,19 +577,21 @@ function drawCoordinationPage(doc: jsPDF, section: ExportSection) {
   drawSectionHeader(doc, section);
 
   let y = 72;
-  let isNewPage = false;
+  let forcedPageReached = false;
 
   section.departments.forEach(dept => {
-    // Force new page before Primeros Auxilios
-    if (dept.name === 'Primeros Auxilios' && !isNewPage) {
-      doc.addPage();
-      drawPageBackground(doc);
-      y = 14;
-      isNewPage = true;
+    // Only force new page if we haven't already moved to a new page (e.g. via overflow)
+    // AND if it's the target department.
+    if (dept.name === 'Primeros Auxilios' && !forcedPageReached) {
+      if (y > 165) { // Only break if we've used more than half the page
+        doc.addPage();
+        drawPageBackground(doc);
+        y = 14;
+      }
+      forcedPageReached = true;
     }
-    drawModernDepartmentTable(doc, y, dept.name, buildDepartmentRows(dept), section.color);
-    // @ts-expect-error plugin property
-    y = doc.lastAutoTable.finalY + 4;
+    
+    y = drawModernDepartmentTable(doc, y, dept.name, buildDepartmentRows(dept), section.color);
   });
 }
 
@@ -672,9 +687,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     ];
 
     if (allAuxRows.length > 0) {
-      drawModernDepartmentTable(doc, y, 'Auxiliares — Audio, Video, Plataforma y JW Stream', allAuxRows, section.color);
-      // @ts-expect-error plugin property
-      y = doc.lastAutoTable.finalY + 4;
+      y = drawModernDepartmentTable(doc, y, 'Auxiliares — Audio, Video, Plataforma y JW Stream', allAuxRows, section.color);
     } else {
       y += 10;
     }
@@ -690,19 +703,18 @@ function drawAccommodationPage(doc: jsPDF, section: ExportSection) {
   drawSectionHeader(doc, section);
 
   let y = 72;
-  let isNewPage = false;
+  let forcedPageReached = false;
 
   section.departments.forEach(dept => {
-    // Force new page before Objetos Perdidos y Guardarropa
-    if (dept.name === 'Objetos Perdidos y Guardarropa' && !isNewPage) {
-      doc.addPage();
-      drawPageBackground(doc);
-      y = 14;
-      isNewPage = true;
+    if (dept.name === 'Objetos Perdidos y Guardarropa' && !forcedPageReached) {
+      if (y > 165) {
+        doc.addPage();
+        drawPageBackground(doc);
+        y = 14;
+      }
+      forcedPageReached = true;
     }
-    drawModernDepartmentTable(doc, y, dept.name, buildDepartmentRows(dept), section.color);
-    // @ts-expect-error plugin property
-    y = doc.lastAutoTable.finalY + 4;
+    y = drawModernDepartmentTable(doc, y, dept.name, buildDepartmentRows(dept), section.color);
   });
 }
 
