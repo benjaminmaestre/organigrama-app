@@ -39,7 +39,7 @@ export const orgData: Member = {
             { name: "Juan Alejandro Flórez", role: "Auxiliar", congregation: "Laureles", phone: "+573136857191", email: "FlorezpatiJuan1@jwpub.org" },
             { name: "Hernando Dávila", role: "Auxiliar", congregation: "Villanueva-Betulia", phone: "+573127167890", email: "HernandoDavila@jwpub.org" },
             { name: "Omar Ramírez", role: "Auxiliar", congregation: "La Divisa", phone: "+573246744348", email: "Omarr2@jwpub.org" },
-            { name: "Jansen Franco", role: "Auxiliar", email: "JANSENF@jwpub.org", phone: "3002795001" }
+            { name: "Jansen Franco", role: "Auxiliar", email: "JANSENF@jwpub.org", phone: "+573002795001" }
           ]}},
           { name: "Coordinador de Seguridad", head: { name: "Juan Diego Mejía", role: "Superintendente", congregation: "Farallones-Betania", phone: "+573003723319", email: "JuanM10@jwpub.org", auxiliaries: [
             { name: "Widmar Grisales", role: "Auxiliar", congregation: "Las Violetas", phone: "+573148059978", email: "WidmarG3@jwpub.org" }
@@ -51,10 +51,10 @@ export const orgData: Member = {
           ]}},
           { name: "Estacionamiento", head: { name: "Fernando Cardona", role: "Superintendente", congregation: "San Javier", phone: "+573053789889", email: "CardonaL@jwpub.org", auxiliaries: [
             { name: "Luis Miguel Martínez", role: "Auxiliar", congregation: "Andes-Central Andina", phone: "+573182759445", email: "34LuisM@jwpub.org" },
-            { name: "Mauricio Gallego", role: "Auxiliar", congregation: "Puertas del Sol-Sopetrán", email: "MGallego28@jwpub.org", phone: "3196818010" }
+            { name: "Mauricio Gallego", role: "Auxiliar", congregation: "Puertas del Sol-Sopetrán", email: "MGallego28@jwpub.org", phone: "+573196818010" }
           ]}},
-          { name: "Primeros Auxilios", head: { name: "Alberto Centeno", role: "Superintendente", congregation: "La Divisa", phone: "3105028815", email: "9CAlberto@jwpub.org", auxiliaries: [
-            { name: "Diego Jaramillo", role: "Auxiliar", congregation: "El Llano-Sfe Ant", email: "jdiego1@jwpub.org", phone: "3046610972" },
+          { name: "Primeros Auxilios", head: { name: "Alberto Centeno", role: "Superintendente", congregation: "La Divisa", phone: "+573105028815", email: "9CAlberto@jwpub.org", auxiliaries: [
+            { name: "Diego Jaramillo", role: "Auxiliar", congregation: "El Llano-Sfe Ant", email: "jdiego1@jwpub.org", phone: "+573046610972" },
             { name: "Jaime Gil", role: "Auxiliar", congregation: "La Divisa", phone: "+573004081464", email: "LeonJaimeG@jwpub.org" },
           ]}},
           { name: "Seguridad", head: { name: "Luis Ardila", role: "Superintendente", congregation: "San Javier", phone: "+573196197782", email: "ArdilaL@jwpub.org", auxiliaries: [
@@ -116,7 +116,7 @@ export const orgData: Member = {
                   members: [
                     { name: "Camilo Mateus", role: "Superintendente", congregation: "Betania-Antioquia", phone: "+573045212640", email: "1MateusCamilo@jwpub.org" },
                     { name: "Juan Andrés Rojas", role: "Auxiliar", congregation: "La Divisa", phone: "+573168382090", email: "Rojascuellj9@jwpub.org" },
-                    { name: "Samuel Díaz", role: "Auxiliar", congregation: "Curazao-Sfe Ant", email: "SamuelD25@jwpub.org", phone: "3122814247" }
+                    { name: "Samuel Díaz", role: "Auxiliar", congregation: "Curazao-Sfe Ant", email: "SamuelD25@jwpub.org", phone: "+573122814247" }
                   ]
                 }
               ]
@@ -148,7 +148,7 @@ export const orgData: Member = {
             { name: "Jhon Jairo Quiróz", role: "Auxiliar", congregation: "Entre Colinas-Amagá", phone: "+573132560170", email: "QJhon18@jwpub.org" },
             { name: "Cristóbal Mejías", role: "Auxiliar", congregation: "San Javier", phone: "+573194649436", email: "MCristobal35@jwpub.org" },
             { name: "Santiago Giraldo", role: "Auxiliar", congregation: "San Javier", phone: "+573137216901", email: "SGiraldoAco7@jwpub.org" },
-            { name: "Andrés Bravo", role: "Auxiliar", congregation: "Paraíso-San Jerónimo", email: "AndresmaurB3@jwpub.org", phone: "3122191008" }
+            { name: "Andrés Bravo", role: "Auxiliar", congregation: "Paraíso-San Jerónimo", email: "AndresmaurB3@jwpub.org", phone: "+573122191008" }
           ]}},
           { name: "Instalación", head: { name: "Alfredo Ramírez", role: "Superintendente", congregation: "San Javier", phone: "+573148187746", email: "RamirezAlfredo@jwpub.org", auxiliaries: [
             { name: "Jhon Deibis Montoya", role: "Auxiliar", congregation: "Penderisco-Urrao", phone: "+573502091697", email: "MJhon31@jwpub.org" },
@@ -164,7 +164,7 @@ export const orgData: Member = {
           ]}},
           { name: "Transporte y Materiales", head: { name: "Luis Ospina", role: "Superintendente", congregation: "Las Violetas", phone: "+573146809366", email: "OspinaRodrLuis3@jwpub.org", auxiliaries: [
             { name: "Nelson Gallego", role: "Auxiliar", congregation: "Urrao", phone: "+573137075790" },
-            { name: "José Luis López", role: "Auxiliar", congregation: "San Javier", phone: "3223567292", email: "LopezJose19@jwpub.org" }
+            { name: "José Luis López", role: "Auxiliar", congregation: "San Javier", phone: "+573223567292", email: "LopezJose19@jwpub.org" }
           ]}}
         ]
       }
