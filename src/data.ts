@@ -39,7 +39,7 @@ export const orgData: Member = {
             { name: "Juan Alejandro Flórez", role: "Auxiliar", congregation: "Laureles", phone: "+573136857191", email: "FlorezpatiJuan1@jwpub.org" },
             { name: "Hernando Dávila", role: "Auxiliar", congregation: "Villanueva-Betulia", phone: "+573127167890", email: "HernandoDavila@jwpub.org" },
             { name: "Omar Ramírez", role: "Auxiliar", congregation: "La Divisa", phone: "+573246744348", email: "Omarr2@jwpub.org" },
-            { name: "Jansen Franco", role: "Auxiliar", email: "JANSENF@jwpub.org", phone: "+573002795001" }
+            { name: "Jansen Franco", role: "Auxiliar", congregation: "El llano, Santa fe de Antioquia", email: "JANSENF@jwpub.org", phone: "+573002795001" }
           ]}},
           { name: "Coordinador de Seguridad", head: { name: "Juan Diego Mejía", role: "Superintendente", congregation: "Farallones-Betania", phone: "+573003723319", email: "JuanM10@jwpub.org", auxiliaries: [
             { name: "Widmar Grisales", role: "Auxiliar", congregation: "Las Violetas", phone: "+573148059978", email: "WidmarG3@jwpub.org" }
@@ -54,7 +54,7 @@ export const orgData: Member = {
             { name: "Mauricio Gallego", role: "Auxiliar", congregation: "Puertas del Sol-Sopetrán", email: "MGallego28@jwpub.org", phone: "+573196818010" }
           ]}},
           { name: "Primeros Auxilios", head: { name: "Alberto Centeno", role: "Superintendente", congregation: "La Divisa", phone: "+573105028815", email: "9CAlberto@jwpub.org", auxiliaries: [
-            { name: "Diego Jaramillo", role: "Auxiliar", congregation: "El Llano-Sfe Ant", email: "jdiego1@jwpub.org", phone: "+573046610972" },
+            { name: "Diego Jaramillo", role: "Auxiliar", congregation: "El llano, Santa fe de Antioquia", email: "jdiego1@jwpub.org", phone: "+573046610972" },
             { name: "Jaime Gil", role: "Auxiliar", congregation: "La Divisa", phone: "+573004081464", email: "LeonJaimeG@jwpub.org" },
           ]}},
           { name: "Seguridad", head: { name: "Luis Ardila", role: "Superintendente", congregation: "San Javier", phone: "+573196197782", email: "ArdilaL@jwpub.org", auxiliaries: [
@@ -116,7 +116,7 @@ export const orgData: Member = {
                   members: [
                     { name: "Camilo Mateus", role: "Superintendente", congregation: "Betania-Antioquia", phone: "+573045212640", email: "1MateusCamilo@jwpub.org" },
                     { name: "Juan Andrés Rojas", role: "Auxiliar", congregation: "La Divisa", phone: "+573168382090", email: "Rojascuellj9@jwpub.org" },
-                    { name: "Samuel Díaz", role: "Auxiliar", congregation: "Curazao-Sfe Ant", email: "SamuelD25@jwpub.org", phone: "+573122814247" }
+                    { name: "Samuel Díaz", role: "Auxiliar", congregation: "Curazao-Santa Fe de Antioquia", email: "SamuelD25@jwpub.org", phone: "+573122814247" }
                   ]
                 }
               ]

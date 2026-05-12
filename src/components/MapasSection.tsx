@@ -16,14 +16,14 @@ const MAP_TABS: MapTab[] = [
     id: 'campus',
     label: 'Mapa Campus',
     subtitle: 'Universidad de Medellín',
-    src: '/campus.png',
+    src: '/mapa_campus.svg',
     icon: <MapPin size={18} />,
   },
   {
     id: 'coliseo',
     label: 'Mapa Coliseo',
     subtitle: 'Distribución interna del recinto',
-    src: '/coliseo.png',
+    src: '/mapa_coliseo.svg',
     icon: <Building2 size={18} />,
   },
 ];
