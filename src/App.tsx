@@ -2,7 +2,7 @@ import React from 'react';
 import { orgData } from './data';
 import { MemberCard } from './components/MemberCard';
 import { ExportMenu } from './components/ExportMenu';
-import { MapasSection } from './components/MapasSection';
+const MapasSection = React.lazy(() => import('./components/MapasSection').then(m => ({ default: m.MapasSection })));
 import { ScrollingPlaceholder } from './components/ScrollingPlaceholder';
 import { cn } from './lib/cn';
 import { 
@@ -108,14 +108,14 @@ function App() {
         deptRefs.current.forEach((el, idx) => {
           if (!el) return;
           const ratio = entries.get(el) ?? 0;
-          const threshold = el.offsetHeight > window.innerHeight * 0.6 ? 0.08 : 0.45;
+          const threshold = el.offsetHeight > window.innerHeight * 0.6 ? 0.05 : 0.35;
           if (ratio > threshold) {
             active.push(idx);
           }
         });
         setActiveDeptIdxs(active);
       },
-      { threshold: [0, 0.05, 0.08, 0.1, 0.25, 0.45, 0.75, 1] }
+      { threshold: [0, 0.1, 0.35, 0.75] }
     );
     deptRefs.current.forEach((el) => {
       if (el) observer.observe(el);
@@ -134,13 +134,13 @@ function App() {
         allRefs.forEach((el, idx) => {
           if (!el) return;
           const ratio = entriesMap.get(el) ?? 0;
-          if (ratio > 0.5) {
+          if (ratio > 0.4) {
             active.push(ids[idx]);
           }
         });
         setActiveCommitteeCards(active);
       },
-      { threshold: [0, 0.1, 0.3, 0.5, 0.75, 1] }
+      { threshold: [0, 0.4, 0.8] }
     );
     [...committeeRefs.current, presidencyRef.current].forEach((el) => {
       if (el) observer.observe(el);
@@ -148,17 +148,19 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  const coordinationDept = orgData.subDepartments?.find((d) => d.name === 'Coordinación del Comité');
-  const programDept = orgData.subDepartments?.find((d) => d.name === 'Programa');
-  const accommodationDept = orgData.subDepartments?.find((d) => d.name === 'Alojamiento y Servicios');
+  const { coordinationDept, programDept, accommodationDept } = React.useMemo(() => ({
+    coordinationDept: orgData.subDepartments?.find((d) => d.name === 'Coordinación del Comité'),
+    programDept: orgData.subDepartments?.find((d) => d.name === 'Programa'),
+    accommodationDept: orgData.subDepartments?.find((d) => d.name === 'Alojamiento y Servicios'),
+  }), []);
 
-  const presidencyData = { ...orgData, subDepartments: [] };
+  const presidencyData = React.useMemo(() => ({ ...orgData, subDepartments: [] }), []);
 
-  const tabs = [
+  const tabs = React.useMemo(() => [
     { id: 'coordination', label: 'Coordinación', icon: Shield, color: 'text-blue-500', data: coordinationDept },
     { id: 'program', label: 'Programa', icon: Radio, color: 'text-purple-500', data: programDept },
     { id: 'accommodation', label: 'Alojamiento', icon: Bed, color: 'text-emerald-500', data: accommodationDept },
-  ] as const;
+  ] as const, [coordinationDept, programDept, accommodationDept]);
 
   const normalizedSearch = searchTerm.toLowerCase().trim();
 
@@ -386,8 +388,8 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-(--page-bg) text-(--page-text) overflow-x-hidden font-sans transition-colors duration-300">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full opacity-(--blob-opacity)" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full opacity-(--blob-opacity)" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[30%] md:w-[40%] md:h-[40%] bg-blue-500/10 blur-[60px] md:blur-[120px] rounded-full opacity-(--blob-opacity)" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[30%] md:w-[40%] md:h-[40%] bg-purple-500/10 blur-[60px] md:blur-[120px] rounded-full opacity-(--blob-opacity)" />
       </div>
 
       <header className="sticky top-0 z-50 bg-(--header-bg) backdrop-blur-xl border-b border-(--header-border) transition-colors duration-300">
@@ -651,7 +653,9 @@ function App() {
           </div>
         </section>
 
-        <MapasSection />
+        <React.Suspense fallback={<div className="h-48 flex items-center justify-center text-slate-400">Cargando mapas...</div>}>
+          <MapasSection />
+        </React.Suspense>
       </main>
 
       <footer className="w-full mt-auto bg-[#1e2a4a] text-slate-300 py-12 px-4 transition-colors">

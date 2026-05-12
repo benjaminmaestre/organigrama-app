@@ -203,6 +203,8 @@ export function MapasSection() {
                     alt={currentMap.label}
                     className="w-full h-full object-contain"
                     draggable={false}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -285,6 +287,8 @@ export function MapasSection() {
                 alt={currentMap.label}
                 className="w-full h-auto rounded-2xl shadow-2xl object-contain max-h-[75vh]"
                 draggable={false}
+                loading="lazy"
+                decoding="async"
               />
 
               {/* Lightbox Navigation - Repositioned to bottom to avoid overlapping content */}
