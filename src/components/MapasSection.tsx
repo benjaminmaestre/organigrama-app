@@ -23,16 +23,16 @@ const MAP_TABS: MapTab[] = [
     id: 'coliseo',
     label: 'Mapa Coliseo',
     subtitle: 'Distribución interna del recinto',
-    src: '/mapa_coliseo.svg',
+    src: '/mapa_coliseo.png',
     icon: <Building2 size={18} />,
   },
 ];
 
 const SLIDE_VARIANTS = {
   enter: (direction: number) => ({
-    x: direction > 0 ? '8%' : '-8%',
+    x: direction > 0 ? '30%' : '-30%',
     opacity: 0,
-    scale: 0.97,
+    scale: 0.95,
   }),
   center: {
     x: 0,
@@ -40,15 +40,15 @@ const SLIDE_VARIANTS = {
     scale: 1,
   },
   exit: (direction: number) => ({
-    x: direction > 0 ? '-8%' : '8%',
+    x: direction > 0 ? '-30%' : '30%',
     opacity: 0,
-    scale: 0.97,
+    scale: 0.95,
   }),
 };
 
 const SLIDE_TRANSITION = {
-  duration: 0.7,
-  ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+  duration: 0.5,
+  ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
 };
 
 export function MapasSection() {
@@ -56,6 +56,7 @@ export function MapasSection() {
   const [direction, setDirection] = React.useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = React.useState(false);
   const [showControls, setShowControls] = React.useState(true);
+  const [zoomScale, setZoomScale] = React.useState(1);
 
   const currentMap = MAP_TABS[activeIndex];
 
@@ -90,8 +91,18 @@ export function MapasSection() {
     else if (info.offset.x > threshold) handlePrev();
   };
 
-  const handleOpenLightbox = () => setIsLightboxOpen(true);
-  const handleCloseLightbox = () => setIsLightboxOpen(false);
+  const handleOpenLightbox = () => {
+    setZoomScale(1);
+    setIsLightboxOpen(true);
+  };
+  const handleCloseLightbox = () => {
+    setIsLightboxOpen(false);
+    setZoomScale(1);
+  };
+
+  const handleZoomIn = () => setZoomScale(prev => Math.min(prev + 0.5, 4));
+  const handleZoomOut = () => setZoomScale(prev => Math.max(prev - 0.5, 1));
+  const handleResetZoom = () => setZoomScale(1);
 
   React.useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -282,14 +293,49 @@ export function MapasSection() {
                 <X size={18} />
               </button>
 
-              <img
-                src={currentMap.src}
-                alt={currentMap.label}
-                className="w-full h-auto rounded-2xl shadow-2xl object-contain max-h-[75vh]"
-                draggable={false}
-                loading="lazy"
-                decoding="async"
-              />
+              <div className="overflow-hidden rounded-2xl bg-slate-900/50">
+                <motion.img
+                  src={currentMap.src}
+                  alt={currentMap.label}
+                  animate={{ scale: zoomScale }}
+                  drag={zoomScale > 1}
+                  dragConstraints={{ left: -500, right: 500, top: -500, bottom: 500 }}
+                  className={cn(
+                    "w-full h-auto shadow-2xl object-contain max-h-[75vh] transition-transform duration-200",
+                    zoomScale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+                  )}
+                  draggable={false}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              {/* Zoom Controls */}
+              <div className={cn(
+                "absolute top-4 right-4 flex flex-col gap-2 transition-opacity duration-300 z-50",
+                !showControls && "opacity-0"
+              )}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleZoomIn(); }}
+                  className="w-11 h-11 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl"
+                  title="Aumentar"
+                >
+                  <ZoomIn size={22} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleZoomOut(); }}
+                  className="w-11 h-11 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl"
+                  title="Disminuir"
+                >
+                  <motion.div animate={{ rotate: 90 }}><ChevronLeft size={22} /></motion.div>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleResetZoom(); }}
+                  className="h-9 px-3 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md text-[10px] font-black border border-white/20 shadow-xl uppercase tracking-tighter"
+                >
+                  1:1
+                </button>
+              </div>
 
               {/* Lightbox Navigation - Repositioned to bottom to avoid overlapping content */}
               <div className={cn(
