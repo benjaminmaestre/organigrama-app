@@ -66,13 +66,11 @@ export function MapasSection() {
   };
 
   const handlePrev = () => {
-    if (activeIndex === 0) return;
-    handleGoTo(activeIndex - 1);
+    handleGoTo((activeIndex - 1 + MAP_TABS.length) % MAP_TABS.length);
   };
 
   const handleNext = () => {
-    if (activeIndex === MAP_TABS.length - 1) return;
-    handleGoTo(activeIndex + 1);
+    handleGoTo((activeIndex + 1) % MAP_TABS.length);
   };
 
   // Auto-play: advance every 4 seconds, pause when lightbox is open
@@ -162,13 +160,12 @@ export function MapasSection() {
             {/* Prev arrow */}
             <button
               onClick={handlePrev}
-              disabled={activeIndex === 0}
               aria-label="Imagen anterior"
               className={cn(
-                'absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300',
-                'bg-white/95 backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.15)]',
-                'hover:scale-110 active:scale-95',
-                activeIndex === 0 || !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                'absolute left-3 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300',
+                'bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700',
+                'hover:scale-110 active:scale-95 hover:bg-white dark:hover:bg-slate-700',
+                !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
               )}
             >
               <ChevronLeft size={20} className="text-slate-700" />
@@ -177,13 +174,12 @@ export function MapasSection() {
             {/* Next arrow */}
             <button
               onClick={handleNext}
-              disabled={activeIndex === MAP_TABS.length - 1}
               aria-label="Siguiente imagen"
               className={cn(
-                'absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300',
-                'bg-white/95 backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.15)]',
-                'hover:scale-110 active:scale-95',
-                activeIndex === MAP_TABS.length - 1 || !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                'absolute right-3 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300',
+                'bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700',
+                'hover:scale-110 active:scale-95 hover:bg-white dark:hover:bg-slate-700',
+                !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
               )}
             >
               <ChevronRight size={20} className="text-slate-700" />
@@ -344,11 +340,7 @@ export function MapasSection() {
               )}>
                 <button
                   onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                  disabled={activeIndex === 0}
-                  className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10",
-                    activeIndex === 0 && "opacity-20 cursor-not-allowed"
-                  )}
+                  className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10"
                 >
                   <ChevronLeft size={24} />
                 </button>
@@ -360,11 +352,7 @@ export function MapasSection() {
 
                 <button
                   onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                  disabled={activeIndex === MAP_TABS.length - 1}
-                  className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10",
-                    activeIndex === MAP_TABS.length - 1 && "opacity-20 cursor-not-allowed"
-                  )}
+                  className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10"
                 >
                   <ChevronRight size={24} />
                 </button>
