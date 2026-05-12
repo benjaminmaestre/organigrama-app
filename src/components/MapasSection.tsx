@@ -1,7 +1,18 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ZoomIn, ZoomOut, MapPin, Building2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ZoomIn, MapPin, Building2, ChevronLeft, ChevronRight, ZoomOut } from 'lucide-react';
 import { cn } from '../lib/cn';
+
+// Swiper imports
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
+
+// Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
 
 type MapTab = {
   id: 'campus' | 'coliseo';
@@ -28,65 +39,27 @@ const MAP_TABS: MapTab[] = [
   },
 ];
 
-const SLIDE_VARIANTS = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? '30%' : '-30%',
-    opacity: 0,
-    scale: 0.95,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-    scale: 1,
-  },
-  exit: (direction: number) => ({
-    x: direction > 0 ? '-30%' : '30%',
-    opacity: 0,
-    scale: 0.95,
-  }),
-};
-
-const SLIDE_TRANSITION = {
-  duration: 0.5,
-  ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
-};
-
 export function MapasSection() {
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const [direction, setDirection] = React.useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = React.useState(false);
-  const [showControls, setShowControls] = React.useState(true);
   const [zoomScale, setZoomScale] = React.useState(1);
+  const swiperRef = React.useRef<SwiperType | null>(null);
 
   const currentMap = MAP_TABS[activeIndex];
 
   const handleGoTo = (index: number) => {
-    setDirection(index > activeIndex ? 1 : -1);
     setActiveIndex(index);
+    if (swiperRef.current) {
+      swiperRef.current.slideTo(index);
+    }
   };
 
   const handlePrev = () => {
-    handleGoTo((activeIndex - 1 + MAP_TABS.length) % MAP_TABS.length);
+    if (swiperRef.current) swiperRef.current.slidePrev();
   };
 
   const handleNext = () => {
-    handleGoTo((activeIndex + 1) % MAP_TABS.length);
-  };
-
-  // Auto-play: advance every 4 seconds, pause when lightbox is open
-  React.useEffect(() => {
-    if (isLightboxOpen) return;
-    const timer = window.setInterval(() => {
-      setDirection(1);
-      setActiveIndex((prev) => (prev + 1) % MAP_TABS.length);
-    }, 10000);
-    return () => window.clearInterval(timer);
-  }, [isLightboxOpen, activeIndex]);
-
-  const handleDragEnd = (_: unknown, info: { offset: { x: number } }) => {
-    const threshold = 60;
-    if (info.offset.x < -threshold) handleNext();
-    else if (info.offset.x > threshold) handlePrev();
+    if (swiperRef.current) swiperRef.current.slideNext();
   };
 
   const handleOpenLightbox = () => {
@@ -155,101 +128,87 @@ export function MapasSection() {
             </div>
           </div>
 
-          {/* Carousel */}
-          <div className="relative">
-            {/* Prev arrow */}
+          {/* Carousel with Swiper */}
+          <div className="relative group">
+            {/* Custom Navigation Buttons - High Visibility */}
             <button
               onClick={handlePrev}
-              aria-label="Imagen anterior"
-              className={cn(
-                'absolute left-3 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300',
-                'bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700',
-                'hover:scale-110 active:scale-95 hover:bg-white dark:hover:bg-slate-700',
-                !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              )}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
+              aria-label="Anterior"
             >
-              <ChevronLeft size={20} className="text-slate-700" />
+              <ChevronLeft size={24} />
             </button>
-
-            {/* Next arrow */}
             <button
               onClick={handleNext}
-              aria-label="Siguiente imagen"
-              className={cn(
-                'absolute right-3 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300',
-                'bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-700',
-                'hover:scale-110 active:scale-95 hover:bg-white dark:hover:bg-slate-700',
-                !showControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              )}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
+              aria-label="Siguiente"
             >
-              <ChevronRight size={20} className="text-slate-700" />
+              <ChevronRight size={24} />
             </button>
 
-            {/* Slide area — fixed aspect ratio so absolute slides can overlap */}
-            <div
-              className="relative overflow-hidden rounded-2xl border border-(--border-color) shadow-xl aspect-4/3 bg-slate-100 dark:bg-slate-900 cursor-zoom-in group"
-              onClick={handleOpenLightbox}
-            >
-              <AnimatePresence mode="popLayout" custom={direction}>
-                <motion.div
-                  key={activeIndex}
-                  custom={direction}
-                  variants={SLIDE_VARIANTS}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={SLIDE_TRANSITION}
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.06}
-                  onDragEnd={handleDragEnd}
-                  className="absolute inset-0 select-none"
-                >
-                  <img
-                    src={currentMap.src}
-                    alt={currentMap.label}
-                    className="w-full h-full object-contain"
-                    draggable={false}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Hover overlay */}
-              <div className={cn(
-                "absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center pointer-events-none z-10",
-                !showControls && "opacity-0"
-              )}>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm text-slate-700 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-[0_2px_12px_rgba(0,0,0,0.25)]">
-                  <ZoomIn size={16} />
-                  Ver en pantalla completa
-                </div>
-              </div>
+            {/* Mobile-only arrows - always visible, but subtle */}
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 z-20 md:hidden pointer-events-none">
+              <button
+                onClick={handlePrev}
+                className="w-10 h-10 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-lg flex items-center justify-center text-slate-700 dark:text-slate-200 pointer-events-auto border border-slate-100 dark:border-slate-700"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={handleNext}
+                className="w-10 h-10 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-lg flex items-center justify-center text-slate-700 dark:text-slate-200 pointer-events-auto border border-slate-100 dark:border-slate-700"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
 
-            {/* Dots + caption */}
-            <div className={cn(
-              "mt-4 flex flex-col items-center gap-3 transition-opacity duration-300",
-              !showControls && "opacity-0 pointer-events-none"
-            )}>
-              <div className="flex items-center gap-2">
-                {MAP_TABS.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleGoTo(idx)}
-                    aria-label={`Ir a ${MAP_TABS[idx].label}`}
-                    className={cn(
-                      'rounded-full transition-all duration-300',
-                      activeIndex === idx
-                        ? 'w-6 h-2 bg-(--institutional-blue)'
-                        : 'w-2 h-2 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'
-                    )}
-                  />
+            <div className="rounded-2xl border border-(--border-color) shadow-xl bg-slate-100 dark:bg-slate-900 overflow-hidden relative min-h-[320px] md:min-h-[450px]">
+              <Swiper
+                modules={[Navigation, Pagination, Autoplay, EffectFade]}
+                effect="fade"
+                fadeEffect={{ crossFade: true }}
+                loop={true}
+                autoplay={{ delay: 8000, disableOnInteraction: false }}
+                pagination={{
+                  clickable: true,
+                  el: '.custom-pagination',
+                }}
+                onSwiper={(swiper) => (swiperRef.current = swiper)}
+                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+                className="w-full h-full"
+              >
+                {MAP_TABS.map((map) => (
+                  <SwiperSlide key={map.id}>
+                    <div
+                      className="w-full h-full cursor-zoom-in relative flex items-center justify-center p-4 md:p-8"
+                      onClick={handleOpenLightbox}
+                    >
+                      <img
+                        src={map.src}
+                        alt={map.label}
+                        className="max-w-full max-h-[400px] md:max-h-[550px] object-contain select-none transition-transform duration-500 hover:scale-[1.01] rounded-lg shadow-sm"
+                        loading="lazy"
+                        draggable={false}
+                      />
+                      
+                      {/* Zoom Indicator overlay - HIGHER CONTRAST */}
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors flex items-center justify-center group/zoom">
+                        <div className="opacity-100 md:opacity-0 md:group-hover/zoom:opacity-100 transition-all transform scale-90 md:scale-100 bg-slate-900/80 dark:bg-slate-800/90 backdrop-blur-md px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold text-white shadow-2xl border border-white/20">
+                          <ZoomIn size={18} className="text-blue-400" />
+                          Ampliar mapa
+                        </div>
+                      </div>
+                    </div>
+                  </SwiperSlide>
                 ))}
-              </div>
+              </Swiper>
+            </div>
 
-              <div className="text-xs text-(--text-muted) flex items-center gap-1.5">
+            {/* Custom Pagination & Caption */}
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <div className="custom-pagination flex items-center gap-2 !static" />
+              
+              <div className="flex items-center gap-2 text-sm font-medium text-(--text-muted) bg-(--page-bg) px-4 py-2 rounded-full border border-(--border-color) shadow-sm transition-all duration-300">
                 {currentMap.icon}
                 <span>{currentMap.subtitle}</span>
               </div>
@@ -258,116 +217,150 @@ export function MapasSection() {
         </div>
       </section>
 
-      {/* Lightbox */}
+      {/* Lightbox - Re-engineered for better spacing */}
       <AnimatePresence>
         {isLightboxOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-100 flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+            className="fixed inset-0 z-100 flex flex-col bg-black/95 backdrop-blur-2xl"
             onClick={handleCloseLightbox}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="relative max-w-6xl w-full"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowControls(!showControls);
-              }}
+            {/* Toolbar */}
+            <div 
+              className="flex-none p-4 md:px-8 flex items-center justify-between z-50 bg-black/60 border-b border-white/10"
+              onClick={e => e.stopPropagation()}
             >
-              {/* Close button */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/5">
+                  {currentMap.icon}
+                </div>
+                <div className="hidden xs:block">
+                  <h3 className="text-white font-bold leading-tight">{currentMap.label}</h3>
+                  <p className="text-white/50 text-[10px] uppercase tracking-widest">{currentMap.subtitle}</p>
+                </div>
+                <div className="xs:hidden">
+                   <h3 className="text-white font-bold text-sm leading-tight">{currentMap.label}</h3>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 mr-4 pr-4 border-r border-white/10">
+                  <button
+                    onClick={handleZoomIn}
+                    className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/5"
+                    title="Acercar"
+                  >
+                    <ZoomIn size={20} />
+                  </button>
+                  <button
+                    onClick={handleZoomOut}
+                    className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/5"
+                    title="Alejar"
+                  >
+                    <ZoomOut size={20} />
+                  </button>
+                  <button
+                    onClick={handleResetZoom}
+                    className="h-10 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors text-[10px] font-black border border-white/5"
+                  >
+                    1:1
+                  </button>
+                </div>
+                
+                <button
+                  onClick={handleCloseLightbox}
+                  className="w-10 h-10 rounded-xl bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition-colors group border border-red-500/10"
+                >
+                  <X size={22} className="group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
+            </div>
+
+            {/* Main Viewport */}
+            <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+              {/* Navigation in Lightbox */}
               <button
-                onClick={handleCloseLightbox}
-                className="absolute -top-3 -right-3 z-10 w-9 h-9 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-transform"
-                aria-label="Cerrar"
+                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all hidden lg:flex border border-white/5 shadow-2xl"
               >
-                <X size={18} />
+                <ChevronLeft size={32} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all hidden lg:flex border border-white/5 shadow-2xl"
+              >
+                <ChevronRight size={32} />
               </button>
 
-              <div className="overflow-hidden rounded-2xl bg-slate-900/50">
+              {/* Main Image Container */}
+              <div 
+                className="w-full h-full p-4 md:p-12 lg:p-20 flex items-center justify-center"
+                onClick={e => e.stopPropagation()}
+              >
                 <motion.img
                   src={currentMap.src}
                   alt={currentMap.label}
                   animate={{ scale: zoomScale }}
                   drag={zoomScale > 1}
-                  dragConstraints={{ left: -500, right: 500, top: -500, bottom: 500 }}
+                  dragConstraints={{ left: -1200, right: 1200, top: -1200, bottom: 1200 }}
                   className={cn(
-                    "w-full h-auto shadow-2xl object-contain max-h-[75vh] transition-transform duration-200",
+                    "max-w-full max-h-full object-contain shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] transition-all duration-300 rounded-sm",
                     zoomScale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"
                   )}
                   draggable={false}
-                  loading="lazy"
-                  decoding="async"
                 />
               </div>
+            </div>
 
-              {/* Zoom Controls */}
-              <div className={cn(
-                "absolute top-4 right-4 flex flex-col gap-2 transition-opacity duration-300 z-50",
-                !showControls && "opacity-0"
-              )}>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleZoomIn(); }}
-                  className="w-11 h-11 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl"
-                  title="Aumentar"
-                >
-                  <ZoomIn size={22} />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleZoomOut(); }}
-                  className="w-11 h-11 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl"
-                  title="Disminuir"
-                >
-                  <ZoomOut size={22} />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleResetZoom(); }}
-                  className="h-9 px-3 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md text-[10px] font-black border border-white/20 shadow-xl uppercase tracking-tighter"
-                >
-                  1:1
-                </button>
+            {/* Mobile Zoom Controls - Improved */}
+            <div className="sm:hidden absolute bottom-28 right-6 flex flex-col gap-3 z-50">
+              <button
+                onClick={(e) => { e.stopPropagation(); handleZoomIn(); }}
+                className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 shadow-2xl"
+              >
+                <ZoomIn size={24} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleZoomOut(); }}
+                className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 shadow-2xl"
+              >
+                <ZoomOut size={24} />
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="flex-none p-6 flex flex-col items-center gap-3">
+              <div className="px-6 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-sm">
+                {activeIndex + 1} / {MAP_TABS.length}
               </div>
-
-              {/* Lightbox Navigation - Repositioned to bottom to avoid overlapping content */}
-              <div className={cn(
-                "mt-6 flex items-center justify-between gap-4 transition-all duration-300",
-                !showControls && "opacity-0 pointer-events-none translate-y-4"
-              )}>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                  className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-
-                <p className="text-center text-white/80 text-sm font-medium flex items-center justify-center gap-1.5 px-4 py-2 bg-white/5 rounded-full backdrop-blur-sm border border-white/5">
-                  {currentMap.icon}
-                  {currentMap.label}
-                </p>
-
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                  className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/10"
-                >
-                  <ChevronRight size={24} />
-                </button>
-              </div>
-
-              <p className={cn(
-                "text-center text-white/40 text-[10px] mt-4 uppercase tracking-widest transition-opacity duration-300",
-                !showControls && "opacity-0"
-              )}>
-                {currentMap.subtitle}
-              </p>
-            </motion.div>
+              <p className="text-white/20 text-[9px] uppercase tracking-widest sm:hidden font-medium">Desliza para cambiar de mapa</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .custom-pagination .swiper-pagination-bullet {
+          width: 8px;
+          height: 8px;
+          background: #cbd5e1;
+          opacity: 1;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+        }
+        .custom-pagination .swiper-pagination-bullet-active {
+          width: 24px;
+          background: #4a6da7;
+        }
+        .dark .custom-pagination .swiper-pagination-bullet {
+          background: #334155;
+        }
+        .dark .custom-pagination .swiper-pagination-bullet-active {
+          background: #5b7bb1;
+        }
+      `}} />
     </>
   );
 }
