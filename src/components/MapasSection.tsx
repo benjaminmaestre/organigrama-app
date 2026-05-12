@@ -5,7 +5,7 @@ import { cn } from '../lib/cn';
 
 // Swiper imports
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay, EffectFade, Zoom } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 
 // Swiper styles
@@ -13,6 +13,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
+import 'swiper/css/zoom';
 
 type MapTab = {
   id: 'campus' | 'coliseo';
@@ -42,38 +43,58 @@ const MAP_TABS: MapTab[] = [
 export function MapasSection() {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = React.useState(false);
-  const [zoomScale, setZoomScale] = React.useState(1);
-  const swiperRef = React.useRef<SwiperType | null>(null);
+  const mainSwiperRef = React.useRef<SwiperType | null>(null);
+  const lightboxSwiperRef = React.useRef<SwiperType | null>(null);
 
   const currentMap = MAP_TABS[activeIndex];
 
   const handleGoTo = (index: number) => {
     setActiveIndex(index);
-    if (swiperRef.current) {
-      swiperRef.current.slideTo(index);
-    }
+    if (mainSwiperRef.current) mainSwiperRef.current.slideToLoop(index);
+    if (lightboxSwiperRef.current) lightboxSwiperRef.current.slideTo(index);
   };
 
   const handlePrev = () => {
-    if (swiperRef.current) swiperRef.current.slidePrev();
+    if (isLightboxOpen) {
+      if (lightboxSwiperRef.current) lightboxSwiperRef.current.slidePrev();
+    } else {
+      if (mainSwiperRef.current) mainSwiperRef.current.slidePrev();
+    }
   };
 
   const handleNext = () => {
-    if (swiperRef.current) swiperRef.current.slideNext();
+    if (isLightboxOpen) {
+      if (lightboxSwiperRef.current) lightboxSwiperRef.current.slideNext();
+    } else {
+      if (mainSwiperRef.current) mainSwiperRef.current.slideNext();
+    }
   };
 
   const handleOpenLightbox = () => {
-    setZoomScale(1);
     setIsLightboxOpen(true);
   };
   const handleCloseLightbox = () => {
     setIsLightboxOpen(false);
-    setZoomScale(1);
   };
 
-  const handleZoomIn = () => setZoomScale(prev => Math.min(prev + 0.5, 4));
-  const handleZoomOut = () => setZoomScale(prev => Math.max(prev - 0.5, 1));
-  const handleResetZoom = () => setZoomScale(1);
+  const handleZoomIn = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (lightboxSwiperRef.current?.zoom) {
+      lightboxSwiperRef.current.zoom.in();
+    }
+  };
+  const handleZoomOut = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (lightboxSwiperRef.current?.zoom) {
+      lightboxSwiperRef.current.zoom.out();
+    }
+  };
+  const handleResetZoom = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (lightboxSwiperRef.current?.zoom) {
+      lightboxSwiperRef.current.zoom.out();
+    }
+  };
 
   React.useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -92,11 +113,9 @@ export function MapasSection() {
   return (
     <>
       <section className="bg-(--card-bg) rounded-[2.5rem] border border-(--border-color) -mx-4 px-4 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden transition-all duration-300">
-        {/* Background glow */}
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="relative z-10">
-          {/* Header */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black text-(--page-text) mb-2 uppercase tracking-tight transition-colors">
               Sede del Evento
@@ -107,7 +126,6 @@ export function MapasSection() {
             <div className="w-16 h-1 bg-(--institutional-blue) mx-auto rounded-full mt-4 shadow-[0_2px_10px_rgba(74,109,167,0.3)]" />
           </div>
 
-          {/* Tabs */}
           <div className="flex justify-center mb-8">
             <div className="inline-flex gap-2 p-1.5 bg-(--page-bg) rounded-2xl border border-(--border-color)">
               {MAP_TABS.map((tab, idx) => (
@@ -128,25 +146,20 @@ export function MapasSection() {
             </div>
           </div>
 
-          {/* Carousel with Swiper */}
           <div className="relative group">
-            {/* Custom Navigation Buttons - High Visibility */}
             <button
               onClick={handlePrev}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
-              aria-label="Anterior"
             >
               <ChevronLeft size={24} />
             </button>
             <button
               onClick={handleNext}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:scale-110 active:scale-95 transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
-              aria-label="Siguiente"
             >
               <ChevronRight size={24} />
             </button>
 
-            {/* Mobile-only arrows - always visible, but subtle */}
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 z-20 md:hidden pointer-events-none">
               <button
                 onClick={handlePrev}
@@ -169,20 +182,14 @@ export function MapasSection() {
                 fadeEffect={{ crossFade: true }}
                 loop={true}
                 autoplay={{ delay: 8000, disableOnInteraction: false }}
-                pagination={{
-                  clickable: true,
-                  el: '.custom-pagination',
-                }}
-                onSwiper={(swiper) => (swiperRef.current = swiper)}
+                pagination={{ clickable: true, el: '.custom-pagination' }}
+                onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
                 onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
                 className="w-full h-full"
               >
                 {MAP_TABS.map((map) => (
                   <SwiperSlide key={map.id}>
-                    <div
-                      className="w-full h-full cursor-zoom-in relative flex items-center justify-center p-4 md:p-8"
-                      onClick={handleOpenLightbox}
-                    >
+                    <div className="w-full h-full cursor-zoom-in relative flex items-center justify-center p-4 md:p-8" onClick={handleOpenLightbox}>
                       <img
                         src={map.src}
                         alt={map.label}
@@ -190,8 +197,6 @@ export function MapasSection() {
                         loading="lazy"
                         draggable={false}
                       />
-                      
-                      {/* Zoom Indicator overlay - HIGHER CONTRAST */}
                       <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors flex items-center justify-center group/zoom">
                         <div className="opacity-100 md:opacity-0 md:group-hover/zoom:opacity-100 transition-all transform scale-90 md:scale-100 bg-slate-900/80 dark:bg-slate-800/90 backdrop-blur-md px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold text-white shadow-2xl border border-white/20">
                           <ZoomIn size={18} className="text-blue-400" />
@@ -204,10 +209,8 @@ export function MapasSection() {
               </Swiper>
             </div>
 
-            {/* Custom Pagination & Caption */}
             <div className="mt-6 flex flex-col items-center gap-4">
               <div className="custom-pagination flex items-center gap-2 !static" />
-              
               <div className="flex items-center gap-2 text-sm font-medium text-(--text-muted) bg-(--page-bg) px-4 py-2 rounded-full border border-(--border-color) shadow-sm transition-all duration-300">
                 {currentMap.icon}
                 <span>{currentMap.subtitle}</span>
@@ -217,7 +220,6 @@ export function MapasSection() {
         </div>
       </section>
 
-      {/* Lightbox - Re-engineered for better spacing */}
       <AnimatePresence>
         {isLightboxOpen && (
           <motion.div
@@ -227,11 +229,7 @@ export function MapasSection() {
             className="fixed inset-0 z-100 flex flex-col bg-black/95 backdrop-blur-2xl"
             onClick={handleCloseLightbox}
           >
-            {/* Toolbar */}
-            <div 
-              className="flex-none p-4 md:px-8 flex items-center justify-between z-50 bg-black/60 border-b border-white/10"
-              onClick={e => e.stopPropagation()}
-            >
+            <div className="flex-none p-4 md:px-8 flex items-center justify-between z-50 bg-black/60 border-b border-white/10" onClick={e => e.stopPropagation()}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/5">
                   {currentMap.icon}
@@ -240,102 +238,79 @@ export function MapasSection() {
                   <h3 className="text-white font-bold leading-tight">{currentMap.label}</h3>
                   <p className="text-white/50 text-[10px] uppercase tracking-widest">{currentMap.subtitle}</p>
                 </div>
-                <div className="xs:hidden">
-                   <h3 className="text-white font-bold text-sm leading-tight">{currentMap.label}</h3>
-                </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2 mr-4 pr-4 border-r border-white/10">
-                  <button
-                    onClick={handleZoomIn}
-                    className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/5"
-                    title="Acercar"
-                  >
+                  <button onClick={handleZoomIn} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/5">
                     <ZoomIn size={20} />
                   </button>
-                  <button
-                    onClick={handleZoomOut}
-                    className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/5"
-                    title="Alejar"
-                  >
+                  <button onClick={handleZoomOut} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/5">
                     <ZoomOut size={20} />
                   </button>
-                  <button
-                    onClick={handleResetZoom}
-                    className="h-10 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors text-[10px] font-black border border-white/5"
-                  >
+                  <button onClick={handleResetZoom} className="h-10 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-[10px] font-black border border-white/5">
                     1:1
                   </button>
                 </div>
-                
-                <button
-                  onClick={handleCloseLightbox}
-                  className="w-10 h-10 rounded-xl bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition-colors group border border-red-500/10"
-                >
+                <button onClick={handleCloseLightbox} className="w-10 h-10 rounded-xl bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center group border border-red-500/10">
                   <X size={22} className="group-hover:scale-110 transition-transform" />
                 </button>
               </div>
             </div>
 
-            {/* Main Viewport */}
-            <div className="flex-1 relative flex items-center justify-center overflow-hidden">
-              {/* Navigation in Lightbox */}
-              <button
-                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all hidden lg:flex border border-white/5 shadow-2xl"
+            <div className="flex-1 relative overflow-hidden">
+              <Swiper
+                modules={[Navigation, Zoom]}
+                zoom={{
+                  maxRatio: 5,
+                  minRatio: 1,
+                  toggle: true, // Allow double tap to zoom
+                }}
+                initialSlide={activeIndex}
+                onSwiper={(swiper) => {
+                  lightboxSwiperRef.current = swiper;
+                }}
+                onSlideChange={(swiper) => {
+                   setActiveIndex(swiper.realIndex);
+                }}
+                className="w-full h-full"
               >
+                {MAP_TABS.map((map) => (
+                  <SwiperSlide key={map.id} className="overflow-hidden">
+                    <div className="swiper-zoom-container w-full h-full flex items-center justify-center p-4 md:p-12 lg:p-20" onClick={e => e.stopPropagation()}>
+                      <img
+                        src={map.src}
+                        alt={map.label}
+                        className="max-w-full max-h-full object-contain shadow-2xl rounded-sm"
+                        draggable={false}
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+
+              <button onClick={handlePrev} className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center hidden lg:flex border border-white/5 shadow-2xl">
                 <ChevronLeft size={32} />
               </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all hidden lg:flex border border-white/5 shadow-2xl"
-              >
+              <button onClick={handleNext} className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center hidden lg:flex border border-white/5 shadow-2xl">
                 <ChevronRight size={32} />
               </button>
-
-              {/* Main Image Container */}
-              <div 
-                className="w-full h-full p-4 md:p-12 lg:p-20 flex items-center justify-center"
-                onClick={e => e.stopPropagation()}
-              >
-                <motion.img
-                  src={currentMap.src}
-                  alt={currentMap.label}
-                  animate={{ scale: zoomScale }}
-                  drag={zoomScale > 1}
-                  dragConstraints={{ left: -1200, right: 1200, top: -1200, bottom: 1200 }}
-                  className={cn(
-                    "max-w-full max-h-full object-contain shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] transition-all duration-300 rounded-sm",
-                    zoomScale > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"
-                  )}
-                  draggable={false}
-                />
-              </div>
             </div>
 
-            {/* Mobile Zoom Controls - Improved */}
             <div className="sm:hidden absolute bottom-28 right-6 flex flex-col gap-3 z-50">
-              <button
-                onClick={(e) => { e.stopPropagation(); handleZoomIn(); }}
-                className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 shadow-2xl"
-              >
+              <button onClick={handleZoomIn} className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 shadow-2xl">
                 <ZoomIn size={24} />
               </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleZoomOut(); }}
-                className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 shadow-2xl"
-              >
+              <button onClick={handleZoomOut} className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 shadow-2xl">
                 <ZoomOut size={24} />
               </button>
             </div>
 
-            {/* Footer */}
             <div className="flex-none p-6 flex flex-col items-center gap-3">
               <div className="px-6 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-sm">
                 {activeIndex + 1} / {MAP_TABS.length}
               </div>
-              <p className="text-white/20 text-[9px] uppercase tracking-widest sm:hidden font-medium">Desliza para cambiar de mapa</p>
+              <p className="text-white/20 text-[9px] uppercase tracking-widest font-medium">Doble toque para zoom · Desliza para cambiar</p>
             </div>
           </motion.div>
         )}
@@ -343,22 +318,17 @@ export function MapasSection() {
 
       <style dangerouslySetInnerHTML={{ __html: `
         .custom-pagination .swiper-pagination-bullet {
-          width: 8px;
-          height: 8px;
-          background: #cbd5e1;
-          opacity: 1;
-          transition: all 0.3s ease;
-          border-radius: 4px;
+          width: 8px; height: 8px; background: #cbd5e1; opacity: 1; transition: all 0.3s ease; border-radius: 4px;
         }
-        .custom-pagination .swiper-pagination-bullet-active {
-          width: 24px;
-          background: #4a6da7;
-        }
-        .dark .custom-pagination .swiper-pagination-bullet {
-          background: #334155;
-        }
-        .dark .custom-pagination .swiper-pagination-bullet-active {
-          background: #5b7bb1;
+        .custom-pagination .swiper-pagination-bullet-active { width: 24px; background: #4a6da7; }
+        .dark .custom-pagination .swiper-pagination-bullet { background: #334155; }
+        .dark .custom-pagination .swiper-pagination-bullet-active { background: #5b7bb1; }
+        
+        .swiper-zoom-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
         }
       `}} />
     </>
