@@ -225,6 +225,8 @@ function drawMiniPersonBlock(
   showIcon: boolean = false
 ) {
   const h = 30;
+  const padding = 4;
+  const maxTextW = w - padding * 2;
 
   setFill(doc, COLORS.white);
   setDraw(doc, COLORS.slate200);
@@ -246,21 +248,53 @@ function drawMiniPersonBlock(
     doc.text(label, x + 4, y + 4.8);
   }
 
+  // --- MEMBER NAME (with shrinking font) ---
+  const nameStr = safe(member.name);
+  let nameSize = 10;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(nameSize);
+  while (doc.getTextWidth(nameStr) > maxTextW && nameSize > 6) {
+    nameSize -= 0.4;
+    doc.setFontSize(nameSize);
+  }
   setText(doc, COLORS.slate900);
-  doc.text(safe(member.name), x + 4, y + 12.5);
+  doc.text(nameStr, x + 4, y + 12.5);
 
+  // --- ROLE ---
+  const roleStr = safe(member.role);
+  let roleSize = 7.6;
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.6);
+  doc.setFontSize(roleSize);
+  while (doc.getTextWidth(roleStr) > maxTextW && roleSize > 5.5) {
+    roleSize -= 0.3;
+    doc.setFontSize(roleSize);
+  }
   setText(doc, COLORS.slate600);
-  doc.text(safe(member.role), x + 4, y + 17.2);
+  doc.text(roleStr, x + 4, y + 17.2);
 
+  // --- CONTACT LINE 1 (Congregación - Teléfono) ---
   const line1 = [safe(member.congregation), formatPhoneForDisplay(member.phone)].filter(Boolean).join(' - ');
-  const line2 = safe(member.email);
+  if (line1) {
+    let l1Size = 7.6;
+    doc.setFontSize(l1Size);
+    while (doc.getTextWidth(line1) > maxTextW && l1Size > 5.5) {
+      l1Size -= 0.3;
+      doc.setFontSize(l1Size);
+    }
+    doc.text(line1, x + 4, y + 22.1);
+  }
 
-  if (line1) doc.text(line1, x + 4, y + 22.1);
-  if (line2) doc.text(line2, x + 4, y + 26.4);
+  // --- CONTACT LINE 2 (Email) ---
+  const line2 = safe(member.email);
+  if (line2) {
+    let l2Size = 7.6;
+    doc.setFontSize(l2Size);
+    while (doc.getTextWidth(line2) > maxTextW && l2Size > 5.5) {
+      l2Size -= 0.3;
+      doc.setFontSize(l2Size);
+    }
+    doc.text(line2, x + 4, y + 26.4);
+  }
 }
 
 function drawCommitteeSectionCard(
@@ -443,16 +477,16 @@ function drawSectionHeader(doc: jsPDF, section: ExportSection) {
   const halfW = (fullW - colGap) / 2;
 
   if (aux) {
-    drawMiniPersonBlock(doc, PAGE.mx, 30, halfW, 'Superintendente', section.head, section.color);
-    drawMiniPersonBlock(doc, PAGE.mx + halfW + colGap, 30, halfW, 'Auxiliar', aux, section.color);
+    drawMiniPersonBlock(doc, PAGE.mx, 26, halfW, 'Superintendente', section.head, section.color);
+    drawMiniPersonBlock(doc, PAGE.mx + halfW + colGap, 26, halfW, 'Auxiliar', aux, section.color);
   } else {
-    drawMiniPersonBlock(doc, PAGE.mx, 30, fullW, 'Superintendente', section.head, section.color);
+    drawMiniPersonBlock(doc, PAGE.mx, 26, fullW, 'Superintendente', section.head, section.color);
   }
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   setText(doc, COLORS.slate800);
-  doc.text(section.subtitle, PAGE.mx, 66);
+  doc.text(section.subtitle, PAGE.mx, 60);
 }
 
 function drawModernDepartmentTable(
@@ -509,7 +543,7 @@ function drawModernDepartmentTable(
     styles: {
       font: 'helvetica',
       fontSize: 7.5,
-      cellPadding: { top: 2.3, right: 2.4, bottom: 2.3, left: 2.4 },
+      cellPadding: { top: 1.5, right: 2.4, bottom: 1.5, left: 2.4 },
       textColor: COLORS.slate900,
       valign: 'middle',
       overflow: 'linebreak',
@@ -536,16 +570,16 @@ function drawModernDepartmentTable(
       }
     },
     columnStyles: {
-      0: { cellWidth: 30 },
-      1: { cellWidth: 40 },
+      0: { cellWidth: 32 },
+      1: { cellWidth: 38 },
       2: { cellWidth: 32 },
-      3: { cellWidth: 24, halign: 'center' },
-      4: { cellWidth: 56 },
+      3: { cellWidth: 30, halign: 'center' },
+      4: { cellWidth: 54 },
     },
   });
 
   // @ts-expect-error plugin property
-  return doc.lastAutoTable.finalY + 4;
+  return doc.lastAutoTable.finalY + 2;
 }
 
 function buildDepartmentRows(dept: Department) {
@@ -599,7 +633,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
   doc.addPage();
   drawSectionHeader(doc, section);
 
-  let y = 72;
+  let y = 62;
 
   const av = section.departments.find(d => d.name === 'Audio y Video');
   const bautismo = section.departments.find(d => d.name === 'Bautismo');
@@ -640,13 +674,13 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     const videoX = PAGE.mx + colW + colGap;
     const plataformaX = PAGE.mx + (colW + colGap) * 2;
     const jwStreamX = PAGE.mx + (colW + colGap) * 3;
-    const childY = parentY + 42;
+    const childY = parentY + 36;
 
     // Conectores
     const parentCenterX = parentX + parentW / 2;
     const parentBottomY = parentY + 30;
-    const connectorTopY = parentBottomY + 4;
-    const connectorLineY = childY - 6;
+    const connectorTopY = parentBottomY + 1.5;
+    const connectorLineY = childY - 2.5;
     const audioCenterX = audioX + colW / 2;
     const videoCenterX = videoX + colW / 2;
     const plataformaCenterX = plataformaX + colW / 2;
@@ -667,7 +701,7 @@ function drawProgramPage(doc: jsPDF, section: ExportSection) {
     drawMiniPersonBlock(doc, plataformaX, childY, colW, 'Plataforma', plataforma.head, section.color, true);
     drawMiniPersonBlock(doc, jwStreamX, childY, colW, 'JW Stream', jwStream.head, section.color, true);
 
-    y = childY + 34;
+    y = childY + 31;
 
     // Draw auxiliaries as full rows in a single combined table per group
     const buildGroupAuxRows = (members: Member[], groupLabel: string) =>

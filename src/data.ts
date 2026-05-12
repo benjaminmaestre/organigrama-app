@@ -114,7 +114,7 @@ export const orgData: Member = {
                 {
                   name: "JW Stream",
                   members: [
-                    { name: "Camilo Mateus", role: "Superintendente", congregation: "Betania-Antioquia", phone: "+573045212640", email: "1MateusCamilo@jwpub.org" },
+                    { name: "Camilo Mateus", role: "Superintendente", congregation: "Betania", phone: "+573045212640", email: "1MateusCamilo@jwpub.org" },
                     { name: "Juan Andrés Rojas", role: "Auxiliar", congregation: "La Divisa", phone: "+573168382090", email: "Rojascuellj9@jwpub.org" },
                     { name: "Samuel Díaz", role: "Auxiliar", congregation: "Curazao-Santa Fe de Antioquia", email: "SamuelD25@jwpub.org", phone: "+573122814247" }
                   ]

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ZoomIn, MapPin, Building2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, MapPin, Building2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/cn';
 
 type MapTab = {
@@ -323,7 +323,7 @@ export function MapasSection() {
                   className="w-11 h-11 rounded-xl bg-black/40 hover:bg-black/60 text-white backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xl"
                   title="Disminuir"
                 >
-                  <motion.div animate={{ rotate: 90 }}><ChevronLeft size={22} /></motion.div>
+                  <ZoomOut size={22} />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleResetZoom(); }}
