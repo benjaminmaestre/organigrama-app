@@ -112,7 +112,7 @@ export function MapasSection() {
 
   return (
     <>
-      <section className="bg-(--card-bg) rounded-[2.5rem] border border-(--border-color) -mx-4 px-4 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden transition-all duration-300">
+      <section className="bg-white dark:bg-slate-900/20 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/30 -mx-4 px-4 py-8 md:mx-0 md:px-8 lg:px-12 lg:py-12 relative overflow-hidden transition-all duration-300 shadow-sm">
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="relative z-10">
@@ -175,7 +175,7 @@ export function MapasSection() {
               </button>
             </div>
 
-            <div className="rounded-2xl border border-(--border-color) shadow-xl bg-slate-100 dark:bg-slate-900 overflow-hidden relative min-h-[320px] md:min-h-[450px]">
+            <div className="rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg bg-slate-50/50 dark:bg-slate-900/20 overflow-hidden relative min-h-[320px] md:min-h-[450px] transition-colors duration-300">
               <Swiper
                 modules={[Navigation, Pagination, Autoplay, EffectFade]}
                 effect="fade"
@@ -198,8 +198,10 @@ export function MapasSection() {
                         draggable={false}
                       />
                       <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors flex items-center justify-center group/zoom">
-                        <div className="opacity-100 md:opacity-0 md:group-hover/zoom:opacity-100 transition-all transform scale-90 md:scale-100 bg-slate-900/80 dark:bg-slate-800/90 backdrop-blur-md px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-bold text-white shadow-2xl border border-white/20">
-                          <ZoomIn size={18} className="text-blue-400" />
+                        <div className="opacity-100 md:opacity-0 md:group-hover/zoom:opacity-100 transition-all transform scale-90 md:scale-100 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center gap-3 text-sm font-black text-slate-900 dark:text-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-200/50 dark:border-white/10">
+                          <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <ZoomIn size={20} />
+                          </div>
                           Ampliar mapa
                         </div>
                       </div>
