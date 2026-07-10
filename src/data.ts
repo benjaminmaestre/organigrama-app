@@ -36,7 +36,7 @@ export const orgData: Member = {
         ],
         subDepartments: [
           { name: "Acomodadores", head: { name: "Alberto Sánchez", role: "Superintendente", congregation: "Napoles-Salgar", phone: "+573165268674", email: "lsanchez@jwpub.org", auxiliaries: [
-            { name: "Juan Alejandro Flórez", role: "Auxiliar", congregation: "Laureles", phone: "+573136857191", email: "FlorezpatiJuan1@jwpub.org" },
+            { name: "Jorge Rodríguez", role: "Auxiliar", congregation: "San Javier", phone: "+573176644669", email: "Rodriguezjorge8@jwpub.org" },
             { name: "Hernando Dávila", role: "Auxiliar", congregation: "Villanueva-Betulia", phone: "+573127167890", email: "HernandoDavila@jwpub.org" },
             { name: "Omar Ramírez", role: "Auxiliar", congregation: "La Divisa", phone: "+573246744348", email: "Omarr2@jwpub.org" },
             { name: "Jansen Franco", role: "Auxiliar", congregation: "El llano, Santa fe de Antioquia", email: "JANSENF@jwpub.org", phone: "+573002795001" }
