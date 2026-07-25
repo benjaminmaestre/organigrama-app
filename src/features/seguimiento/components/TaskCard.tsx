@@ -18,6 +18,12 @@ const PRIORITY_STYLES = {
   urgent: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200/50 animate-pulse',
 };
 
+const PRIORITY_LABELS: Record<string, string> = {
+  normal: 'Normal',
+  important: 'Importante',
+  urgent: 'Urgente',
+};
+
 const STATUS_LABELS = {
   pending: 'Pendiente',
   in_progress: 'En proceso',
@@ -134,7 +140,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
             {/* Prioridad */}
             <span className={cn("text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-transparent", PRIORITY_STYLES[task.priority])}>
-              {task.priority}
+              {PRIORITY_LABELS[task.priority] || task.priority}
             </span>
           </div>
 

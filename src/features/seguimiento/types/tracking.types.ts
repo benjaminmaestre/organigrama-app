@@ -24,6 +24,12 @@ export interface SourceReference {
   displayLabel: string;
 }
 
+export interface SourceQuote {
+  reference: string;
+  document: 'CO-1' | 'CO-80';
+  quote: string;
+}
+
 export type SourceClassification = 'direct' | 'combined' | 'operational_summary' | 'local';
 
 export interface Task {
@@ -44,6 +50,7 @@ export interface Task {
   completed_by?: string;
   notes?: string;
   source_refs?: SourceReference[];
+  source_quotes?: SourceQuote[];
   instruction_basis?: string;
   source_classification?: SourceClassification;
   updated_at: string;

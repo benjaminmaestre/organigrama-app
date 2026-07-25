@@ -27,6 +27,12 @@ const SEVERITY_STYLES = {
   urgent: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-900/60 animate-pulse',
 };
 
+const LEVEL_LABELS: Record<string, string> = {
+  normal: 'Normal',
+  important: 'Importante',
+  urgent: 'Urgente',
+};
+
 
 export const IssueTracker: React.FC<IssueTrackerProps> = ({
   issues,
@@ -254,7 +260,7 @@ export const IssueTracker: React.FC<IssueTrackerProps> = ({
                       "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border",
                       SEVERITY_STYLES[issue.level]
                     )}>
-                      {issue.level}
+                      {LEVEL_LABELS[issue.level] || issue.level}
                     </span>
                   </div>
 

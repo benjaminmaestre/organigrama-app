@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Task, Subtask, TaskActivity } from '../types/tracking.types';
+import { OFFICIAL_TASK_METADATA_BY_KEY } from '../data/seedData';
 import { cn } from '../../../lib/cn';
 import {
   X,
@@ -9,7 +10,6 @@ import {
   ArrowUpRight,
   History,
   BookOpen,
-  AlertTriangle,
   Calendar,
   Check,
   ChevronDown,
@@ -89,11 +89,9 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   onUpdateAssignment,
   onUpdateNotes,
   onUpdateDueDate,
-  onSyncOfficialContent,
   onToggleSubtask,
   onAddSubtask,
 }) => {
-  const [syncing, setSyncing] = React.useState(false);
   const [notes, setNotes] = React.useState(task.notes || '');
   const [newSubTitle, setNewSubTitle] = React.useState('');
   const [dueDateInput, setDueDateInput] = React.useState(task.due_date || '');
@@ -193,15 +191,16 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   };
 
   const isLocalTask = task.source === 'custom' || task.source_classification === 'local';
-  const hasRefs = Boolean(task.source_refs && task.source_refs.length > 0);
-  const hasBasis = Boolean(task.instruction_basis?.trim());
-  const isOfficialComplete = !isLocalTask && hasRefs && hasBasis;
+  const officialMetadata = task.template_key ? OFFICIAL_TASK_METADATA_BY_KEY.get(task.template_key) : undefined;
+
+  const references = officialMetadata?.source_refs ?? task.source_refs ?? [];
+  const quotes = officialMetadata?.source_quotes ?? task.source_quotes ?? [];
+  const instructionBasis = officialMetadata?.instruction_basis ?? task.instruction_basis;
+  const classification = officialMetadata?.source_classification ?? task.source_classification ?? (isLocalTask ? 'local' : 'direct');
 
   const classificationBadgeText = isLocalTask
     ? 'Tarea local'
-    : isOfficialComplete
-    ? CLASSIFICATION_LABELS[task.source_classification || 'direct'] || 'Instrucción oficial'
-    : 'Pendiente de verificar';
+    : CLASSIFICATION_LABELS[classification] || 'Instrucción oficial';
 
   const currentAssignedOption = ASSIGNED_OPTIONS.find((opt) => opt.value === task.assigned_to) || ASSIGNED_OPTIONS[0];
 
@@ -256,103 +255,74 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
               )}
 
               {/* RECUADRO FUNDAMENTO DE LA TAREA */}
-              <div className="space-y-3 p-4 sm:p-5 rounded-2xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="space-y-4 p-4 sm:p-5 rounded-2xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20">
+                <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-blue-500/15">
                   <span className="text-[11px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
                     <BookOpen size={15} />
                     Fundamento de la Tarea
                   </span>
-                  <span className={cn(
-                    "text-[10px] font-bold px-2.5 py-0.5 rounded-full border",
-                    isOfficialComplete || isLocalTask
-                      ? "bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-200 border-blue-500/20"
-                      : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/20"
-                  )}>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-200 border-blue-500/20">
                     {classificationBadgeText}
                   </span>
                 </div>
 
-                {/* CASO A — TAREA OFICIAL COMPLETA */}
-                {isOfficialComplete && (
-                  <div className="space-y-3">
-                    {/* Chips de referencias */}
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {task.source_refs?.map((ref, idx) => {
-                        const fullTooltip = `${ref.document}${ref.chapter ? ` — Cap. ${ref.chapter}` : ''}${ref.paragraphs ? `, párrs. ${ref.paragraphs}` : ''}${ref.appendix ? ` — Apéndice ${ref.appendix}` : ''}`;
-                        return (
+                {/* TAREA OFICIAL */}
+                {!isLocalTask && (
+                  <div className="space-y-4">
+                    {/* CHIPS DE REFERENCIAS */}
+                    {references.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {references.map((ref, idx) => (
                           <span
                             key={idx}
-                            title={fullTooltip}
-                            aria-label={fullTooltip}
-                            className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-blue-500/15 dark:bg-blue-500/25 text-blue-900 dark:text-blue-200 border border-blue-500/30"
+                            title={`${ref.document}${ref.chapter ? ` · Cap. ${ref.chapter}` : ''}${ref.paragraphs ? `, párrs. ${ref.paragraphs}` : ''}`}
+                            className="text-[11px] font-black px-3 py-1 rounded-lg bg-blue-600/15 dark:bg-blue-400/20 text-blue-900 dark:text-blue-200 border border-blue-500/30"
                           >
                             {ref.displayLabel}
                           </span>
-                        );
-                      })}
-                    </div>
-
-                    {/* Resumen de la Instrucción */}
-                    <div className="space-y-1.5 pt-2 border-t border-blue-500/15">
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Resumen de la instrucción:</span>
-                      <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed italic">
-                        "{task.instruction_basis}"
-                      </p>
-                    </div>
-
-                    {/* Desglose de referencias completas */}
-                    <div className="space-y-1 pt-2 border-t border-blue-500/15 text-[11px] text-slate-600 dark:text-slate-400">
-                      <span className="font-bold">Referencias verificadas:</span>
-                      <ul className="list-disc list-inside space-y-0.5">
-                        {task.source_refs?.map((ref, idx) => (
-                          <li key={idx}>
-                            <span className="font-bold text-blue-600 dark:text-blue-400">{ref.document}</span>
-                            {ref.chapter && ` — Capítulo ${ref.chapter}`}
-                            {ref.paragraphs && `, párrafo${ref.paragraphs.includes('-') || ref.paragraphs.includes(',') ? 's' : ''} ${ref.paragraphs}`}
-                            {ref.appendix && ` — Apéndice ${ref.appendix}`}
-                            {ref.section && ` (${ref.section})`}
-                            {ref.page && `, pág. ${ref.page}`}
-                          </li>
                         ))}
-                      </ul>
-                    </div>
+                      </div>
+                    )}
+
+                    {/* CITAS DOCUMENTALES TEXTUALES CORTAS */}
+                    {quotes.length > 0 && (
+                      <div className="space-y-2.5 pt-1">
+                        {quotes.map((sq, idx) => (
+                          <div key={idx} className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-blue-500/20 space-y-1 shadow-xs">
+                            <span className="text-[10px] font-black text-blue-700 dark:text-blue-300 uppercase tracking-widest block">
+                              Cita Documental — {sq.reference}
+                            </span>
+                            <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed italic font-medium">
+                              "{sq.quote}"
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* APLICACIÓN DE LA INSTRUCCIÓN / RESUMEN OPERATIVO */}
+                    {instructionBasis && (
+                      <div className="space-y-1.5 pt-3 border-t border-blue-500/15">
+                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                          {classification === 'operational_summary' ? 'Resumen Operativo' : 'Aplicación de la Instrucción'}
+                        </span>
+                        <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed">
+                          {instructionBasis}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* CASO B — TAREA LOCAL */}
+                {/* TAREA LOCAL */}
                 {isLocalTask && (
-                  <p className="text-xs sm:text-sm text-(--text-muted) leading-relaxed">
-                    Esta tarea fue añadida para atender una necesidad específica de esta asamblea y no procede directamente del CO-1 o CO-80.
-                  </p>
-                )}
-
-                {/* CASO C — TAREA OFICIAL INCOMPLETA / PENDIENTE */}
-                {!isOfficialComplete && !isLocalTask && (
-                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-start gap-2.5">
-                    <AlertTriangle size={18} className="shrink-0 text-amber-500 mt-0.5" />
-                    <div className="space-y-1.5 flex-1">
-                      <div className="font-bold">Referencia documental pendiente de sincronización</div>
-                      <p className="text-[11px] font-normal opacity-90">
-                        Esta tarea oficial todavía no recibió su fundamento documental. Las referencias del CO-1 / CO-80 se vincularán automáticamente al sincronizar.
-                      </p>
-                      {onSyncOfficialContent && (
-                        <button
-                          type="button"
-                          disabled={syncing}
-                          onClick={async () => {
-                            setSyncing(true);
-                            try {
-                              await onSyncOfficialContent();
-                            } finally {
-                              setSyncing(false);
-                            }
-                          }}
-                          className="mt-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold rounded-lg text-xs transition-colors shadow-xs flex items-center gap-1.5"
-                        >
-                          {syncing ? 'Sincronizando...' : 'Sincronizar contenido oficial'}
-                        </button>
-                      )}
-                    </div>
+                  <div className="p-3.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                      Tarea Local
+                    </span>
+                    <p className="text-xs sm:text-sm text-(--text-muted) leading-relaxed">
+                      Esta tarea fue añadida para atender una necesidad específica de esta asamblea.
+                    </p>
                   </div>
                 )}
               </div>

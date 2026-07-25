@@ -1,7 +1,38 @@
 import React from 'react';
 import { supabase } from '../api/supabaseClient';
 import type { Task, Subtask, Issue, DepartmentConfig, TaskActivity } from '../types/tracking.types';
-import { OFFICIAL_CHECKLIST_SEED } from '../data/seedData';
+import { OFFICIAL_CHECKLIST_SEED, OFFICIAL_TASK_METADATA_BY_KEY } from '../data/seedData';
+
+export function enrichTaskWithOfficialMetadata(task: Task): Task {
+  if (task.source === 'custom' || !task.template_key) {
+    return task;
+  }
+
+  const official = OFFICIAL_TASK_METADATA_BY_KEY.get(task.template_key);
+
+  if (!official) {
+    return task;
+  }
+
+  return {
+    ...task,
+    // Contenido oficial siempre tomado del frontend
+    title: official.title,
+    description: official.description,
+    source_refs: official.source_refs,
+    source_quotes: official.source_quotes,
+    instruction_basis: official.instruction_basis,
+    source_classification: official.source_classification,
+
+    // No sobrescribir datos operativos de Supabase
+    status: task.status,
+    priority: task.priority,
+    assigned_to: task.assigned_to,
+    due_date: task.due_date,
+    notes: task.notes,
+    completed_at: task.completed_at,
+  };
+}
 
 export function useTrackingTasks(
   eventId: string = '11111111-1111-1111-1111-111111111111',
@@ -391,7 +422,8 @@ const LEGACY_TITLE_MAP: Record<string, string> = {
           'Para habilitar la persistencia, ejecuta las políticas RLS en el SQL Editor de Supabase.'
         );
       } else {
-        setTasks(tasksData || []);
+        const enriched = (tasksData || []).map(enrichTaskWithOfficialMetadata);
+        setTasks(enriched);
       }
 
       // 3. Subtareas

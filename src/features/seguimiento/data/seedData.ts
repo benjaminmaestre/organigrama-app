@@ -1,4 +1,4 @@
-import type { Task, SourceReference, SourceClassification } from '../types/tracking.types';
+import type { Task, SourceReference, SourceQuote, SourceClassification } from '../types/tracking.types';
 
 export interface SeedTask {
   template_key: string;
@@ -10,6 +10,7 @@ export interface SeedTask {
   priority: Task['priority'];
   assigned_to: Task['assigned_to'];
   source_refs: SourceReference[];
+  source_quotes: SourceQuote[];
   instruction_basis: string;
   source_classification: SourceClassification;
 }
@@ -33,6 +34,18 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
       { document: 'CO-1', chapter: '1', paragraphs: '23', displayLabel: 'CO-1 · 1:23' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 1:23',
+        quote: 'El superintendente [...] tiene que estudiar y seguir con mucha atención el Manual de alojamiento.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · Apéndice E',
+        quote: 'Estudia detenidamente el Manual de alojamiento [...] y síguelo según corresponda.'
+      }
+    ],
     instruction_basis: 'El superintendente de Alojamiento debe estudiar y seguir cuidadosamente el Manual de alojamiento para asambleas regionales (CO-80) y las pautas generales del CO-1.',
     source_classification: 'combined',
   },
@@ -49,6 +62,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
       { document: 'CO-1', chapter: '1', paragraphs: '24', displayLabel: 'CO-1 · 1:24' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 1:33',
+        quote: 'El Comité de Asamblea y sus auxiliares se reunirán para elegir a ancianos capacitados.'
+      }
+    ],
     instruction_basis: 'El Comité de Asamblea selecciona y nombra a los superintendentes de departamento y sus auxiliares con suficiente antelación.',
     source_classification: 'combined',
   },
@@ -63,6 +83,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'both',
     source_refs: [
       { document: 'CO-1', appendix: 'E', section: 'Asuntos que atender antes de la asamblea', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 2:31',
+        quote: 'Con dos o tres meses de antelación, el Comité de Asamblea convocará una reunión.'
+      }
     ],
     instruction_basis: 'El superintendente debe familiarizarse con el estado de preparación de los departamentos varios meses antes del evento.',
     source_classification: 'direct',
@@ -79,6 +106,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '50', displayLabel: 'CO-1 · 3:50' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:50',
+        quote: 'Determinar si la magnitud del recinto exige habilitar los departamentos adicionales de Instalación o Transporte.'
+      }
     ],
     instruction_basis: 'Determinar si la magnitud del recinto exige habilitar los departamentos adicionales de Instalación o Transporte.',
     source_classification: 'combined',
@@ -97,6 +131,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', appendix: 'E', section: 'Asuntos que atender antes de la asamblea', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 2:31',
+        quote: 'Con dos o tres meses de antelación, el Comité de Asamblea convocará una reunión.'
+      }
+    ],
     instruction_basis: 'Mantener reuniones de alineación con cada responsable de departamento para verificar el nivel de preparación.',
     source_classification: 'direct',
   },
@@ -111,6 +152,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'both',
     source_refs: [
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · Apéndice E',
+        quote: 'Estudia detenidamente el Manual de alojamiento [...] y síguelo según corresponda.'
+      }
     ],
     instruction_basis: 'Asegurarse de que todos los superintendentes de departamento a su cargo entiendan las pautas del manual.',
     source_classification: 'direct',
@@ -128,6 +176,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
       { document: 'CO-1', chapter: '3', paragraphs: '52-53', displayLabel: 'CO-1 · 3:52-53' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:52',
+        quote: 'Puede que el Comité de Asamblea descubra que a cierto departamento todavía le falta personal.'
+      }
+    ],
     instruction_basis: 'Si todavía falta personal en algún departamento, el superintendente de Alojamiento puede pedir al Departamento de Información y Servicio Voluntario que prepare una solicitud conjunta para las congregaciones.',
     source_classification: 'combined',
   },
@@ -143,6 +198,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [],
     instruction_basis: 'Validar que los departamentos dispongan de las herramientas y suministros adecuados para sus tareas.',
     source_classification: 'operational_summary',
   },
@@ -157,6 +213,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'both',
     source_refs: [
       { document: 'CO-1', appendix: 'E', section: 'Asuntos que atender antes de la asamblea', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:55',
+        quote: 'Este departamento brinda la ayuda necesaria en las tareas de montaje, mantenimiento, reparación y desalojo.'
+      }
     ],
     instruction_basis: 'Supervisar el avance del montaje de la infraestructura en el local antes de que inicien las sesiones.',
     source_classification: 'direct',
@@ -177,13 +240,25 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
       { document: 'CO-1', chapter: '3', paragraphs: '51', displayLabel: 'CO-1 · 3:51' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 1:26',
+        quote: 'El superintendente de Alojamiento dará [...] una cantidad suficiente de directorios sencillos.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:51',
+        quote: 'Deben [...] saber explicar dónde están situados los distintos departamentos.'
+      }
+    ],
     instruction_basis: 'Se deben preparar directorios sencillos con la ubicación de los departamentos, excepto las zonas relacionadas con Contabilidad, y entregarlos a las personas autorizadas.',
     source_classification: 'combined',
   },
   {
     template_key: 'before_accommodation_complimentary_and_backup',
-    title: 'Confirmar las habitaciones de cortesía y el hospedaje de respaldo',
-    description: 'Verificar la lista aprobada por el Comité y contar con margen de hospedaje particular para casos imprevistos.',
+    title: 'Participar con el Comité de Asamblea en la asignación de habitaciones de cortesía y confirmar que exista hospedaje particular de respaldo',
+    description: 'Participar con el Comité de Asamblea en la asignación de habitaciones de cortesía y confirmar que exista hospedaje particular de respaldo.',
     phase: 'before',
     department_code: 'accommodation',
     responsibility_type: 'direct_accommodation',
@@ -191,15 +266,32 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'superintendent',
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '79', displayLabel: 'CO-1 · 3:79' },
-      { document: 'CO-80', chapter: '6', paragraphs: '4-8', displayLabel: 'CO-80 · 6:4-8' }
+      { document: 'CO-80', chapter: '6', paragraphs: '5', displayLabel: 'CO-80 · 6:5' }
     ],
-    instruction_basis: 'El Comité de Asamblea decide quién recibirá habitaciones de cortesía, y el superintendente de Alojamiento debe contar además con hospedaje de respaldo en casas particulares.',
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:79',
+        quote: 'El Comité de Asamblea, no solo el superintendente de Alojamiento o sus auxiliares, decide a quién se le ofrecerá alojamiento de cortesía.'
+      },
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 6:5',
+        quote: 'El Comité de Asamblea Regional decide a quién asignará habitaciones de cortesía y por cuántas noches.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:79',
+        quote: 'El superintendente de Alojamiento debe contar con hospedaje en casas particulares por si acaso.'
+      }
+    ],
+    instruction_basis: 'El Comité de Asamblea decide la asignación de habitaciones de cortesía. El superintendente de Alojamiento también debe disponer de hospedaje particular de respaldo.',
     source_classification: 'combined',
   },
   {
     template_key: 'before_accommodation_hotel_reservations',
     title: 'Coordinar con hoteles y hospedajes locales',
-    description: 'Confirmar contratos, listas de precios negociados y acuerdos logísticos con los establecimientos hotelero.',
+    description: 'Confirmar contratos, listas de precios negociados y acuerdos logísticos con los establecimientos hoteleros.',
     phase: 'before',
     department_code: 'accommodation',
     responsibility_type: 'direct_accommodation',
@@ -208,6 +300,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-80', chapter: '1', paragraphs: '1-10', displayLabel: 'CO-80 · 1:1-10' },
       { document: 'CO-80', chapter: '2', paragraphs: '1-12', displayLabel: 'CO-80 · 2:1-12' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 6:4',
+        quote: 'El Comité de Asamblea Regional hará cuanto pueda por conseguirle alojamiento de cortesía.'
+      }
     ],
     instruction_basis: 'Establecer contacto oficial con los hoteles locales, negociar tarifas acordes y validar los cupos de reserva.',
     source_classification: 'direct',
@@ -227,6 +326,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
       { document: 'CO-1', chapter: '3', paragraphs: '51', displayLabel: 'CO-1 · 3:51' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:51',
+        quote: 'Deben [...] saber explicar dónde están situados los distintos departamentos.'
+      }
+    ],
     instruction_basis: 'El Departamento de Información debe situarse en un área accesible para atender las consultas de los asistentes.',
     source_classification: 'combined',
   },
@@ -244,6 +350,18 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '55-62', displayLabel: 'CO-1 · 3:55-62' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:55',
+        quote: 'Este departamento brinda la ayuda necesaria en las tareas de montaje, mantenimiento, reparación y desalojo.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:56',
+        quote: 'Comprobar que se disponga de los rótulos necesarios y que se instalen debidamente.'
+      }
+    ],
     instruction_basis: 'Verificar que la sección de Instalación adecúe los espacios, tarimas, letreros y acometidas conforme a los planos.',
     source_classification: 'direct',
   },
@@ -259,7 +377,15 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     priority: 'important',
     assigned_to: 'department_head',
     source_refs: [
+      { document: 'CO-1', chapter: '3', paragraphs: '34', displayLabel: 'CO-1 · 3:34' },
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:34',
+        quote: 'El superintendente de Alojamiento y el superintendente de Limpieza se encargarán de que se lleve a cabo.'
+      }
     ],
     instruction_basis: 'El Departamento de Limpieza debe contar con los insumos y voluntarios necesarios para la limpieza previa y durante el evento.',
     source_classification: 'combined',
@@ -278,6 +404,18 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '63-67', displayLabel: 'CO-1 · 3:63-67' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:63',
+        quote: 'Debe contar con personal todo el tiempo que las instalaciones estén abiertas.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:67',
+        quote: 'Los encargados deben emplear algún sistema para identificar los [...] artículos.'
+      }
+    ],
     instruction_basis: 'Disponer un espacio seguro y bien identificado para la recepción y custodia de artículos extraviados y prendas.',
     source_classification: 'direct',
   },
@@ -294,6 +432,23 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'department_head',
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '80-85', displayLabel: 'CO-1 · 3:80-85' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:80',
+        quote: 'Este departamento se encarga de localizar y transportar el equipo necesario.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:81',
+        quote: 'Se usará el formulario Registro y recibo de equipos.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:82',
+        quote: 'Hay que comprobar que no tienen daños.'
+      }
     ],
     instruction_basis: 'Coordinar el traslado, descarga y almacenamiento seguro del mobiliario y materiales traídos al local.',
     source_classification: 'direct',
@@ -316,8 +471,9 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [],
     instruction_basis: 'Mantener comunicación continua con el Comité de Asamblea para resolver imprevistos durante el programa.',
-    source_classification: 'direct',
+    source_classification: 'operational_summary',
   },
 
   // Supervisión General
@@ -332,6 +488,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'both',
     source_refs: [
       { document: 'CO-1', appendix: 'E', section: 'Asuntos que atender durante la asamblea', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · Apéndice E',
+        quote: 'Visita, junto con tu auxiliar, todos los departamentos que están a tu cargo al menos una vez al día.'
+      }
     ],
     instruction_basis: 'El superintendente de Alojamiento y su auxiliar deben visitar todos los departamentos a su cargo al menos una vez al día, si es posible.',
     source_classification: 'direct',
@@ -348,6 +511,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [],
     instruction_basis: 'Prestar asistencia inmediata a cualquier departamento que enfrente dificultades operativas durante las sesiones.',
     source_classification: 'operational_summary',
   },
@@ -363,9 +527,25 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     priority: 'important',
     assigned_to: 'both',
     source_refs: [
-      { document: 'CO-1', chapter: '1', paragraphs: '25', displayLabel: 'CO-1 · 1:25' },
       { document: 'CO-1', chapter: '3', paragraphs: '78', displayLabel: 'CO-1 · 3:78' },
       { document: 'CO-80', chapter: '7', paragraphs: '10-11', displayLabel: 'CO-80 · 7:10-11' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:78',
+        quote: 'El Departamento de Alojamiento debe estar convenientemente situado.'
+      },
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:10',
+        quote: 'Proporcionar a los hermanos un lugar donde hallar respuestas a sus preguntas.'
+      },
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:11',
+        quote: 'La Sección de Alojamiento [...] debe situarse [...] en un lugar que sea visible.'
+      }
     ],
     instruction_basis: 'El puesto debe estar ubicado en un lugar visible y preparado para atender preguntas, problemas de alojamiento y necesidades de hospedaje de última hora.',
     source_classification: 'combined',
@@ -381,6 +561,18 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'superintendent',
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '8, 12-13', displayLabel: 'CO-80 · 7:8, 12-13' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:8',
+        quote: 'Estas situaciones se deben investigar y resolver a la mayor brevedad.'
+      },
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:13',
+        quote: 'Es necesario llevar un registro conciso de los comentarios y quejas.'
+      }
     ],
     instruction_basis: 'Los problemas comunicados por hoteles o asambleístas deben investigarse y resolverse rápidamente. También debe mantenerse un registro conciso de los comentarios y soluciones.',
     source_classification: 'direct',
@@ -399,6 +591,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '51-54', displayLabel: 'CO-1 · 3:51-54' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:54',
+        quote: 'Atenderá a quienes se ofrezcan a trabajar durante la asamblea.'
+      }
+    ],
     instruction_basis: 'Brindar información exacta sobre horarios, servicios y ubicación de departamentos durante la jornada.',
     source_classification: 'direct',
   },
@@ -416,6 +615,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [],
     instruction_basis: 'Asegurar que los equipos de limpieza recorran las instalaciones para mantener la pulcritud durante las sesiones.',
     source_classification: 'operational_summary',
   },
@@ -432,6 +632,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'department_head',
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '63-67', displayLabel: 'CO-1 · 3:63-67' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:64',
+        quote: 'Quien los reclame debe ser capaz de describirlos.'
+      }
     ],
     instruction_basis: 'Llevar un control ordenado de los artículos hallados en el recinto para su pronta devolución a los dueños.',
     source_classification: 'direct',
@@ -454,6 +661,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '14', displayLabel: 'CO-80 · 7:14' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:14',
+        quote: 'El Departamento de Alojamiento debe estar preparado para atender llamadas telefónicas.'
+      }
+    ],
     instruction_basis: 'El superintendente de Alojamiento debe estar disponible por teléfono durante todo el día siguiente al cierre de la asamblea.',
     source_classification: 'direct',
   },
@@ -468,6 +682,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'both',
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '15', displayLabel: 'CO-80 · 7:15' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:15',
+        quote: 'El superintendente de alojamiento programará una visita a todos los hoteles utilizados.'
+      }
     ],
     instruction_basis: 'El superintendente o su auxiliar deben visitar los hoteles utilizados para conocer los comentarios de la gerencia sobre el grupo.',
     source_classification: 'direct',
@@ -484,6 +705,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '15', displayLabel: 'CO-80 · 7:15' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:15',
+        quote: 'El superintendente de alojamiento programará una visita a todos los hoteles utilizados.'
+      }
+    ],
     instruction_basis: 'Recopilar los datos cuantitativos finales de habitaciones reservadas y ocupadas realmente por asambleístas.',
     source_classification: 'direct',
   },
@@ -499,6 +727,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '16', displayLabel: 'CO-80 · 7:16' }
     ],
+    source_quotes: [],
     instruction_basis: 'Asegurarse de que los beneficios o puntos acumulados por reservas se gestionen en estricta conformidad con las normas.',
     source_classification: 'direct',
   },
@@ -513,6 +742,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'superintendent',
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '17-20', displayLabel: 'CO-80 · 7:17-20' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:17',
+        quote: 'El informe tiene que llenarse completamente.'
+      }
     ],
     instruction_basis: 'Llenar completamente el formulario CO-83 resumiendo la ocupación hotelera y los comentarios recibidos.',
     source_classification: 'direct',
@@ -529,6 +765,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '21', displayLabel: 'CO-80 · 7:21' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:21',
+        quote: 'Enviará el original del Informe de ocupación [...] en un plazo de dos semanas.'
+      }
+    ],
     instruction_basis: 'El formulario CO-83 debe enviarse a la sucursal a más tardar dos semanas después de haber concluido la asamblea.',
     source_classification: 'direct',
   },
@@ -544,6 +787,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '21', displayLabel: 'CO-80 · 7:21' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:21',
+        quote: 'Enviará el original del Informe de ocupación [...] en un plazo de dos semanas.'
+      }
+    ],
     instruction_basis: 'Entregar una copia del informe CO-83 y la correspondencia oficial de alojamiento al coordinador del Comité de Asamblea.',
     source_classification: 'direct',
   },
@@ -558,6 +808,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'assistant',
     source_refs: [
       { document: 'CO-80', chapter: '7', paragraphs: '22-23', displayLabel: 'CO-80 · 7:22-23' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 7:22',
+        quote: 'Archivará todos los registros, formularios y correspondencia.'
+      }
     ],
     instruction_basis: 'Conservar los archivos ordenados de contratos, listas y notas de trabajo conforme a los plazos establecidos.',
     source_classification: 'direct',
@@ -576,6 +833,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '2', paragraphs: '30-35', displayLabel: 'CO-1 · 2:30-35' }
     ],
+    source_quotes: [],
     instruction_basis: 'Consolidar la información del evento para garantizar la continuidad operativa en la asamblea venidera.',
     source_classification: 'direct',
   },
@@ -591,6 +849,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
     ],
+    source_quotes: [],
     instruction_basis: 'Comprobar que los departamentos bajo supervisión hayan finalizado sus compromisos postasamblea.',
     source_classification: 'operational_summary',
   },
@@ -606,8 +865,9 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '54', displayLabel: 'CO-1 · 3:54' }
     ],
+    source_quotes: [],
     instruction_basis: 'Recoger los recursos del stand de información y resguardar la documentación generada.',
-    source_classification: 'direct',
+    source_classification: 'operational_summary',
   },
   {
     template_key: 'after_installation_teardown',
@@ -620,6 +880,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'department_head',
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '62', displayLabel: 'CO-1 · 3:62' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:55',
+        quote: 'Este departamento brinda la ayuda necesaria en las tareas de montaje, mantenimiento, reparación y desalojo.'
+      }
     ],
     instruction_basis: 'Coordinar el desmontaje ordenado garantizando la protección de los elementos del local.',
     source_classification: 'direct',
@@ -636,6 +903,7 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '2', paragraphs: '28-29', displayLabel: 'CO-1 · 2:28-29' }
     ],
+    source_quotes: [],
     instruction_basis: 'Realizar el recorrido final de inspección para devolver las instalaciones limpias y en buen estado.',
     source_classification: 'combined',
   },
@@ -650,6 +918,13 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     assigned_to: 'department_head',
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '66-67', displayLabel: 'CO-1 · 3:66-67' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:66',
+        quote: 'El superintendente del departamento guardará los objetos no reclamados.'
+      }
     ],
     instruction_basis: 'Procesar adecuadamente los bienes no reclamados una vez finalizado el periodo de atención.',
     source_classification: 'direct',
@@ -666,7 +941,18 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     source_refs: [
       { document: 'CO-1', chapter: '3', paragraphs: '84-85', displayLabel: 'CO-1 · 3:84-85' }
     ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:85',
+        quote: 'Se debe informar de inmediato al comité.'
+      }
+    ],
     instruction_basis: 'Verificar la devolución a tiempo de todo el material arrendado o prestado para evitar cobros adicionales.',
     source_classification: 'direct',
   },
 ];
+
+export const OFFICIAL_TASK_METADATA_BY_KEY = new Map<string, SeedTask>(
+  OFFICIAL_CHECKLIST_SEED.map((task) => [task.template_key, task])
+);
