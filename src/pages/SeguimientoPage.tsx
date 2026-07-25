@@ -45,6 +45,7 @@ export function SeguimientoPage() {
     updateTaskPriority,
     updateTaskAssignment,
     updateTaskNotes,
+    updateTaskDueDate,
     createCustomTask,
     toggleSubtask,
     addSubtask,
@@ -337,9 +338,11 @@ export function SeguimientoPage() {
             subtasks={subtasks[currentActiveTask.id] || []}
             activities={activities}
             onClose={() => setActiveTask(null)}
+            onUpdateStatus={updateTaskStatus}
             onUpdatePriority={updateTaskPriority}
             onUpdateAssignment={updateTaskAssignment}
             onUpdateNotes={updateTaskNotes}
+            onUpdateDueDate={updateTaskDueDate}
             onToggleSubtask={toggleSubtask}
             onAddSubtask={addSubtask}
           />

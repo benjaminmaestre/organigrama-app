@@ -15,6 +15,16 @@ export function useTrackingTasks(
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Validación en desarrollo del catálogo maestro para asegurar que ninguna tarea oficial carezca de fundamento
+  React.useEffect(() => {
+    const unreferenced = OFFICIAL_CHECKLIST_SEED.filter(
+      (t) => !t.source_refs || t.source_refs.length === 0 || !t.instruction_basis?.trim()
+    );
+    if (unreferenced.length > 0) {
+      console.warn('[Checklist Audit Warning]: Tareas oficiales sin fundamento documental:', unreferenced.map((t) => t.template_key));
+    }
+  }, []);
+
   // Asegura la existencia del evento en public.events antes de insertar tareas
   const ensureEventExists = async (targetEventId: string) => {
     try {
@@ -685,6 +695,23 @@ export function useTrackingTasks(
     }
   };
 
+  // Mutador: Actualizar Fecha Límite
+  const updateTaskDueDate = async (taskId: string, dueDate: string) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, due_date: dueDate } : t))
+    );
+    try {
+      const { error: err } = await supabase
+        .from('tasks')
+        .update({ due_date: dueDate || null, updated_at: new Date().toISOString() })
+        .eq('id', taskId);
+      if (err) throw err;
+    } catch (err: any) {
+      console.error('Error updating task due date:', err);
+      fetchData();
+    }
+  };
+
   return {
     tasks,
     subtasks,
@@ -697,6 +724,7 @@ export function useTrackingTasks(
     updateTaskPriority,
     updateTaskAssignment,
     updateTaskNotes,
+    updateTaskDueDate,
     createCustomTask,
     toggleSubtask,
     addSubtask,
