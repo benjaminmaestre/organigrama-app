@@ -28,7 +28,7 @@ export function SeguimientoPage() {
   const [activePhase, setActivePhase] = React.useState<Task['phase']>(getDefaultPhase);
   const [viewTab, setViewTab] = React.useState<'checklist' | 'incidents'>('checklist');
   const [selectedDept, setSelectedDept] = React.useState<string | null>(null);
-  const [activeTask, setActiveTask] = React.useState<Task | null>(null);
+  const [activeTaskId, setActiveTaskId] = React.useState<string | null>(null);
 
   const enabled = !authLoading && Boolean(user?.id);
 
@@ -135,10 +135,9 @@ export function SeguimientoPage() {
   };
 
   // Mantener actualizado el activeTask si cambia en el listado de tareas en tiempo real
-  const currentActiveTask = React.useMemo(() => {
-    if (!activeTask) return null;
-    return tasks.find((t) => t.id === activeTask.id) || activeTask;
-  }, [tasks, activeTask]);
+  const currentActiveTask = activeTaskId
+    ? tasks.find((t) => t.id === activeTaskId) || null
+    : null;
 
   if (authLoading) {
     return (
@@ -305,7 +304,7 @@ export function SeguimientoPage() {
                     await updateTaskStatus(id, status);
                   }}
                   onStatusChange={updateTaskStatus}
-                  onOpenDetails={setActiveTask}
+                  onOpenDetails={(task) => setActiveTaskId(task.id)}
                   onCreateTask={createCustomTask}
                 />
               </motion.div>
@@ -337,12 +336,13 @@ export function SeguimientoPage() {
             task={currentActiveTask}
             subtasks={subtasks[currentActiveTask.id] || []}
             activities={activities}
-            onClose={() => setActiveTask(null)}
+            onClose={() => setActiveTaskId(null)}
             onUpdateStatus={updateTaskStatus}
             onUpdatePriority={updateTaskPriority}
             onUpdateAssignment={updateTaskAssignment}
             onUpdateNotes={updateTaskNotes}
             onUpdateDueDate={updateTaskDueDate}
+            onSyncOfficialContent={refetch}
             onToggleSubtask={toggleSubtask}
             onAddSubtask={addSubtask}
           />

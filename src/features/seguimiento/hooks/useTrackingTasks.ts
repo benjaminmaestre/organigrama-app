@@ -48,14 +48,78 @@ export function useTrackingTasks(
     }
   };
 
+const LEGACY_TITLE_MAP: Record<string, string> = {
+  'confirmar documentos e instrucciones vigentes': 'before_committee_instructions',
+  'estudiar y repasar todas las cartas y manuales de asamblea actualizados para alojamiento.': 'before_committee_instructions',
+  'participar en la selección de superintendentes y auxiliares': 'before_committee_select_superintendents',
+  'confirmar los departamentos necesarios': 'before_committee_confirm_departments',
+  'participar en la ubicación de los departamentos': 'before_committee_department_locations',
+  'participar en la reunión preasamblea': 'before_committee_preassembly_meeting',
+  'participar en la asignación de habitaciones de cortesía y hospedaje particular': 'before_committee_courtesy_rooms',
+  'reunirse con cada superintendente de departamento y su auxiliar': 'before_supervision_meet_department_superintendents',
+  'confirmar que conocen sus instrucciones': 'before_supervision_confirm_instructions',
+  'revisar organización, personal y horarios de los departamentos': 'before_supervision_review_personnel_schedules',
+  'revisar necesidades de equipos y materiales': 'before_supervision_equipment_needs',
+  'confirmar canales de comunicación': 'before_supervision_communication_channels',
+  'identificar necesidades de personal y resolver faltantes': 'before_supervision_resolve_personnel_deficits',
+  'inspeccionar las instalaciones durante el montaje': 'before_supervision_inspect_montage',
+  'coordinar con hoteles y hospedajes locales': 'before_accommodation_hotels_coordination',
+  'reclutar y programar personal voluntario': 'before_volunteers_recruit_schedule',
+  'revisar herramientas y materiales requeridos para el montaje': 'before_installation_review_tools',
+  'confirmar personal suficiente, insumos de limpieza y plan de basura': 'before_cleaning_supplies_trash_plan',
+  'establecer área segura para guardar ropa y objetos perdidos': 'before_lost_found_secure_area',
+  'coordinar vehículos de carga y materiales pesados': 'before_transport_heavy_vehicles',
+  'visitar todos los departamentos supervisados al menos una vez cada día (viernes)': 'during_supervision_daily_visit_friday',
+  'visitar todos los departamentos supervisados al menos una vez cada día (sábado)': 'during_supervision_daily_visit_saturday',
+  'visitar todos los departamentos supervisados al menos una vez cada día (domingo)': 'during_supervision_daily_visit_sunday',
+  'buscar aspectos por los cuales felicitar': 'during_supervision_commend_volunteers',
+  'ayudar a mejorar el desempeño cuando sea necesario': 'during_supervision_improve_performance',
+  'confirmar que cada departamento funciona correctamente': 'during_supervision_confirm_proper_function',
+  'informar al comité sobre asuntos graves': 'during_committee_report_serious_matters',
+  'dar seguimiento a incidencias abiertas': 'during_supervision_follow_open_issues',
+  'atender a los delegados e invitados especiales al llegar': 'during_accommodation_receive_delegates',
+  'instalar el stand de información y atender dudas': 'during_volunteers_info_stand',
+  'estar disponible para resolver fallas en las estructuras del evento': 'during_installation_structural_repairs',
+  'inspeccionar baños y áreas comunes continuamente': 'during_cleaning_restrooms_inspection',
+  'registrar objetos recibidos y entregados': 'during_lost_found_register',
+  'estar disponible para traslados logísticos urgentes': 'during_transport_urgent_relocations',
+  'confirmar el cierre de cada departamento': 'after_supervision_confirm_department_closure',
+  'participar en la inspección final': 'after_committee_final_inspection',
+  'reunirse con los superintendentes de departamento': 'after_supervision_debrief_meeting',
+  'registrar lo que funcionó bien, dificultades y recomendaciones': 'after_supervision_consolidated_report',
+  'identificar hermanos que recibieron capacitación': 'after_supervision_identify_trained_brothers',
+  'entregar información pertinente a la siguiente asamblea': 'after_committee_handover_next_assembly',
+  'verificar que no queden incidencias abiertas': 'after_supervision_verify_no_open_issues',
+  'verificar la entrega de llaves y estado de habitaciones': 'after_accommodation_keys_room_checkout',
+  'recoger equipos, banners y archivar registros': 'after_volunteers_collect_equipment',
+  'desmontar estructuras, ordenar y guardar materiales': 'after_installation_dismantle_structures',
+  'hacer limpieza profunda final y entrega de llaves': 'after_cleaning_deep_clean',
+  'clasificar objetos no reclamados y coordinar su destino': 'after_lost_found_unclaimed_items',
+  'retornar equipos rentados y archivar inventarios': 'after_transport_return_rented_equipment',
+};
+
   // Inicialización y precarga del checklist oficial (con sincronización idempotente de fuentes y metadatos)
   const initializeOfficialChecklist = async (targetEventId: string): Promise<number> => {
     await ensureEventExists(targetEventId);
 
-    // 1. Consultar tareas existentes por template_key y id
+    // Intentar primero mediante la función RPC segura de Supabase (si está creada en la BD)
+    try {
+      const { data: rpcRes, error: rpcErr } = await supabase.rpc('sync_official_checklist_metadata', {
+        p_event_id: targetEventId,
+        p_tasks: OFFICIAL_CHECKLIST_SEED,
+      });
+
+      if (!rpcErr && rpcRes?.status === 'success') {
+        console.log('[RPC Sync Exitoso]:', rpcRes);
+      }
+    } catch (e) {
+      console.warn('[RPC Sync Warning]: RPC no ejecutada o no disponible, usando sincronización cliente verificada.', e);
+    }
+
+    // 1. Consultar tareas existentes por template_key, title e id
     const { data: existingTasks, error: fetchErr } = await supabase
       .from('tasks')
-      .select('id, template_key, title, source_refs, instruction_basis, source_classification')
+      .select('id, template_key, title, description, phase, department_code, responsibility_type, source_refs, instruction_basis, source_classification')
       .eq('event_id', targetEventId);
 
     if (fetchErr) {
@@ -63,10 +127,15 @@ export function useTrackingTasks(
       throw new Error(`Error al consultar tareas existentes: ${fetchErr.message}`);
     }
 
-    const existingMap = new Map<string, any>();
+    const existingByTemplateKey = new Map<string, any>();
+    const existingByTitle = new Map<string, any>();
+
     (existingTasks || []).forEach((t) => {
       if (t.template_key) {
-        existingMap.set(t.template_key, t);
+        existingByTemplateKey.set(t.template_key, t);
+      }
+      if (t.title) {
+        existingByTitle.set(t.title.trim().toLowerCase(), t);
       }
     });
 
@@ -74,12 +143,30 @@ export function useTrackingTasks(
     const tasksToSyncMetadata: Array<{ id: string; seed: typeof OFFICIAL_CHECKLIST_SEED[0] }> = [];
 
     OFFICIAL_CHECKLIST_SEED.forEach((seed) => {
-      const existing = existingMap.get(seed.template_key);
+      // 1. Buscar por template_key exacto
+      let existing = existingByTemplateKey.get(seed.template_key);
+
+      // 2. Buscar por título nuevo exacto
+      if (!existing && seed.title) {
+        existing = existingByTitle.get(seed.title.trim().toLowerCase());
+      }
+
+      // 3. Buscar por mapeo de título heredado (legacy)
+      if (!existing) {
+        for (const [legacyTitle, mappedKey] of Object.entries(LEGACY_TITLE_MAP)) {
+          if (mappedKey === seed.template_key) {
+            existing = existingByTitle.get(legacyTitle);
+            if (existing) break;
+          }
+        }
+      }
+
       if (!existing) {
         missingSeedTasks.push(seed);
       } else {
-        // Verificar si los metadatos maestros han cambiado o no están definidos en la BD
+        // Verificar si la tarea carece de template_key o metadatos maestros documentales
         const needsUpdate =
+          !existing.template_key ||
           !existing.source_refs ||
           existing.source_refs.length === 0 ||
           existing.instruction_basis !== seed.instruction_basis ||
@@ -100,7 +187,8 @@ export function useTrackingTasks(
       toSyncMetadata: tasksToSyncMetadata.length,
     });
 
-    // 2. Insertar las tareas faltantes en Supabase
+    // 2. Insertar las tareas faltantes en Supabase y verificar respuesta
+    let insertedCount = 0;
     if (missingSeedTasks.length > 0) {
       const payload = missingSeedTasks.map((seed) => ({
         event_id: targetEventId,
@@ -119,21 +207,26 @@ export function useTrackingTasks(
         source_classification: seed.source_classification || 'direct',
       }));
 
-      const { error: insertError } = await supabase
+      const { data: insertedRows, error: insertError } = await supabase
         .from('tasks')
-        .insert(payload);
+        .insert(payload)
+        .select('id, template_key');
 
       if (insertError) {
         console.error('[Checklist Error]: Error de Supabase al insertar checklist:', insertError);
         throw new Error(`[Supabase Error ${insertError.code || ''}]: ${insertError.message}`);
       }
+
+      insertedCount = insertedRows?.length || payload.length;
     }
 
-    // 3. Actualizar únicamente el contenido maestro (título, descripción, fundamento y referencias) de tareas existentes
+    // 3. Actualizar metadatos documentales de tareas existentes capturando DATA y ERROR explícitamente
+    let successfulUpdatesCount = 0;
     for (const { id, seed } of tasksToSyncMetadata) {
-      await supabase
+      const { data: updatedRow, error: updateErr } = await supabase
         .from('tasks')
         .update({
+          template_key: seed.template_key,
           title: seed.title,
           description: seed.description || null,
           source_refs: seed.source_refs || [],
@@ -141,10 +234,73 @@ export function useTrackingTasks(
           source_classification: seed.source_classification || 'direct',
           updated_at: new Date().toISOString(),
         })
-        .eq('id', id);
+        .eq('id', id)
+        .select('id, template_key, title, source_refs, instruction_basis, source_classification')
+        .single();
+
+      if (updateErr) {
+        console.error('[Official Metadata Sync Error]', {
+          taskId: id,
+          templateKey: seed.template_key,
+          code: updateErr.code,
+          message: updateErr.message,
+          details: updateErr.details,
+          hint: updateErr.hint,
+        });
+        throw new Error(`No se pudo sincronizar ${seed.template_key}: ${updateErr.message}`);
+      }
+
+      if (!updatedRow) {
+        throw new Error(`Supabase no devolvió la tarea actualizada: ${seed.template_key}`);
+      }
+
+      successfulUpdatesCount++;
     }
 
-    return missingSeedTasks.length + tasksToSyncMetadata.length;
+    // 4. Verificación completa post-sincronización en la BD real
+    const { data: verifiedTasks, error: verifyErr } = await supabase
+      .from('tasks')
+      .select('id, template_key, title, source_refs, instruction_basis, source_classification')
+      .eq('event_id', targetEventId)
+      .eq('source', 'official');
+
+    if (verifyErr) {
+      console.error('[Checklist Verification Query Error]:', verifyErr);
+    } else {
+      const incompleteTasks = (verifiedTasks || []).filter(
+        (t) =>
+          !Array.isArray(t.source_refs) ||
+          t.source_refs.length === 0 ||
+          !t.instruction_basis?.trim() ||
+          !t.source_classification
+      );
+
+      const summaryStats = {
+        catalogSize: OFFICIAL_CHECKLIST_SEED.length,
+        existingTasks: existingTasks?.length || 0,
+        requestedUpdates: tasksToSyncMetadata.length,
+        successfulUpdates: successfulUpdatesCount,
+        verifiedComplete: (verifiedTasks?.length || 0) - incompleteTasks.length,
+        incomplete: incompleteTasks.length,
+      };
+
+      console.log('[Checklist Metadata Sync Summary]:', summaryStats);
+
+      if (incompleteTasks.length > 0) {
+        console.error(
+          '[Checklist Metadata Verification Failed]:',
+          incompleteTasks.map((t) => ({
+            template_key: t.template_key,
+            title: t.title,
+            references: t.source_refs,
+            hasBasis: Boolean(t.instruction_basis?.trim()),
+            classification: t.source_classification,
+          }))
+        );
+      }
+    }
+
+    return insertedCount + successfulUpdatesCount;
   };
 
   // Cargar datos de Supabase de forma sincronizada

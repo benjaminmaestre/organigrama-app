@@ -342,3 +342,106 @@ values
   ('11111111-1111-1111-1111-111111111111', 'Hacer limpieza profunda final y entrega de llaves', 'Dejar la sede en idénticas o mejores condiciones de limpieza en las que se recibió.', 'after', 'cleaning', 'supervision', 'pending', 'important', 'department_head'),
   ('11111111-1111-1111-1111-111111111111', 'Clasificar objetos no reclamados y coordinar su destino', 'Clasificar ropa, biblias y otros objetos de valor no reclamados.', 'after', 'lost-found-cloakroom', 'supervision', 'pending', 'normal', 'department_head'),
   ('11111111-1111-1111-1111-111111111111', 'Retornar equipos rentados y archivar inventarios', 'Entrega de tarimas, andamios, mesas, etc., de proveedores externos.', 'after', 'transport-materials', 'supervision', 'pending', 'important', 'department_head');
+
+-- ==========================================
+-- 7. FUNCIÓN RPC DE SINCRONIZACIÓN Y BACKFILL
+-- ==========================================
+
+create or replace function public.sync_official_checklist_metadata(
+  p_event_id uuid,
+  p_tasks jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid;
+  v_user_role text;
+  v_item jsonb;
+  v_template_key text;
+  v_title text;
+  v_description text;
+  v_phase text;
+  v_dept text;
+  v_type text;
+  v_priority text;
+  v_assigned text;
+  v_refs jsonb;
+  v_basis text;
+  v_classification text;
+
+  v_inserted integer := 0;
+  v_updated integer := 0;
+  v_matched_id uuid;
+begin
+  v_user_id := auth.uid();
+  if v_user_id is not null then
+    select role into v_user_role from public.profiles where id = v_user_id;
+  end if;
+
+  -- Bucle por cada tarea en el catálogo jsonb
+  for v_item in select * from jsonb_array_elements(p_tasks)
+  loop
+    v_template_key := v_item->>'template_key';
+    v_title := v_item->>'title';
+    v_description := v_item->>'description';
+    v_phase := v_item->>'phase';
+    v_dept := v_item->>'department_code';
+    v_type := v_item->>'responsibility_type';
+    v_priority := coalesce(v_item->>'priority', 'normal');
+    v_assigned := coalesce(v_item->>'assigned_to', 'both');
+    v_refs := coalesce(v_item->'source_refs', '[]'::jsonb);
+    v_basis := v_item->>'instruction_basis';
+    v_classification := coalesce(v_item->>'source_classification', 'direct');
+
+    -- Buscar coincidencia por template_key o por título exacto/similar
+    select id into v_matched_id
+    from public.tasks
+    where event_id = p_event_id
+      and (
+        template_key = v_template_key
+        or lower(trim(title)) = lower(trim(v_title))
+      )
+    limit 1;
+
+    if v_matched_id is not null then
+      -- Actualizar metadatos maestros preservando estado, notas, fecha y asignaciones
+      update public.tasks
+      set
+        template_key = v_template_key,
+        title = v_title,
+        description = coalesce(v_description, description),
+        source_refs = v_refs,
+        instruction_basis = v_basis,
+        source_classification = v_classification,
+        updated_at = now()
+      where id = v_matched_id;
+
+      v_updated := v_updated + 1;
+    else
+      -- Insertar tarea oficial faltante
+      insert into public.tasks (
+        event_id, template_key, source, title, description, phase,
+        department_code, responsibility_type, priority, assigned_to,
+        status, source_refs, instruction_basis, source_classification
+      ) values (
+        p_event_id, v_template_key, 'official', v_title, v_description, v_phase,
+        v_dept, v_type, v_priority, v_assigned,
+        'pending', v_refs, v_basis, v_classification
+      );
+
+      v_inserted := v_inserted + 1;
+    end if;
+  end loop;
+
+  return jsonb_build_object(
+    'inserted_count', v_inserted,
+    'updated_count', v_updated,
+    'status', 'success'
+  );
+end;
+$$;
+
+grant execute on function public.sync_official_checklist_metadata(uuid, jsonb) to authenticated;

@@ -25,6 +25,7 @@ interface TaskDetailsDialogProps {
   onUpdateAssignment: (taskId: string, assignedTo: Task['assigned_to']) => Promise<void>;
   onUpdateNotes: (taskId: string, notes: string) => Promise<void>;
   onUpdateDueDate?: (taskId: string, dueDate: string) => Promise<void>;
+  onSyncOfficialContent?: () => Promise<void>;
   onToggleSubtask: (subtaskId: string, isCompleted: boolean) => Promise<void>;
   onAddSubtask: (taskId: string, title: string) => Promise<void>;
 }
@@ -88,9 +89,11 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   onUpdateAssignment,
   onUpdateNotes,
   onUpdateDueDate,
+  onSyncOfficialContent,
   onToggleSubtask,
   onAddSubtask,
 }) => {
+  const [syncing, setSyncing] = React.useState(false);
   const [notes, setNotes] = React.useState(task.notes || '');
   const [newSubTitle, setNewSubTitle] = React.useState('');
   const [dueDateInput, setDueDateInput] = React.useState(task.due_date || '');
@@ -194,6 +197,12 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   const hasBasis = Boolean(task.instruction_basis?.trim());
   const isOfficialComplete = !isLocalTask && hasRefs && hasBasis;
 
+  const classificationBadgeText = isLocalTask
+    ? 'Tarea local'
+    : isOfficialComplete
+    ? CLASSIFICATION_LABELS[task.source_classification || 'direct'] || 'Instrucción oficial'
+    : 'Pendiente de verificar';
+
   const currentAssignedOption = ASSIGNED_OPTIONS.find((opt) => opt.value === task.assigned_to) || ASSIGNED_OPTIONS[0];
 
   return (
@@ -253,8 +262,13 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                     <BookOpen size={15} />
                     Fundamento de la Tarea
                   </span>
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-200 border border-blue-500/20">
-                    {CLASSIFICATION_LABELS[task.source_classification || (isLocalTask ? 'local' : 'direct')]}
+                  <span className={cn(
+                    "text-[10px] font-bold px-2.5 py-0.5 rounded-full border",
+                    isOfficialComplete || isLocalTask
+                      ? "bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-200 border-blue-500/20"
+                      : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/20"
+                  )}>
+                    {classificationBadgeText}
                   </span>
                 </div>
 
@@ -316,11 +330,28 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                 {!isOfficialComplete && !isLocalTask && (
                   <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold flex items-start gap-2.5">
                     <AlertTriangle size={18} className="shrink-0 text-amber-500 mt-0.5" />
-                    <div className="space-y-1">
+                    <div className="space-y-1.5 flex-1">
                       <div className="font-bold">Referencia documental pendiente de sincronización</div>
                       <p className="text-[11px] font-normal opacity-90">
-                        Esta tarea oficial todavía no recibió su fundamento documental. Las referencias del CO-1 / CO-80 se vincularán automáticamente durante la sincronización.
+                        Esta tarea oficial todavía no recibió su fundamento documental. Las referencias del CO-1 / CO-80 se vincularán automáticamente al sincronizar.
                       </p>
+                      {onSyncOfficialContent && (
+                        <button
+                          type="button"
+                          disabled={syncing}
+                          onClick={async () => {
+                            setSyncing(true);
+                            try {
+                              await onSyncOfficialContent();
+                            } finally {
+                              setSyncing(false);
+                            }
+                          }}
+                          className="mt-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold rounded-lg text-xs transition-colors shadow-xs flex items-center gap-1.5"
+                        >
+                          {syncing ? 'Sincronizando...' : 'Sincronizar contenido oficial'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
