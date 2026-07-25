@@ -110,6 +110,7 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
   const fetchData = React.useCallback(async () => {
     setLoading(true);
     setError(null);
+    let seedFailed = false;
     try {
       let activeEventId = eventId;
       try {
@@ -130,9 +131,12 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
       // Inicializar y garantizar tareas del checklist oficial
       try {
         await initializeOfficialChecklist(activeEventId);
-      } catch (seedErr: any) {
+      } catch (seedErr: unknown) {
+        const errMsg = seedErr instanceof Error ? seedErr.message : String(seedErr);
         console.error('Fallo en initializeOfficialChecklist:', seedErr);
-        setError(`No fue posible cargar el checklist oficial: ${seedErr.message}`);
+        seedFailed = true;
+        // No establecer error aún — intentamos consultar antes de decidir
+        console.warn('[Checklist Fallback]: La precarga en Supabase falló. Se evaluará si usar datos locales.', errMsg);
       }
 
       // 1. Consultar tareas completas para el evento
@@ -145,7 +149,36 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
         throw new Error(`Error al leer tareas de la base de datos: ${tasksErr.message}`);
       }
 
-      setTasks(tasksData || []);
+      // 2. FALLBACK: Si Supabase no tiene tareas y la precarga falló (RLS u otro error),
+      //    generar tareas locales desde el catálogo oficial para que la UI no esté vacía.
+      if ((!tasksData || tasksData.length === 0) && seedFailed) {
+        console.warn('[Checklist Fallback]: Supabase devolvió 0 tareas y la precarga falló. Usando datos locales del checklist oficial.');
+        const now = new Date().toISOString();
+        const localTasks: Task[] = OFFICIAL_CHECKLIST_SEED.map((seed, index) => ({
+          id: `local-${seed.template_key}-${index}`,
+          event_id: activeEventId,
+          template_key: seed.template_key,
+          source: 'official' as const,
+          title: seed.title,
+          description: seed.description,
+          phase: seed.phase,
+          department_code: seed.department_code,
+          responsibility_type: seed.responsibility_type,
+          priority: seed.priority,
+          assigned_to: seed.assigned_to,
+          status: 'pending' as const,
+          updated_at: now,
+          created_at: now,
+        }));
+        setTasks(localTasks);
+        setError(
+          'Las políticas de seguridad (RLS) de Supabase impiden guardar el checklist. ' +
+          'Los datos se muestran desde el catálogo local. ' +
+          'Para habilitar la persistencia, ejecuta las políticas RLS en el SQL Editor de Supabase.'
+        );
+      } else {
+        setTasks(tasksData || []);
+      }
 
       // 2. Subtareas
       const { data: subtasksData, error: subtasksErr } = await supabase

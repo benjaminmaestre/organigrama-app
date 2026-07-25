@@ -9,7 +9,7 @@ import { IssueTracker } from '../features/seguimiento/components/IssueTracker';
 import { useTrackingTasks } from '../features/seguimiento/hooks/useTrackingTasks';
 import type { Task } from '../features/seguimiento/types/tracking.types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, ClipboardList, AlertCircle, Loader2 } from 'lucide-react';
+import { Calendar, ClipboardList, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { cn } from '../lib/cn';
 
 export function SeguimientoPage() {
@@ -49,6 +49,7 @@ export function SeguimientoPage() {
     createIssue,
     updateIssueStatus,
     configureDepartmentStatus,
+    refetch,
   } = useTrackingTasks();
 
   // Escuchar estado de autenticación real de Supabase
@@ -158,14 +159,21 @@ export function SeguimientoPage() {
           </p>
         </div>
 
-        {/* ERRORES O ESTADO DE CARGA DE DATOS */}
+        {/* ERROR ÚNICO DE SINCRONIZACIÓN */}
         {dataError && (
-          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-2.5">
-            <AlertCircle size={20} className="shrink-0" />
-            <div>
-              <h5 className="font-bold">Error de sincronización</h5>
-              <p className="text-xs mt-1">{dataError}</p>
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-sm flex items-start gap-3">
+            <AlertCircle size={20} className="shrink-0 mt-0.5" />
+            <div className="flex-1 space-y-1">
+              <h5 className="font-bold">Sincronización pendiente</h5>
+              <p className="text-xs leading-relaxed">{dataError}</p>
             </div>
+            <button
+              onClick={() => refetch()}
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all active:scale-95"
+            >
+              <RefreshCw size={13} />
+              Reintentar
+            </button>
           </div>
         )}
 
@@ -252,13 +260,7 @@ export function SeguimientoPage() {
           </div>
         </div>
 
-        {/* ALERTA DE ERROR DE PRECARGA / RLS */}
-        {dataError && (
-          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-3 shadow-md my-4">
-            <AlertCircle size={20} className="shrink-0 text-red-500" />
-            <div className="flex-1">{dataError}</div>
-          </div>
-        )}
+
 
         {/* VISTAS DINÁMICAS */}
         {dataLoading ? (
