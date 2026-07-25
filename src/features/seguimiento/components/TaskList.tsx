@@ -1,7 +1,8 @@
 import React from 'react';
 import type { Task, Subtask } from '../types/tracking.types';
 import { TaskCard } from './TaskCard';
-import { Search, Plus, X, Filter } from 'lucide-react';
+import { Search, Plus, X, Filter, ChevronDown, ChevronRight } from 'lucide-react';
+import { getDeptIcon } from '../../../lib/icons';
 
 interface TaskListProps {
   tasks: Task[];
@@ -24,16 +25,16 @@ interface TaskListProps {
   ) => Promise<void>;
 }
 
-const DEPT_LABELS: Record<string, string> = {
-  committee: 'Comité',
-  supervision: 'Supervisión Gral.',
-  accommodation: 'Alojamiento',
-  'information-volunteers': 'Información',
-  installation: 'Instalación',
-  cleaning: 'Limpieza',
-  'lost-found-cloakroom': 'Objetos Perdidos',
-  'transport-materials': 'Transporte',
-};
+const CATEGORY_GROUPS = [
+  { code: 'committee', name: 'Responsabilidades del Comité' },
+  { code: 'supervision', name: 'Supervisión General' },
+  { code: 'accommodation', name: 'Departamento de Alojamiento' },
+  { code: 'information-volunteers', name: 'Información y Servicio Voluntario' },
+  { code: 'installation', name: 'Instalación' },
+  { code: 'cleaning', name: 'Limpieza' },
+  { code: 'lost-found-cloakroom', name: 'Objetos Perdidos y Guardarropa' },
+  { code: 'transport-materials', name: 'Transporte y Materiales' },
+];
 
 export const TaskList: React.FC<TaskListProps> = ({
   tasks,
@@ -50,7 +51,19 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [statusFilter, setStatusFilter] = React.useState<string>('all');
   const [priorityFilter, setPriorityFilter] = React.useState<string>('all');
   const [assignedFilter, setAssignedFilter] = React.useState<string>('all');
-  
+
+  // Estado de colapsables por categoría (por defecto todos desplegados)
+  const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>({
+    committee: true,
+    supervision: true,
+    accommodation: true,
+    'information-volunteers': true,
+    installation: true,
+    cleaning: true,
+    'lost-found-cloakroom': true,
+    'transport-materials': true,
+  });
+
   // Estado para la creación de tareas personalizadas
   const [showAddForm, setShowAddForm] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
@@ -62,10 +75,25 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [newDueDate, setNewDueDate] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  // Filtrado de tareas
-  const filteredTasks = React.useMemo(() => {
-    return tasks
-      .filter((t) => t.phase === activePhase)
+  const toggleCategory = (code: string) => {
+    setExpandedCategories((prev) => ({ ...prev, [code]: !prev[code] }));
+  };
+
+  // Tareas pertenecientes a la fase activa
+  const phaseTasks = React.useMemo(() => {
+    return tasks.filter((t) => t.phase === activePhase);
+  }, [tasks, activePhase]);
+
+  // Avance global de la fase activa
+  const activePhaseProgress = React.useMemo(() => {
+    const valid = phaseTasks.filter((t) => t.status !== 'not_applicable');
+    const completed = valid.filter((t) => t.status === 'completed').length;
+    return { completed, total: valid.length };
+  }, [phaseTasks]);
+
+  // Filtrado general
+  const filteredPhaseTasks = React.useMemo(() => {
+    return phaseTasks
       .filter((t) => (selectedDept ? t.department_code === selectedDept : true))
       .filter((t) => {
         if (!search.trim()) return true;
@@ -91,38 +119,7 @@ export const TaskList: React.FC<TaskListProps> = ({
         if (assignedFilter === 'all') return true;
         return t.assigned_to === assignedFilter;
       });
-  }, [tasks, activePhase, selectedDept, search, statusFilter, priorityFilter, assignedFilter]);
-
-  // Ordenación de tareas:
-  // 1. Atrasadas (Overdue)
-  // 2. Prioridad Urgente
-  // 3. En Proceso
-  // 4. Pendiente
-  // 5. Completadas
-  // 6. No Aplican
-  const sortedTasks = React.useMemo(() => {
-    const todayStr = new Date().toISOString().split('T')[0];
-    
-    return [...filteredTasks].sort((a, b) => {
-      const aOverdue = a.status !== 'completed' && a.status !== 'not_applicable' && a.due_date && a.due_date < todayStr;
-      const bOverdue = b.status !== 'completed' && b.status !== 'not_applicable' && b.due_date && b.due_date < todayStr;
-
-      if (aOverdue && !bOverdue) return -1;
-      if (!aOverdue && bOverdue) return 1;
-
-      const priorityOrder = { urgent: 0, important: 1, normal: 2 };
-      const aPriority = priorityOrder[a.priority] ?? 2;
-      const bPriority = priorityOrder[b.priority] ?? 2;
-      if (a.status !== 'completed' && b.status !== 'completed') {
-        if (aPriority !== bPriority) return aPriority - bPriority;
-      }
-
-      const statusOrder = { blocked: 0, in_progress: 1, pending: 2, completed: 3, not_applicable: 4 };
-      const aStatus = statusOrder[a.status as keyof typeof statusOrder] ?? 2;
-      const bStatus = statusOrder[b.status as keyof typeof statusOrder] ?? 2;
-      return aStatus - bStatus;
-    });
-  }, [filteredTasks]);
+  }, [phaseTasks, selectedDept, search, statusFilter, priorityFilter, assignedFilter]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,11 +148,25 @@ export const TaskList: React.FC<TaskListProps> = ({
     }
   };
 
+  const phaseTitle = activePhase === 'before' ? 'ANTES DE LA ASAMBLEA' : activePhase === 'during' ? 'DURANTE LA ASAMBLEA' : 'DESPUÉS DE LA ASAMBLEA';
+
   return (
     <div className="space-y-6 w-full">
+      {/* CABECERA DE FASE CON CONTRADOR GENERAL */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xs">
+        <div>
+          <h3 className="text-base sm:text-lg font-black text-(--page-text) uppercase tracking-wider">{phaseTitle}</h3>
+          <p className="text-xs text-(--text-muted)">
+            Mostrando el checklist oficial precargado para esta etapa.
+          </p>
+        </div>
+        <div className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-black text-(--page-text) self-start sm:self-auto">
+          {activePhaseProgress.completed} de {activePhaseProgress.total} completadas
+        </div>
+      </div>
+
       {/* BARRA DE FILTROS */}
-      <div className="bg-white/40 dark:bg-slate-900/10 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
-        {/* Fila 1: Buscar y Filtro Departamento */}
+      <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative flex-1 group">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors" />
@@ -163,7 +174,7 @@ export const TaskList: React.FC<TaskListProps> = ({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar tareas..."
+              placeholder="Buscar tareas en el checklist..."
               className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--page-text)"
             />
           </div>
@@ -175,9 +186,9 @@ export const TaskList: React.FC<TaskListProps> = ({
               className="bg-(--input-bg) border border-(--border-color) text-(--page-text) rounded-xl py-2.5 px-3.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-semibold"
             >
               <option value="">Todos los Departamentos</option>
-              {Object.keys(DEPT_LABELS).map((code) => (
-                <option key={code} value={code}>
-                  {DEPT_LABELS[code]}
+              {CATEGORY_GROUPS.map((grp) => (
+                <option key={grp.code} value={grp.code}>
+                  {grp.name}
                 </option>
               ))}
             </select>
@@ -193,53 +204,49 @@ export const TaskList: React.FC<TaskListProps> = ({
           </div>
         </div>
 
-        {/* Fila 2: Filtros de Estado, Prioridad y Asignado */}
+        {/* Filtros avanzados */}
         <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 dark:border-slate-800/40 pt-3 text-xs font-semibold">
           <div className="flex items-center gap-1.5 text-(--text-muted)">
             <Filter size={14} />
-            <span>Filtros avanzados:</span>
+            <span>Filtros:</span>
           </div>
 
-          {/* Estado */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1.5 focus:outline-none focus:border-blue-500 font-bold"
+            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1 focus:outline-none focus:border-blue-500 font-bold"
           >
-            <option value="all">Cualquier Estado</option>
-            <option value="pending">Pendiente</option>
+            <option value="all">Todos los Estados</option>
+            <option value="pending">Pendientes</option>
             <option value="in_progress">En proceso</option>
-            <option value="blocked">Bloqueada</option>
-            <option value="completed">Completada</option>
-            <option value="overdue">Atrasada / Vencida</option>
+            <option value="blocked">Bloqueadas</option>
+            <option value="completed">Completadas</option>
+            <option value="overdue">Atrasadas / Vencidas</option>
           </select>
 
-          {/* Prioridad */}
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1.5 focus:outline-none focus:border-blue-500 font-bold"
+            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1 focus:outline-none focus:border-blue-500 font-bold"
           >
-            <option value="all">Cualquier Prioridad</option>
+            <option value="all">Todas las Prioridades</option>
             <option value="normal">Normal</option>
             <option value="important">Importante</option>
             <option value="urgent">Urgente</option>
           </select>
 
-          {/* Asignado */}
           <select
             value={assignedFilter}
             onChange={(e) => setAssignedFilter(e.target.value)}
-            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1.5 focus:outline-none focus:border-blue-500 font-bold"
+            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1 focus:outline-none focus:border-blue-500 font-bold"
           >
-            <option value="all">Cualquier Responsable</option>
+            <option value="all">Todos los Responsables</option>
+            <option value="both">Ambos</option>
             <option value="superintendent">Jhonny F.</option>
             <option value="assistant">Benjamín P.</option>
-            <option value="both">Ambos</option>
             <option value="department_head">Sup. Depto.</option>
           </select>
 
-          {/* Botón de limpiar filtros generales */}
           {(statusFilter !== 'all' || priorityFilter !== 'all' || assignedFilter !== 'all' || search) && (
             <button
               onClick={() => {
@@ -256,23 +263,94 @@ export const TaskList: React.FC<TaskListProps> = ({
         </div>
       </div>
 
-      {/* BOTÓN Y FORMULARIO DE NUEVA TAREA */}
-      <div className="w-full">
+      {/* LISTADO DE TAREAS AGRUPADAS POR DEPARTAMENTO */}
+      <div className="space-y-6">
+        {CATEGORY_GROUPS.filter((grp) => (selectedDept ? grp.code === selectedDept : true)).map((grp) => {
+          const groupTasks = filteredPhaseTasks.filter((t) => t.department_code === grp.code);
+
+          // Si hay filtro activo y este grupo no tiene tareas, no mostrar grupo vacío
+          if (groupTasks.length === 0 && (search || statusFilter !== 'all' || priorityFilter !== 'all' || assignedFilter !== 'all')) {
+            return null;
+          }
+
+          // Todos los ítems del grupo en la fase
+          const allGroupPhaseTasks = phaseTasks.filter((t) => t.department_code === grp.code);
+          const completedCount = allGroupPhaseTasks.filter((t) => t.status === 'completed').length;
+          const totalCount = allGroupPhaseTasks.length;
+
+          const isExpanded = expandedCategories[grp.code] ?? true;
+
+          return (
+            <div key={grp.code} className="space-y-3">
+              {/* ACCORDION HEADER */}
+              <div
+                onClick={() => toggleCategory(grp.code)}
+                className="flex items-center justify-between gap-3 p-3.5 sm:p-4 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-2xl cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-all select-none shadow-2xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-slate-400">
+                    {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                  </div>
+                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    {getDeptIcon(grp.name, 18)}
+                  </div>
+                  <span className="text-sm sm:text-base font-bold text-(--page-text)">{grp.name}</span>
+                </div>
+
+                <div className="text-xs font-bold text-(--text-muted) bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-xl">
+                  {completedCount}/{totalCount}
+                </div>
+              </div>
+
+              {/* CONTENIDO DEL GRUPO */}
+              {isExpanded && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-0 sm:pl-2">
+                  {groupTasks.length > 0 ? (
+                    groupTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        subtasks={subtasks[task.id] || []}
+                        onToggleComplete={onToggleComplete}
+                        onStatusChange={onStatusChange}
+                        onOpenDetails={onOpenDetails}
+                      />
+                    ))
+                  ) : (
+                    <div className="md:col-span-2 text-center py-6 text-slate-400 dark:text-slate-500 font-semibold italic text-xs bg-slate-50/50 dark:bg-slate-900/20 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                      No hay tareas registradas en este departamento para la etapa seleccionada.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* TAREA PERSONALIZADA (ACCIÓN SECUNDARIA AL FINAL) */}
+      <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
         {!showAddForm ? (
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center justify-center gap-2 px-5 py-3 w-full sm:w-auto bg-(--institutional-blue) hover:brightness-110 active:brightness-95 text-white rounded-2xl font-bold transition-all shadow-md active:scale-98 text-sm"
-          >
-            <Plus size={18} />
-            <span>Añadir Tarea Personalizada</span>
-          </button>
+          <div className="flex items-center justify-between gap-4 p-4 bg-slate-50 dark:bg-slate-900/20 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
+            <div>
+              <h5 className="text-xs font-bold text-(--page-text)">¿Necesitas agregar una tarea extraordinaria?</h5>
+              <p className="text-[11px] text-(--text-muted)">Las tareas personalizadas son opcionales y adicionales al checklist oficial.</p>
+            </div>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-(--page-text) rounded-xl font-bold transition-all text-xs shrink-0"
+            >
+              <Plus size={16} />
+              <span>Añadir Tarea Personalizada</span>
+            </button>
+          </div>
         ) : (
           <form
             onSubmit={handleCreate}
-            className="bg-white/50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 space-y-4 shadow-lg w-full"
+            className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 sm:p-6 space-y-4 shadow-lg w-full"
           >
             <div className="flex items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800/40">
-              <h4 className="text-sm font-black text-(--page-text) uppercase tracking-wider">Nueva Tarea</h4>
+              <h4 className="text-sm font-black text-(--page-text) uppercase tracking-wider">Nueva Tarea Personalizada</h4>
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
@@ -290,7 +368,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Ej: Revisar inventario final de Limpieza"
+                  placeholder="Ej: Comprar baterías de repuesto para megáfonos"
                   className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--page-text)"
                 />
               </div>
@@ -313,16 +391,15 @@ export const TaskList: React.FC<TaskListProps> = ({
                   onChange={(e) => {
                     const val = e.target.value as Task['department_code'];
                     setNewDept(val);
-                    // Mapeo automático de responsabilidad para ahorrar clics
                     if (val === 'committee') setNewType('committee');
                     else if (val === 'supervision') setNewType('supervision');
                     else setNewType('direct_accommodation');
                   }}
                   className="w-full bg-(--input-bg) border border-(--border-color) rounded-xl py-2.5 px-3 text-sm focus:outline-none text-(--page-text)"
                 >
-                  {Object.keys(DEPT_LABELS).map((code) => (
-                    <option key={code} value={code}>
-                      {DEPT_LABELS[code]}
+                  {CATEGORY_GROUPS.map((grp) => (
+                    <option key={grp.code} value={grp.code}>
+                      {grp.name}
                     </option>
                   ))}
                 </select>
@@ -396,26 +473,6 @@ export const TaskList: React.FC<TaskListProps> = ({
               </button>
             </div>
           </form>
-        )}
-      </div>
-
-      {/* LISTADO DE TARJETAS ORDENADAS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {sortedTasks.length > 0 ? (
-          sortedTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              subtasks={subtasks[task.id] || []}
-              onToggleComplete={onToggleComplete}
-              onStatusChange={onStatusChange}
-              onOpenDetails={onOpenDetails}
-            />
-          ))
-        ) : (
-          <div className="md:col-span-2 text-center py-12 text-slate-400 dark:text-slate-500 font-semibold italic bg-white/20 dark:bg-slate-900/10 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800/80">
-            No se encontraron tareas con los filtros seleccionados.
-          </div>
         )}
       </div>
     </div>

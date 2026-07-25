@@ -252,6 +252,14 @@ export function SeguimientoPage() {
           </div>
         </div>
 
+        {/* ALERTA DE ERROR DE PRECARGA / RLS */}
+        {dataError && (
+          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-3 shadow-md my-4">
+            <AlertCircle size={20} className="shrink-0 text-red-500" />
+            <div className="flex-1">{dataError}</div>
+          </div>
+        )}
+
         {/* VISTAS DINÁMICAS */}
         {dataLoading ? (
           <div className="h-64 flex items-center justify-center text-(--text-muted) font-semibold italic gap-2">

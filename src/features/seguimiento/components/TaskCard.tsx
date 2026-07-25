@@ -95,10 +95,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     <div
       onClick={() => onOpenDetails(task)}
       className={cn(
-        "relative p-4 sm:p-5 rounded-2xl border bg-white/50 dark:bg-slate-900/20 backdrop-blur-md transition-all duration-300 hover:shadow-md cursor-pointer flex flex-col gap-4 group scroll-mt-28 w-full border-slate-200 dark:border-slate-800",
-        isCompleted && "bg-slate-50/50 dark:bg-slate-950/10 opacity-75 border-emerald-100 dark:border-emerald-950/20",
-        isNotApplicable && "opacity-50 bg-slate-100/50 dark:bg-slate-900/10 border-slate-200 dark:border-slate-800/40",
-        isOverdue && "border-red-200 dark:border-red-950/30 bg-red-50/10 dark:bg-red-950/5"
+        "relative p-4 sm:p-5 rounded-2xl border bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/80 transition-all duration-300 hover:shadow-md cursor-pointer flex flex-col gap-4 group scroll-mt-28 w-full",
+        isCompleted && "bg-slate-50 dark:bg-slate-950/20 opacity-75 border-emerald-100/60 dark:border-emerald-950/20",
+        isNotApplicable && "opacity-55 bg-slate-100 dark:bg-slate-900/10 border-slate-200 dark:border-slate-800/40",
+        isOverdue && "border-red-200 dark:border-red-950/30 bg-red-50/50 dark:bg-red-950/10"
       )}
     >
       <div className="flex items-start gap-3 w-full">

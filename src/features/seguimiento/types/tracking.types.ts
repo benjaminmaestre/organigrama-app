@@ -17,6 +17,8 @@ export interface Event {
 export interface Task {
   id: string;
   event_id: string;
+  template_key?: string;
+  source?: 'official' | 'custom';
   title: string;
   description?: string;
   phase: 'before' | 'during' | 'after';

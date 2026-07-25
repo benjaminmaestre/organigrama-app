@@ -29,6 +29,8 @@ create table if not exists public.events (
 create table if not exists public.tasks (
   id uuid default uuid_generate_v4() primary key,
   event_id uuid references public.events(id) on delete cascade not null,
+  template_key text,
+  source text default 'official' check (source in ('official', 'custom')),
   title text not null,
   description text,
   phase text not null check (phase in ('before', 'during', 'after')),
@@ -42,7 +44,8 @@ create table if not exists public.tasks (
   completed_by uuid references public.profiles(id) on delete set null,
   notes text,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  constraint tasks_event_template_key_unique unique (event_id, template_key)
 );
 
 -- Tabla de subtareas
@@ -115,34 +118,22 @@ create policy "Permitir lectura de perfiles a todos los autenticados" on public.
 create policy "Permitir actualización de perfil propio" on public.profiles
   for update to authenticated using (auth.uid() = id);
 
--- Eventos (Cualquier usuario autenticado puede leer eventos)
-create policy "Permitir lectura de eventos a todos los autenticados" on public.events
-  for select to authenticated using (true);
+-- Eventos
+create policy "Permitir lectura de eventos a todos" on public.events
+  for select using (true);
 
--- Tareas
-create policy "Superintendentes y asistentes pueden ver y modificar tareas" on public.tasks
-  for all to authenticated
-  using (
-    exists (
-      select 1 from public.profiles
-      where id = auth.uid() 
-      and role in ('admin', 'accommodation_superintendent', 'accommodation_assistant')
-    )
-  );
+-- Tareas (Permitir lectura, inserción y actualización completa)
+create policy "Permitir lectura de tareas a todos" on public.tasks
+  for select using (true);
 
-create policy "Superintendentes de departamento pueden ver y modificar tareas de su departamento" on public.tasks
-  for select to authenticated using (true); -- Lectura para todos los autenticados
+create policy "Permitir insercion de tareas a todos" on public.tasks
+  for insert with check (true);
 
-create policy "Actualización limitada de tareas para superintendentes de departamento" on public.tasks
-  for update to authenticated
-  using (
-    exists (
-      select 1 from public.profiles
-      where id = auth.uid() 
-      and role = 'department_superintendent'
-      and department_code = tasks.department_code
-    )
-  );
+create policy "Permitir actualizacion de tareas a todos" on public.tasks
+  for update using (true);
+
+create policy "Permitir eliminacion de tareas a todos" on public.tasks
+  for delete using (true);
 
 -- Subtareas (Políticas heredadas de tareas)
 create policy "Acceso completo a subtareas para personal de alojamiento" on public.subtasks

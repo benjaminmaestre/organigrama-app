@@ -37,7 +37,7 @@ export const ProgressSummary: React.FC<ProgressSummaryProps> = ({
   return (
     <div className="space-y-6 sm:space-y-8 w-full">
       {/* CARD PRINCIPAL - AVANCE GLOBAL */}
-      <div className="relative bg-white/60 dark:bg-slate-900/30 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300">
+      <div className="relative bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.25)] overflow-hidden transition-all duration-300">
         <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
@@ -107,7 +107,7 @@ export const ProgressSummary: React.FC<ProgressSummaryProps> = ({
       </div>
 
       {/* PROGRESO POR DEPARTAMENTO */}
-      <div className="bg-white/60 dark:bg-slate-900/30 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.25)] transition-all duration-300">
+      <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.25)] transition-all duration-300">
         <h3 className="text-lg font-black text-(--page-text) uppercase tracking-wider mb-6 border-b border-(--border-color) pb-3">
           Progreso por Departamento
         </h3>
@@ -129,8 +129,8 @@ export const ProgressSummary: React.FC<ProgressSummaryProps> = ({
                 className={cn(
                   "p-4 rounded-2xl border transition-all duration-300 flex flex-col gap-3 group relative overflow-hidden",
                   isNotApplicable
-                    ? "bg-slate-100/50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800/40 opacity-70"
-                    : "bg-white/40 dark:bg-slate-800/10 border-slate-200/80 dark:border-slate-800/60 hover:border-(--institutional-blue)/30 hover:shadow-lg cursor-pointer"
+                    ? "bg-slate-100/70 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800/40 opacity-60"
+                    : "bg-slate-50 dark:bg-slate-900/20 border-slate-200/80 dark:border-slate-800/50 hover:border-(--institutional-blue)/30 hover:shadow-lg cursor-pointer"
                 )}
                 onClick={() => !isNotApplicable && onSelectDept(dept.code)}
               >

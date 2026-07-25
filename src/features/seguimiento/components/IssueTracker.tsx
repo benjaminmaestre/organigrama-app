@@ -77,7 +77,7 @@ export const IssueTracker: React.FC<IssueTrackerProps> = ({
   };
 
   return (
-    <div className="bg-white/60 dark:bg-slate-900/30 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.25)] transition-all duration-300 w-full">
+    <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.25)] transition-all duration-300 w-full">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/40 mb-6">
         <div className="space-y-1">
@@ -237,8 +237,8 @@ export const IssueTracker: React.FC<IssueTrackerProps> = ({
               <div
                 key={issue.id}
                 className={cn(
-                  "p-4 rounded-2xl border flex flex-col gap-3 justify-between bg-white/40 dark:bg-slate-800/10 transition-all border-slate-200 dark:border-slate-800",
-                  isResolved && "opacity-75 border-emerald-100 dark:border-emerald-950/20 bg-slate-50/50 dark:bg-slate-950/10",
+                  "p-4 rounded-2xl border flex flex-col gap-3 justify-between bg-slate-50 dark:bg-slate-900/20 transition-all border-slate-200 dark:border-slate-800/80",
+                  isResolved && "opacity-75 border-emerald-100 dark:border-emerald-950/20 bg-slate-100/50 dark:bg-slate-950/20",
                   issue.level === 'urgent' && !isResolved && "border-red-200 dark:border-red-950/30"
                 )}
               >
