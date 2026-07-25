@@ -7,14 +7,16 @@ import { TaskList } from '../features/seguimiento/components/TaskList';
 import { TaskDetailsDialog } from '../features/seguimiento/components/TaskDetailsDialog';
 import { IssueTracker } from '../features/seguimiento/components/IssueTracker';
 import { useTrackingTasks } from '../features/seguimiento/hooks/useTrackingTasks';
-import type { Task } from '../features/seguimiento/types/tracking.types';
+import type { Task, Profile } from '../features/seguimiento/types/tracking.types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, ClipboardList, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { cn } from '../lib/cn';
 
+const AUTHORIZED_ROLES = ['admin', 'accommodation_superintendent', 'accommodation_assistant'];
+
 export function SeguimientoPage() {
   const navigate = useNavigate();
-  const [user, setUser] = React.useState<any>(null);
+  const [user, setUser] = React.useState<Profile | null>(null);
   const [authLoading, setAuthLoading] = React.useState(true);
 
   // Obtener fase por defecto según la fecha actual local
@@ -68,6 +70,15 @@ export function SeguimientoPage() {
           .eq('id', session.user.id)
           .single();
         
+        const role = profile?.role || 'viewer';
+        if (!AUTHORIZED_ROLES.includes(role)) {
+          // Si el usuario no tiene rol autorizado para ver el seguimiento, redirigir a la página pública
+          setUser(null);
+          navigate('/', { replace: true });
+          setAuthLoading(false);
+          return;
+        }
+
         const resolveName = (email?: string, name?: string) => {
           const clean = email?.toLowerCase().trim() || '';
           if (clean === 'dartjfe@gmail.com') return 'Jhonny Flores';
@@ -78,9 +89,10 @@ export function SeguimientoPage() {
 
         setUser({
           id: session.user.id,
-          email: session.user.email,
+          email: session.user.email || '',
           full_name: resolveName(session.user.email, profile?.full_name),
-          role: profile?.role || 'viewer',
+          role,
+          created_at: profile?.created_at || new Date().toISOString(),
         });
       } else {
         // Si no hay sesión de Supabase Auth, redirigir a login
@@ -105,6 +117,13 @@ export function SeguimientoPage() {
           .eq('id', session.user.id)
           .single();
 
+        const role = profile?.role || 'viewer';
+        if (!AUTHORIZED_ROLES.includes(role)) {
+          setUser(null);
+          navigate('/', { replace: true });
+          return;
+        }
+
         const resolveName = (email?: string, name?: string) => {
           const clean = email?.toLowerCase().trim() || '';
           if (clean === 'dartjfe@gmail.com') return 'Jhonny Flores';
@@ -115,9 +134,10 @@ export function SeguimientoPage() {
 
         setUser({
           id: session.user.id,
-          email: session.user.email,
+          email: session.user.email || '',
           full_name: resolveName(session.user.email, profile?.full_name),
-          role: profile?.role || 'viewer',
+          role,
+          created_at: profile?.created_at || new Date().toISOString(),
         });
       }
     });
@@ -160,32 +180,32 @@ export function SeguimientoPage() {
 
       <AppHeader user={user} onLogout={handleLogout} />
 
-      <main className="grow max-w-7xl mx-auto px-4 py-6 md:py-12 relative z-10 w-full flex flex-col gap-6 sm:gap-8">
+      <main className="grow max-w-7xl mx-auto px-1.5 py-3 sm:px-3 md:px-5 lg:px-6 md:py-6 relative z-10 w-full flex flex-col gap-4 sm:gap-6">
         
         {/* TITULO Y DESCRIPCION DE LA SECCIÓN */}
-        <div className="text-center sm:text-left space-y-1">
-          <h2 className="text-2xl sm:text-3xl font-black text-(--page-text) tracking-tight flex items-center justify-center sm:justify-start gap-2.5">
-            <ClipboardList className="text-(--institutional-blue)" size={28} />
+        <div className="text-center sm:text-left space-y-0.5">
+          <h2 className="text-xl sm:text-2xl font-black text-(--page-text) tracking-tight flex items-center justify-center sm:justify-start gap-2">
+            <ClipboardList className="text-(--institutional-blue) w-5 h-5 sm:w-6 sm:h-6" />
             Seguimiento de la Asamblea
           </h2>
-          <p className="text-xs sm:text-sm text-(--text-muted)">
-            Mapeo de tareas y pendientes de la Superintendencia de Alojamiento · Medellín 4
+          <p className="text-[10px] sm:text-xs text-(--text-muted) truncate sm:overflow-visible">
+            Superintendencia de Alojamiento · Medellín 4
           </p>
         </div>
 
         {/* ERROR ÚNICO DE SINCRONIZACIÓN */}
         {dataError && (
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-sm flex items-start gap-3">
-            <AlertCircle size={20} className="shrink-0 mt-0.5" />
-            <div className="flex-1 space-y-1">
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs flex items-start gap-2.5">
+            <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <div className="flex-1 space-y-0.5">
               <h5 className="font-bold">Sincronización pendiente</h5>
-              <p className="text-xs leading-relaxed">{dataError}</p>
+              <p className="text-[11px] leading-relaxed">{dataError}</p>
             </div>
             <button
               onClick={() => refetch()}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all active:scale-95"
+              className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold transition-all active:scale-95"
             >
-              <RefreshCw size={13} />
+              <RefreshCw size={11} />
               Reintentar
             </button>
           </div>
@@ -194,7 +214,9 @@ export function SeguimientoPage() {
         {/* DASHBOARD DE RESUMEN DE PROGRESO */}
         <ProgressSummary
           tasks={tasks}
+          issues={issues}
           configs={configs}
+          canViewSuperintendence={true}
           onConfigureDept={configureDepartmentStatus}
           onSelectDept={(code) => {
             setSelectedDept(code);
@@ -203,72 +225,72 @@ export function SeguimientoPage() {
         />
 
         {/* NAVEGACIÓN PRINCIPAL DEL MÓDULO (CHECKLIST VS INCIDENCIAS) */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="sticky top-0 z-30 bg-(--page-bg)/80 backdrop-blur-md py-2 border-b border-slate-200 dark:border-slate-850 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
           {/* Fases Temporales (Antes, Durante, Después) */}
-          <div className="inline-flex p-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm self-start">
+          <div className="w-full sm:w-auto grid grid-cols-3 p-0.5 bg-white/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xs">
             <button
               onClick={() => setActivePhase('before')}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                "flex items-center justify-center gap-1 py-2 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all min-h-[40px] sm:min-h-0",
                 activePhase === 'before'
-                  ? "bg-(--institutional-blue) text-white shadow-md"
+                  ? "bg-(--institutional-blue) text-white shadow-2xs"
                   : "text-(--text-muted) hover:text-(--page-text)"
               )}
             >
-              <Calendar size={14} />
-              Antes
+              <Calendar size={13} className="shrink-0" />
+              <span className="truncate">Antes</span>
             </button>
             <button
               onClick={() => setActivePhase('during')}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                "flex items-center justify-center gap-1 py-2 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all min-h-[40px] sm:min-h-0",
                 activePhase === 'during'
-                  ? "bg-(--institutional-blue) text-white shadow-md"
+                  ? "bg-(--institutional-blue) text-white shadow-2xs"
                   : "text-(--text-muted) hover:text-(--page-text)"
               )}
             >
-              <Calendar size={14} />
-              Durante
+              <Calendar size={13} className="shrink-0" />
+              <span className="truncate">Durante</span>
             </button>
             <button
               onClick={() => setActivePhase('after')}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all",
+                "flex items-center justify-center gap-1 py-2 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all min-h-[40px] sm:min-h-0",
                 activePhase === 'after'
-                  ? "bg-(--institutional-blue) text-white shadow-md"
+                  ? "bg-(--institutional-blue) text-white shadow-2xs"
                   : "text-(--text-muted) hover:text-(--page-text)"
               )}
             >
-              <Calendar size={14} />
-              Después
+              <Calendar size={13} className="shrink-0" />
+              <span className="truncate">Después</span>
             </button>
           </div>
 
           {/* Vistas Secundarias (Tareas vs Incidencias) */}
-          <div className="flex items-center gap-2 self-end sm:self-center">
+          <div className="w-full sm:w-auto grid grid-cols-2 p-0.5 bg-white/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xs">
             <button
               onClick={() => setViewTab('checklist')}
               className={cn(
-                "px-4 py-2 rounded-xl text-xs font-black border transition-all active:scale-95",
+                "py-2 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all min-h-[40px] sm:min-h-0 text-center",
                 viewTab === 'checklist'
-                  ? "bg-slate-900 border-slate-900 text-white dark:bg-slate-800 dark:border-slate-800"
-                  : "bg-transparent border-slate-200 dark:border-slate-800 text-(--text-muted) hover:text-(--page-text)"
+                  ? "bg-slate-900 text-white dark:bg-slate-800 shadow-2xs"
+                  : "text-(--text-muted) hover:text-(--page-text)"
               )}
             >
-              Tareas
+              Tareas ({tasks.filter(t => t.phase === activePhase && (selectedDept ? (selectedDept === 'superintendence' ? (t.department_code === 'committee' || t.department_code === 'supervision') : t.department_code === selectedDept) : true)).length})
             </button>
             <button
               onClick={() => setViewTab('incidents')}
               className={cn(
-                "px-4 py-2 rounded-xl text-xs font-black border transition-all active:scale-95 flex items-center gap-1.5",
+                "py-2 sm:py-1.5 px-3 rounded-lg text-xs font-black transition-all min-h-[40px] sm:min-h-0 text-center flex items-center justify-center gap-1.5",
                 viewTab === 'incidents'
-                  ? "bg-slate-900 border-slate-900 text-white dark:bg-slate-800 dark:border-slate-800"
-                  : "bg-transparent border-slate-200 dark:border-slate-800 text-(--text-muted) hover:text-(--page-text)"
+                  ? "bg-slate-900 text-white dark:bg-slate-800 shadow-2xs"
+                  : "text-(--text-muted) hover:text-(--page-text)"
               )}
             >
-              Incidencias
+              Incidencias ({issues.filter(i => i.status !== 'resolved' && (selectedDept ? (selectedDept === 'superintendence' ? (i.department_code === 'committee' || i.department_code === 'supervision') : i.department_code === selectedDept) : true)).length})
               {issues.filter((i) => i.status !== 'resolved').length > 0 && (
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
               )}
             </button>
           </div>
@@ -319,7 +341,7 @@ export function SeguimientoPage() {
               >
                 <IssueTracker
                   issues={issues}
-                  currentUserName={user?.full_name || user?.email}
+                  currentUserName={user?.full_name || user?.email || 'Usuario'}
                   onCreateIssue={createIssue}
                   onResolveIssue={updateIssueStatus}
                 />
