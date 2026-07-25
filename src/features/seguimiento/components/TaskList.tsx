@@ -51,6 +51,7 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [statusFilter, setStatusFilter] = React.useState<string>('all');
   const [priorityFilter, setPriorityFilter] = React.useState<string>('all');
   const [assignedFilter, setAssignedFilter] = React.useState<string>('all');
+  const [sourceFilter, setSourceFilter] = React.useState<string>('all');
 
   // Estado de colapsables por categoría (por defecto todos desplegados)
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>({
@@ -118,8 +119,24 @@ export const TaskList: React.FC<TaskListProps> = ({
       .filter((t) => {
         if (assignedFilter === 'all') return true;
         return t.assigned_to === assignedFilter;
+      })
+      .filter((t) => {
+        if (sourceFilter === 'all') return true;
+        const isLocal = t.source === 'custom' || t.source_classification === 'local';
+        if (sourceFilter === 'local') return isLocal;
+        if (isLocal) return false;
+
+        const hasCO1 = t.source_refs?.some((r) => r.document === 'CO-1');
+        const hasCO80 = t.source_refs?.some((r) => r.document === 'CO-80');
+
+        if (sourceFilter === 'co1') return Boolean(hasCO1);
+        if (sourceFilter === 'co80') return Boolean(hasCO80);
+        if (sourceFilter === 'co1_and_co80') return Boolean(hasCO1 && hasCO80);
+        if (sourceFilter === 'pending') return (!t.source_refs || t.source_refs.length === 0);
+
+        return true;
       });
-  }, [phaseTasks, selectedDept, search, statusFilter, priorityFilter, assignedFilter]);
+  }, [phaseTasks, selectedDept, search, statusFilter, priorityFilter, assignedFilter, sourceFilter]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,12 +264,26 @@ export const TaskList: React.FC<TaskListProps> = ({
             <option value="department_head">Sup. Depto.</option>
           </select>
 
-          {(statusFilter !== 'all' || priorityFilter !== 'all' || assignedFilter !== 'all' || search) && (
+          <select
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value)}
+            className="bg-transparent border-b border-slate-300 dark:border-slate-700 text-(--page-text) py-1 focus:outline-none focus:border-blue-500 font-bold"
+          >
+            <option value="all">Todas las Fuentes</option>
+            <option value="co1">CO-1</option>
+            <option value="co80">CO-80</option>
+            <option value="co1_and_co80">CO-1 y CO-80</option>
+            <option value="local">Tareas locales</option>
+            <option value="pending">Referencia pendiente</option>
+          </select>
+
+          {(statusFilter !== 'all' || priorityFilter !== 'all' || assignedFilter !== 'all' || sourceFilter !== 'all' || search) && (
             <button
               onClick={() => {
                 setStatusFilter('all');
                 setPriorityFilter('all');
                 setAssignedFilter('all');
+                setSourceFilter('all');
                 setSearch('');
               }}
               className="ml-auto text-red-500 hover:text-red-600 transition-colors uppercase text-[10px] font-black tracking-wider"

@@ -150,6 +150,28 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {task.description}
             </p>
           )}
+
+          {/* CHIPS DISCRETOS DE FUENTE Y REFERENCIA DOCUMENTAL */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {task.source === 'custom' || task.source_classification === 'local' ? (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
+                Tarea local
+              </span>
+            ) : task.source_refs && task.source_refs.length > 0 ? (
+              task.source_refs.map((ref, idx) => (
+                <span
+                  key={idx}
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/20"
+                >
+                  {ref.displayLabel}
+                </span>
+              ))
+            ) : (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                Referencia pendiente
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Menú de Estados (Status Select) */}

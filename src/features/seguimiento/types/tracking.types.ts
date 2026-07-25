@@ -14,6 +14,18 @@ export interface Event {
   created_at: string;
 }
 
+export interface SourceReference {
+  document: 'CO-1' | 'CO-80';
+  chapter?: string;
+  paragraphs?: string;
+  appendix?: string;
+  section?: string;
+  page?: number;
+  displayLabel: string;
+}
+
+export type SourceClassification = 'direct' | 'combined' | 'operational_summary' | 'local';
+
 export interface Task {
   id: string;
   event_id: string;
@@ -31,6 +43,9 @@ export interface Task {
   completed_at?: string;
   completed_by?: string;
   notes?: string;
+  source_refs?: SourceReference[];
+  instruction_basis?: string;
+  source_classification?: SourceClassification;
   updated_at: string;
   created_at: string;
   subtasks_count?: number;

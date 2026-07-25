@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Task, Subtask, TaskActivity } from '../types/tracking.types';
 import { cn } from '../../../lib/cn';
-import { X, User, CheckCircle2, Plus, ArrowUpRight, History } from 'lucide-react';
+import { X, User, CheckCircle2, Plus, ArrowUpRight, History, BookOpen, FileText } from 'lucide-react';
 
 interface TaskDetailsDialogProps {
   task: Task;
@@ -28,6 +28,13 @@ const STATUS_LABELS: Record<string, string> = {
   blocked: 'Bloqueada',
   completed: 'Completada',
   not_applicable: 'No aplica',
+};
+
+const CLASSIFICATION_LABELS: Record<string, string> = {
+  direct: 'Instrucción directa',
+  combined: 'Instrucción combinada',
+  operational_summary: 'Resumen operativo',
+  local: 'Tarea local',
 };
 
 export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
@@ -72,6 +79,8 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
     }
   };
 
+  const isLocalTask = task.source === 'custom' || task.source_classification === 'local';
+
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all">
       <div 
@@ -110,6 +119,59 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                 </p>
               </div>
             )}
+
+            {/* FUNDAMENTO DE LA TAREA */}
+            <div className="space-y-3 p-4 rounded-2xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+                  <BookOpen size={14} />
+                  Fundamento de la Tarea
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-800 dark:text-blue-200">
+                  {CLASSIFICATION_LABELS[task.source_classification || (isLocalTask ? 'local' : 'direct')]}
+                </span>
+              </div>
+
+              {isLocalTask ? (
+                <p className="text-xs text-(--text-muted) leading-relaxed">
+                  Esta es una tarea local o extraordinaria creada para las necesidades específicas de esta asamblea. No cuenta con referencia directa en los manuales oficiales CO-1 o CO-80.
+                </p>
+              ) : (
+                <div className="space-y-2.5">
+                  {/* Referencias documentales */}
+                  {task.source_refs && task.source_refs.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Referencias:</span>
+                      <div className="flex flex-col gap-1">
+                        {task.source_refs.map((ref, idx) => (
+                          <div key={idx} className="text-xs font-semibold text-(--page-text) flex items-center gap-2">
+                            <FileText size={12} className="text-blue-500 shrink-0" />
+                            <span>
+                              {ref.document}
+                              {ref.chapter && ` — Capítulo ${ref.chapter}`}
+                              {ref.paragraphs && `, párrafo${ref.paragraphs.includes('-') || ref.paragraphs.includes(',') ? 's' : ''} ${ref.paragraphs}`}
+                              {ref.appendix && ` — Apéndice ${ref.appendix}`}
+                              {ref.section && ` (${ref.section})`}
+                              {ref.page && `, pág. ${ref.page}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Resumen de la Instrucción */}
+                  {task.instruction_basis && (
+                    <div className="space-y-1 pt-1 border-t border-blue-500/10">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Resumen de la Instrucción:</span>
+                      <p className="text-xs text-(--page-text) leading-relaxed italic">
+                        "{task.instruction_basis}"
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Gestión de Subtareas */}
             <div className="space-y-3">

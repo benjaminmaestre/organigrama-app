@@ -43,10 +43,22 @@ create table if not exists public.tasks (
   completed_at timestamp with time zone,
   completed_by uuid references public.profiles(id) on delete set null,
   notes text,
+  source_refs jsonb not null default '[]'::jsonb,
+  instruction_basis text,
+  source_classification text default 'direct',
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   constraint tasks_event_template_key_unique unique (event_id, template_key)
 );
+
+-- Migraciones para columnas de fundamento documental y clasificación
+alter table public.tasks add column if not exists source_refs jsonb not null default '[]'::jsonb;
+alter table public.tasks add column if not exists instruction_basis text;
+alter table public.tasks add column if not exists source_classification text default 'direct';
+
+alter table public.tasks drop constraint if exists tasks_source_classification_check;
+alter table public.tasks add constraint tasks_source_classification_check
+  check (source_classification in ('direct', 'combined', 'operational_summary', 'local'));
 
 -- Tabla de subtareas
 create table if not exists public.subtasks (

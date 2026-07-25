@@ -25,3 +25,8 @@ dist-ssr
 
 .vercel
 .env*.local
+
+# Documentos internos de referencia
+documentos-internos/
+private-references/
+*.internal.pdf

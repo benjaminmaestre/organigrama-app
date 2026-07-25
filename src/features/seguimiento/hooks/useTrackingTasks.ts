@@ -38,14 +38,14 @@ export function useTrackingTasks(
     }
   };
 
-  // Inicialización y precarga del checklist oficial (compatible con cualquier esquema de BD)
+  // Inicialización y precarga del checklist oficial (con sincronización idempotente de fuentes y metadatos)
   const initializeOfficialChecklist = async (targetEventId: string): Promise<number> => {
     await ensureEventExists(targetEventId);
 
-    // 1. Consultar tareas existentes por la columna estándar 'title'
+    // 1. Consultar tareas existentes por template_key y id
     const { data: existingTasks, error: fetchErr } = await supabase
       .from('tasks')
-      .select('title')
+      .select('id, template_key, title, source_refs, instruction_basis, source_classification')
       .eq('event_id', targetEventId);
 
     if (fetchErr) {
@@ -53,60 +53,88 @@ export function useTrackingTasks(
       throw new Error(`Error al consultar tareas existentes: ${fetchErr.message}`);
     }
 
-    const existingTitles = new Set(
-      (existingTasks || []).map((t) => t.title?.trim().toLowerCase()).filter(Boolean)
-    );
+    const existingMap = new Map<string, any>();
+    (existingTasks || []).forEach((t) => {
+      if (t.template_key) {
+        existingMap.set(t.template_key, t);
+      }
+    });
 
-    // 2. Filtrar OFFICIAL_CHECKLIST_SEED para obtener solo las tareas faltantes por título
-    const missingSeedTasks = OFFICIAL_CHECKLIST_SEED.filter(
-      (seed) => !existingTitles.has(seed.title.trim().toLowerCase())
-    );
+    const missingSeedTasks: typeof OFFICIAL_CHECKLIST_SEED = [];
+    const tasksToSyncMetadata: Array<{ id: string; seed: typeof OFFICIAL_CHECKLIST_SEED[0] }> = [];
+
+    OFFICIAL_CHECKLIST_SEED.forEach((seed) => {
+      const existing = existingMap.get(seed.template_key);
+      if (!existing) {
+        missingSeedTasks.push(seed);
+      } else {
+        // Verificar si los metadatos maestros han cambiado o no están definidos en la BD
+        const needsUpdate =
+          !existing.source_refs ||
+          existing.source_refs.length === 0 ||
+          existing.instruction_basis !== seed.instruction_basis ||
+          existing.source_classification !== seed.source_classification ||
+          existing.title !== seed.title;
+
+        if (needsUpdate) {
+          tasksToSyncMetadata.push({ id: existing.id, seed });
+        }
+      }
+    });
 
     console.log('[Checklist Preload Diagnostics]:', {
       eventIdUsed: targetEventId,
       catalogSize: OFFICIAL_CHECKLIST_SEED.length,
       foundInSupabase: existingTasks?.length || 0,
       missingToInsert: missingSeedTasks.length,
+      toSyncMetadata: tasksToSyncMetadata.length,
     });
 
-    if (missingSeedTasks.length === 0) {
-      return 0;
+    // 2. Insertar las tareas faltantes en Supabase
+    if (missingSeedTasks.length > 0) {
+      const payload = missingSeedTasks.map((seed) => ({
+        event_id: targetEventId,
+        template_key: seed.template_key,
+        source: 'official',
+        title: seed.title,
+        description: seed.description || null,
+        phase: seed.phase,
+        department_code: seed.department_code,
+        responsibility_type: seed.responsibility_type,
+        priority: seed.priority,
+        assigned_to: seed.assigned_to,
+        status: 'pending',
+        source_refs: seed.source_refs || [],
+        instruction_basis: seed.instruction_basis || null,
+        source_classification: seed.source_classification || 'direct',
+      }));
+
+      const { error: insertError } = await supabase
+        .from('tasks')
+        .insert(payload);
+
+      if (insertError) {
+        console.error('[Checklist Error]: Error de Supabase al insertar checklist:', insertError);
+        throw new Error(`[Supabase Error ${insertError.code || ''}]: ${insertError.message}`);
+      }
     }
 
-    // 3. Preparar payload de inserción con columnas 100% estándar
-    const payload = missingSeedTasks.map((seed) => ({
-      event_id: targetEventId,
-      template_key: seed.template_key,
-      source: 'official',
-      title: seed.title,
-      description: seed.description || null,
-      phase: seed.phase,
-      department_code: seed.department_code,
-      responsibility_type: seed.responsibility_type,
-      priority: seed.priority,
-      assigned_to: seed.assigned_to,
-      status: 'pending',
-    }));
-
-    // 4. Insertar las tareas faltantes en Supabase
-    const { data: insertedData, error: insertError } = await supabase
-      .from('tasks')
-      .insert(payload)
-      .select('*');
-
-    if (insertError) {
-      console.error('[Checklist Error]: Error completo de Supabase al insertar checklist:', {
-        eventIdUsed: targetEventId,
-        catalogSize: OFFICIAL_CHECKLIST_SEED.length,
-        foundInSupabase: existingTasks?.length || 0,
-        missingToInsert: missingSeedTasks.length,
-        supabaseError: insertError,
-      });
-      throw new Error(`[Supabase Error ${insertError.code || ''}]: ${insertError.message}`);
+    // 3. Actualizar únicamente el contenido maestro (título, descripción, fundamento y referencias) de tareas existentes
+    for (const { id, seed } of tasksToSyncMetadata) {
+      await supabase
+        .from('tasks')
+        .update({
+          title: seed.title,
+          description: seed.description || null,
+          source_refs: seed.source_refs || [],
+          instruction_basis: seed.instruction_basis || null,
+          source_classification: seed.source_classification || 'direct',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
     }
 
-    console.log(`[Checklist Preload Exitoso]: ${insertedData?.length || payload.length} tareas oficiales insertadas en Supabase.`);
-    return insertedData?.length || payload.length;
+    return missingSeedTasks.length + tasksToSyncMetadata.length;
   };
 
   // Cargar datos de Supabase de forma sincronizada
@@ -153,7 +181,6 @@ export function useTrackingTasks(
         const errMsg = seedErr instanceof Error ? seedErr.message : String(seedErr);
         console.error('Fallo en initializeOfficialChecklist:', seedErr);
         seedFailed = true;
-        // No establecer error aún — intentamos consultar antes de decidir
         console.warn('[Checklist Fallback]: La precarga en Supabase falló. Se evaluará si usar datos locales.', errMsg);
       }
 
@@ -185,6 +212,9 @@ export function useTrackingTasks(
           priority: seed.priority,
           assigned_to: seed.assigned_to,
           status: 'pending' as const,
+          source_refs: seed.source_refs,
+          instruction_basis: seed.instruction_basis,
+          source_classification: seed.source_classification,
           updated_at: now,
           created_at: now,
         }));
