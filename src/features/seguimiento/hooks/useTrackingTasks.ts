@@ -3,7 +3,10 @@ import { supabase } from '../api/supabaseClient';
 import type { Task, Subtask, Issue, DepartmentConfig, TaskActivity } from '../types/tracking.types';
 import { OFFICIAL_CHECKLIST_SEED } from '../data/seedData';
 
-export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-111111111111') {
+export function useTrackingTasks(
+  eventId: string = '11111111-1111-1111-1111-111111111111',
+  enabled: boolean = true
+) {
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [subtasks, setSubtasks] = React.useState<Record<string, Subtask[]>>({});
   const [issues, setIssues] = React.useState<Issue[]>([]);
@@ -108,6 +111,21 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
 
   // Cargar datos de Supabase de forma sincronizada
   const fetchData = React.useCallback(async () => {
+    // Comprobación de diagnóstico obligatoria de sesión antes de precargar
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('[Auth Diagnostic Before Preload]:', {
+      authenticated: Boolean(session),
+      userId: session?.user?.id,
+      email: session?.user?.email,
+      role: session?.user?.role || 'authenticated',
+    });
+
+    if (!session?.user) {
+      console.warn('[Checklist Cancelled]: No existe una sesión activa de Supabase Auth. Cancelando precarga.');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     let seedFailed = false;
@@ -180,27 +198,27 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
         setTasks(tasksData || []);
       }
 
-      // 2. Subtareas
+      // 3. Subtareas
       const { data: subtasksData, error: subtasksErr } = await supabase
         .from('subtasks')
         .select('*');
       if (subtasksErr) console.warn('Error al cargar subtareas:', subtasksErr);
 
-      // 3. Incidencias
+      // 4. Incidencias
       const { data: issuesData, error: issuesErr } = await supabase
         .from('issues')
         .select('*')
         .eq('event_id', activeEventId);
       if (issuesErr) console.warn('Error al cargar incidencias:', issuesErr);
 
-      // 4. Configs de departamento
+      // 5. Configs de departamento
       const { data: configsData, error: configsErr } = await supabase
         .from('department_configs')
         .select('*')
         .eq('event_id', activeEventId);
       if (configsErr) console.warn('Error al cargar configs:', configsErr);
 
-      // 5. Historial de actividad
+      // 6. Historial de actividad
       const { data: activitiesData, error: activitiesErr } = await supabase
         .from('task_activity')
         .select('*')
@@ -230,6 +248,11 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
   }, [eventId]);
 
   React.useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+
     fetchData();
 
     // Canales en tiempo real
@@ -283,7 +306,7 @@ export function useTrackingTasks(eventId: string = '11111111-1111-1111-1111-1111
       supabase.removeChannel(issuesSubscription);
       supabase.removeChannel(configsSubscription);
     };
-  }, [fetchData]);
+  }, [enabled, fetchData]);
 
   // Mutador: Actualizar Estado de Tarea y registrar auditoría
   const updateTaskStatus = async (

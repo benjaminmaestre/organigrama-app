@@ -30,7 +30,9 @@ export function SeguimientoPage() {
   const [selectedDept, setSelectedDept] = React.useState<string | null>(null);
   const [activeTask, setActiveTask] = React.useState<Task | null>(null);
 
-  // Cargar datos en tiempo real mediante el custom hook
+  const enabled = !authLoading && Boolean(user?.id);
+
+  // Cargar datos en tiempo real mediante el custom hook únicamente si hay sesión autenticada
   const {
     tasks,
     subtasks,
@@ -50,7 +52,7 @@ export function SeguimientoPage() {
     updateIssueStatus,
     configureDepartmentStatus,
     refetch,
-  } = useTrackingTasks();
+  } = useTrackingTasks('11111111-1111-1111-1111-111111111111', enabled);
 
   // Escuchar estado de autenticación real de Supabase
   React.useEffect(() => {
@@ -65,20 +67,24 @@ export function SeguimientoPage() {
           .eq('id', session.user.id)
           .single();
         
+        const resolveName = (email?: string, name?: string) => {
+          const clean = email?.toLowerCase().trim() || '';
+          if (clean === 'dartjfe@gmail.com') return 'Jhonny Flores';
+          if (clean === 'benjaminmaestre@gmail.com') return 'Benjamín Pérez';
+          if (name && !name.includes('@') && name !== clean.split('@')[0]) return name;
+          return name || email || 'Usuario';
+        };
+
         setUser({
           id: session.user.id,
           email: session.user.email,
-          full_name: profile?.full_name || session.user.email,
+          full_name: resolveName(session.user.email, profile?.full_name),
           role: profile?.role || 'viewer',
         });
       } else {
-        // Fallback a sesión mock si existe (para pruebas sin conexión o desarrollo)
-        const mockUser = localStorage.getItem('mock-user');
-        if (mockUser) {
-          setUser(JSON.parse(mockUser));
-        } else {
-          navigate('/login', { replace: true });
-        }
+        // Si no hay sesión de Supabase Auth, redirigir a login
+        setUser(null);
+        navigate('/login', { replace: true });
       }
       setAuthLoading(false);
     };
@@ -86,7 +92,7 @@ export function SeguimientoPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT' || !session?.user) {
         setUser(null);
         localStorage.removeItem('mock-session');
         localStorage.removeItem('mock-user');
@@ -98,10 +104,18 @@ export function SeguimientoPage() {
           .eq('id', session.user.id)
           .single();
 
+        const resolveName = (email?: string, name?: string) => {
+          const clean = email?.toLowerCase().trim() || '';
+          if (clean === 'dartjfe@gmail.com') return 'Jhonny Flores';
+          if (clean === 'benjaminmaestre@gmail.com') return 'Benjamín Pérez';
+          if (name && !name.includes('@') && name !== clean.split('@')[0]) return name;
+          return name || email || 'Usuario';
+        };
+
         setUser({
           id: session.user.id,
           email: session.user.email,
-          full_name: profile?.full_name || session.user.email,
+          full_name: resolveName(session.user.email, profile?.full_name),
           role: profile?.role || 'viewer',
         });
       }

@@ -75,7 +75,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ user, onLogout }) => {
             <div className="flex items-center gap-3">
               {user && (
                 <div className="hidden md:flex flex-col text-right">
-                  <span className="text-xs font-bold text-(--page-text)">{user.full_name || user.email}</span>
+                  <span className="text-xs font-bold text-(--page-text)">
+                    {(() => {
+                      const cleanEmail = user.email?.toLowerCase().trim() || '';
+                      if (cleanEmail === 'dartjfe@gmail.com') return 'Jhonny Flores';
+                      if (cleanEmail === 'benjaminmaestre@gmail.com') return 'Benjamín Pérez';
+                      if (user.full_name && !user.full_name.includes('@') && user.full_name !== cleanEmail.split('@')[0]) {
+                        return user.full_name;
+                      }
+                      return user.full_name || user.email;
+                    })()}
+                  </span>
                   <span className="text-[10px] text-(--text-muted) uppercase font-semibold">Superintendencia de Alojamiento</span>
                 </div>
               )}
