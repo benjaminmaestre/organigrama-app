@@ -117,6 +117,85 @@ export const OFFICIAL_CHECKLIST_SEED: SeedTask[] = [
     instruction_basis: 'Determinar si la magnitud del recinto exige habilitar los departamentos adicionales de Instalación o Transporte.',
     source_classification: 'combined',
   },
+  {
+    template_key: 'before_committee_department_locations',
+    title: 'Participar en la ubicación de los departamentos',
+    description: 'Participar con el Comité de Asamblea en la decisión sobre la ubicación física de los departamentos en las instalaciones.',
+    phase: 'before',
+    department_code: 'committee',
+    responsibility_type: 'committee',
+    priority: 'normal',
+    assigned_to: 'both',
+    source_refs: [
+      { document: 'CO-1', chapter: '1', paragraphs: '27', displayLabel: 'CO-1 · 1:27' },
+      { document: 'CO-1', appendix: 'E', section: 'Asuntos que atender antes de la asamblea', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 1:27',
+        quote: 'Asimismo, decidirán la ubicación de los departamentos.'
+      },
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · Apéndice E',
+        quote: 'Decidir la ubicación de los departamentos.'
+      }
+    ],
+    instruction_basis: 'La ubicación de los departamentos es una decisión del Comité de Asamblea. El superintendente de Alojamiento participa en esa decisión como miembro del comité y da seguimiento a la ubicación de los departamentos bajo su supervisión.',
+    source_classification: 'direct',
+  },
+  {
+    template_key: 'before_committee_preassembly_meeting',
+    title: 'Participar en la reunión preasamblea con los superintendentes',
+    description: 'Participar en la reunión convocada por el Comité de Asamblea para coordinar los detalles finales antes del evento.',
+    phase: 'before',
+    department_code: 'committee',
+    responsibility_type: 'committee',
+    priority: 'important',
+    assigned_to: 'both',
+    source_refs: [
+      { document: 'CO-1', chapter: '2', paragraphs: '31', displayLabel: 'CO-1 · 2:31' },
+      { document: 'CO-1', appendix: 'E', displayLabel: 'CO-1 · Apéndice E' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 2:31',
+        quote: 'Con dos o tres meses de antelación, el Comité de Asamblea convocará una reunión.'
+      }
+    ],
+    instruction_basis: 'El Comité de Asamblea convoca una reunión preasamblea con los superintendentes para revisar la preparación y resolver asuntos pendientes.',
+    source_classification: 'direct',
+  },
+  {
+    template_key: 'before_committee_courtesy_rooms',
+    title: 'Participar en la asignación de habitaciones de cortesía y hospedaje particular',
+    description: 'Participar con el Comité de Asamblea en la asignación de habitaciones de cortesía y confirmar que exista hospedaje particular de respaldo.',
+    phase: 'before',
+    department_code: 'committee',
+    responsibility_type: 'committee',
+    priority: 'important',
+    assigned_to: 'superintendent',
+    source_refs: [
+      { document: 'CO-1', chapter: '3', paragraphs: '79', displayLabel: 'CO-1 · 3:79' },
+      { document: 'CO-80', chapter: '6', paragraphs: '5', displayLabel: 'CO-80 · 6:5' }
+    ],
+    source_quotes: [
+      {
+        document: 'CO-1',
+        reference: 'CO-1 · 3:79',
+        quote: 'El Comité de Asamblea, no solo el superintendente de Alojamiento o sus auxiliares, decide a quién se le ofrecerá alojamiento de cortesía.'
+      },
+      {
+        document: 'CO-80',
+        reference: 'CO-80 · 6:5',
+        quote: 'El Comité de Asamblea Regional decide a quién asignará habitaciones de cortesía y por cuántas noches.'
+      }
+    ],
+    instruction_basis: 'El Comité de Asamblea decide la asignación de habitaciones de cortesía. El superintendente de Alojamiento también debe disponer de hospedaje particular de respaldo.',
+    source_classification: 'combined',
+  },
 
   // Supervisión General (supervision)
   {

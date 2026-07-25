@@ -3,20 +3,177 @@ import { supabase } from '../api/supabaseClient';
 import type { Task, Subtask, Issue, DepartmentConfig, TaskActivity } from '../types/tracking.types';
 import { OFFICIAL_CHECKLIST_SEED, OFFICIAL_TASK_METADATA_BY_KEY } from '../data/seedData';
 
+/**
+ * Traduce claves heredadas (template_key antiguo guardado en Supabase)
+ * a la clave actual del catálogo local. Necesario porque el catálogo fue
+ * refactorizado con nuevas claves pero las filas en Supabase conservan las viejas.
+ */
+const LEGACY_KEY_TRANSLATION: Record<string, string> = {
+  // Supervisión — Antes (claves heredadas → claves actuales equivalentes)
+  before_supervision_meet_department_superintendents: 'before_supervision_meet_heads',
+  before_supervision_confirm_instructions:            'before_supervision_understand_instructions',
+  before_supervision_review_personnel_schedules:      'before_supervision_review_volunteers',
+  before_supervision_equipment_needs:                 'before_supervision_review_materials',
+  before_supervision_communication_channels:          'before_supervision_track_pending',
+  before_supervision_resolve_personnel_deficits:      'before_supervision_track_pending',
+  before_supervision_inspect_montage:                 'before_supervision_track_pending',
+  // Alojamiento — Antes
+  before_accommodation_hotels_coordination: 'before_accommodation_hotel_reservations',
+  // Voluntarios — Antes
+  before_volunteers_recruit_schedule: 'before_info_volunteers_stand_location',
+  // Instalación — Antes
+  before_installation_review_tools: 'before_installation_inspect_site',
+  // Limpieza — Antes
+  before_cleaning_supplies_trash_plan: 'before_cleaning_verify_supplies',
+  // Objetos perdidos — Antes
+  before_lost_found_secure_area: 'before_lost_found_setup_area',
+  // Transporte — Antes
+  before_transport_heavy_vehicles: 'before_transport_inventory_rentals',
+  // Supervisión — Durante
+  during_supervision_daily_visit_friday:      'during_supervision_daily_visits',
+  during_supervision_daily_visit_saturday:    'during_supervision_daily_visits',
+  during_supervision_daily_visit_sunday:      'during_supervision_daily_visits',
+  during_supervision_commend_volunteers:      'during_supervision_daily_visits',
+  during_supervision_improve_performance:     'during_supervision_daily_visits',
+  during_supervision_confirm_proper_function: 'during_supervision_resolve_incidents',
+  during_committee_report_serious_matters:    'during_committee_daily_meetings',
+  during_supervision_follow_open_issues:      'during_supervision_resolve_incidents',
+  // Alojamiento — Durante
+  during_accommodation_receive_delegates: 'during_accommodation_operate_stand',
+  // Voluntarios — Durante
+  during_volunteers_info_stand: 'during_info_volunteers_answer_queries',
+  // Instalación — Durante
+  during_installation_structural_repairs: 'during_accommodation_manage_hotel_problems',
+  // Limpieza — Durante
+  during_cleaning_restrooms_inspection: 'during_cleaning_continuous_sweeping',
+  // Objetos perdidos — Durante
+  during_lost_found_register: 'during_lost_found_handle_items',
+  // Transporte — Durante
+  during_transport_urgent_relocations: 'during_lost_found_handle_items',
+  // Supervisión — Después
+  after_supervision_confirm_department_closure: 'after_supervision_verify_resolved',
+  after_committee_final_inspection:             'after_committee_handover_info',
+  after_supervision_debrief_meeting:            'after_supervision_verify_resolved',
+  after_supervision_consolidated_report:        'after_supervision_verify_resolved',
+  after_supervision_identify_trained_brothers:  'after_supervision_verify_resolved',
+  after_committee_handover_next_assembly:       'after_committee_handover_info',
+  after_supervision_verify_no_open_issues:      'after_supervision_verify_resolved',
+  // Alojamiento — Después
+  after_accommodation_keys_room_checkout: 'after_accommodation_visit_hotels',
+  // Voluntarios — Después
+  after_volunteers_collect_equipment: 'after_info_volunteers_pack_up',
+  // Instalación — Después
+  after_installation_dismantle_structures: 'after_installation_teardown',
+  // Limpieza — Después
+  after_cleaning_deep_clean: 'after_cleaning_deep_clean',
+  // Objetos perdidos — Después
+  after_lost_found_unclaimed_items: 'after_lost_found_classify_unclaimed',
+  // Transporte — Después
+  after_transport_return_rented_equipment: 'after_transport_return_rentals',
+};
+
+// Mapa de título normalizado → template_key.
+// Cubre: (1) títulos heredados del primer catálogo, (2) títulos actuales del catálogo.
+// Se usa cuando template_key es null en Supabase (tareas antiguas no migradas).
+const TITLE_TO_KEY_MAP: Map<string, string> = (() => {
+  const map = new Map<string, string>();
+
+  // Títulos heredados → clave destino
+  const LEGACY_TITLE_MAP_LOCAL: Record<string, string> = {
+    'confirmar documentos e instrucciones vigentes': 'before_committee_instructions',
+    'estudiar y repasar todas las cartas y manuales de asamblea actualizados para alojamiento.': 'before_committee_instructions',
+    'participar en la selección de superintendentes y auxiliares': 'before_committee_select_superintendents',
+    'confirmar los departamentos necesarios': 'before_committee_confirm_departments',
+    'participar en la ubicación de los departamentos': 'before_committee_department_locations',
+    'participar en la reunión preasamblea': 'before_committee_preassembly_meeting',
+    'participar en la asignación de habitaciones de cortesía y hospedaje particular': 'before_committee_courtesy_rooms',
+    'reunirse con cada superintendente de departamento y su auxiliar': 'before_supervision_meet_heads',
+    'confirmar que conocen sus instrucciones': 'before_supervision_understand_instructions',
+    'revisar organización, personal y horarios de los departamentos': 'before_supervision_review_volunteers',
+    'revisar necesidades de equipos y materiales': 'before_supervision_review_materials',
+    'confirmar canales de comunicación': 'before_supervision_track_pending',
+    'identificar necesidades de personal y resolver faltantes': 'before_supervision_track_pending',
+    'inspeccionar las instalaciones durante el montaje': 'before_supervision_track_pending',
+    'coordinar con hoteles y hospedajes locales': 'before_accommodation_hotel_reservations',
+    'reclutar y programar personal voluntario': 'before_info_volunteers_stand_location',
+    'revisar herramientas y materiales requeridos para el montaje': 'before_installation_inspect_site',
+    'confirmar personal suficiente, insumos de limpieza y plan de basura': 'before_cleaning_verify_supplies',
+    'establecer área segura para guardar ropa y objetos perdidos': 'before_lost_found_setup_area',
+    'coordinar vehículos de carga y materiales pesados': 'before_transport_inventory_rentals',
+    'visitar todos los departamentos supervisados al menos una vez cada día (viernes)': 'during_supervision_daily_visits',
+    'visitar todos los departamentos supervisados al menos una vez cada día (sábado)': 'during_supervision_daily_visits',
+    'visitar todos los departamentos supervisados al menos una vez cada día (domingo)': 'during_supervision_daily_visits',
+    'buscar aspectos por los cuales felicitar': 'during_supervision_daily_visits',
+    'ayudar a mejorar el desempeño cuando sea necesario': 'during_supervision_daily_visits',
+    'confirmar que cada departamento funciona correctamente': 'during_supervision_resolve_incidents',
+    'informar al comité sobre asuntos graves': 'during_committee_daily_meetings',
+    'dar seguimiento a incidencias abiertas': 'during_supervision_resolve_incidents',
+    'atender a los delegados e invitados especiales al llegar': 'during_accommodation_operate_stand',
+    'instalar el stand de información y atender dudas': 'during_info_volunteers_answer_queries',
+    'estar disponible para resolver fallas en las estructuras del evento': 'during_accommodation_manage_hotel_problems',
+    'inspeccionar baños y áreas comunes continuamente': 'during_cleaning_continuous_sweeping',
+    'registrar objetos recibidos y entregados': 'during_lost_found_handle_items',
+    'estar disponible para traslados logísticos urgentes': 'during_lost_found_handle_items',
+    'confirmar el cierre de cada departamento': 'after_supervision_verify_resolved',
+    'participar en la inspección final': 'after_committee_handover_info',
+    'reunirse con los superintendentes de departamento': 'after_supervision_verify_resolved',
+    'registrar lo que funcionó bien, dificultades y recomendaciones': 'after_supervision_verify_resolved',
+    'identificar hermanos que recibieron capacitación': 'after_supervision_verify_resolved',
+    'entregar información pertinente a la siguiente asamblea': 'after_committee_handover_info',
+    'verificar que no queden incidencias abiertas': 'after_supervision_verify_resolved',
+    'verificar la entrega de llaves y estado de habitaciones': 'after_accommodation_visit_hotels',
+    'recoger equipos, banners y archivar registros': 'after_info_volunteers_pack_up',
+    'desmontar estructuras, ordenar y guardar materiales': 'after_installation_teardown',
+    'hacer limpieza profunda final y entrega de llaves': 'after_cleaning_deep_clean',
+    'clasificar objetos no reclamados y coordinar su destino': 'after_lost_found_classify_unclaimed',
+    'retornar equipos rentados y archivar inventarios': 'after_transport_return_rentals',
+  };
+
+  for (const [title, key] of Object.entries(LEGACY_TITLE_MAP_LOCAL)) {
+    map.set(title.trim().toLowerCase(), key);
+  }
+
+  // Títulos actuales del catálogo → su propia clave
+  for (const seed of OFFICIAL_CHECKLIST_SEED) {
+    map.set(seed.title.trim().toLowerCase(), seed.template_key);
+  }
+
+  return map;
+})();
+
 export function enrichTaskWithOfficialMetadata(task: Task): Task {
-  if (task.source === 'custom' || !task.template_key) {
+  if (task.source === 'custom') {
     return task;
   }
 
-  const official = OFFICIAL_TASK_METADATA_BY_KEY.get(task.template_key);
+  // 1. Buscar por template_key directo
+  let resolvedKey: string | null = task.template_key
+    ? (OFFICIAL_TASK_METADATA_BY_KEY.has(task.template_key)
+        ? task.template_key
+        : (LEGACY_KEY_TRANSLATION[task.template_key] ?? null))
+    : null;
+
+  // 2. Fallback por título (cubre tareas con template_key=null en Supabase)
+  if (!resolvedKey && task.title) {
+    resolvedKey = TITLE_TO_KEY_MAP.get(task.title.trim().toLowerCase()) ?? null;
+  }
+
+  const official = resolvedKey ? OFFICIAL_TASK_METADATA_BY_KEY.get(resolvedKey) : undefined;
 
   if (!official) {
+    if (import.meta.env.DEV) {
+      console.error('[Missing Official Metadata] No se encontró entrada en el catálogo local:', {
+        id: task.id,
+        template_key: task.template_key,
+        title: task.title,
+      });
+    }
     return task;
   }
 
   return {
     ...task,
-    // Contenido oficial siempre tomado del frontend
+    // Contenido oficial siempre tomado del catálogo local
     title: official.title,
     description: official.description,
     source_refs: official.source_refs,
@@ -24,7 +181,7 @@ export function enrichTaskWithOfficialMetadata(task: Task): Task {
     instruction_basis: official.instruction_basis,
     source_classification: official.source_classification,
 
-    // No sobrescribir datos operativos de Supabase
+    // Conservar datos operativos de Supabase
     status: task.status,
     priority: task.priority,
     assigned_to: task.assigned_to,

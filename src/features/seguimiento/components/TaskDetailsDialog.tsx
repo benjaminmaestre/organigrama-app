@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Task, Subtask, TaskActivity } from '../types/tracking.types';
 import { OFFICIAL_TASK_METADATA_BY_KEY } from '../data/seedData';
+import { enrichTaskWithOfficialMetadata } from '../hooks/useTrackingTasks';
 import { cn } from '../../../lib/cn';
 import {
   X,
@@ -191,12 +192,16 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   };
 
   const isLocalTask = task.source === 'custom' || task.source_classification === 'local';
+
+  // Enriquecer la tarea con el catálogo local (resuelve también claves heredadas)
+  const enrichedTask = isLocalTask ? task : enrichTaskWithOfficialMetadata(task);
+  // officialMetadata por clave directa (para el badge de clasificación)
   const officialMetadata = task.template_key ? OFFICIAL_TASK_METADATA_BY_KEY.get(task.template_key) : undefined;
 
-  const references = officialMetadata?.source_refs ?? task.source_refs ?? [];
-  const quotes = officialMetadata?.source_quotes ?? task.source_quotes ?? [];
-  const instructionBasis = officialMetadata?.instruction_basis ?? task.instruction_basis;
-  const classification = officialMetadata?.source_classification ?? task.source_classification ?? (isLocalTask ? 'local' : 'direct');
+  const references = enrichedTask.source_refs ?? officialMetadata?.source_refs ?? [];
+  const quotes = enrichedTask.source_quotes ?? officialMetadata?.source_quotes ?? [];
+  const instructionBasis = enrichedTask.instruction_basis ?? officialMetadata?.instruction_basis;
+  const classification = enrichedTask.source_classification ?? officialMetadata?.source_classification ?? (isLocalTask ? 'local' : 'direct');
 
   const classificationBadgeText = isLocalTask
     ? 'Tarea local'
@@ -267,52 +272,77 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                 </div>
 
                 {/* TAREA OFICIAL */}
-                {!isLocalTask && (
-                  <div className="space-y-4">
-                    {/* CHIPS DE REFERENCIAS */}
-                    {references.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {references.map((ref, idx) => (
-                          <span
-                            key={idx}
-                            title={`${ref.document}${ref.chapter ? ` · Cap. ${ref.chapter}` : ''}${ref.paragraphs ? `, párrs. ${ref.paragraphs}` : ''}`}
-                            className="text-[11px] font-black px-3 py-1 rounded-lg bg-blue-600/15 dark:bg-blue-400/20 text-blue-900 dark:text-blue-200 border border-blue-500/30"
-                          >
-                            {ref.displayLabel}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                {!isLocalTask && (() => {
+                  const hasOfficialFoundation =
+                    references.length > 0 &&
+                    quotes.length > 0 &&
+                    !!instructionBasis?.trim();
 
-                    {/* CITAS DOCUMENTALES TEXTUALES CORTAS */}
-                    {quotes.length > 0 && (
-                      <div className="space-y-2.5 pt-1">
-                        {quotes.map((sq, idx) => (
-                          <div key={idx} className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-blue-500/20 space-y-1 shadow-xs">
-                            <span className="text-[10px] font-black text-blue-700 dark:text-blue-300 uppercase tracking-widest block">
-                              Cita Documental — {sq.reference}
-                            </span>
-                            <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed italic font-medium">
-                              "{sq.quote}"
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* APLICACIÓN DE LA INSTRUCCIÓN / RESUMEN OPERATIVO */}
-                    {instructionBasis && (
-                      <div className="space-y-1.5 pt-3 border-t border-blue-500/15">
-                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                          {classification === 'operational_summary' ? 'Resumen Operativo' : 'Aplicación de la Instrucción'}
+                  if (!hasOfficialFoundation) {
+                    return (
+                      <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 space-y-1">
+                        <span className="text-[10px] font-black text-amber-700 dark:text-amber-300 uppercase tracking-wider block">
+                          Metadata local no disponible
                         </span>
-                        <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed">
-                          {instructionBasis}
+                        <p className="text-xs text-amber-800 dark:text-amber-200">
+                          Esta tarea no tiene referencias en el catálogo local.
                         </p>
+                        {import.meta.env.DEV && task.template_key && (
+                          <code className="block text-[10px] mt-1 text-amber-600 dark:text-amber-400 font-mono">
+                            template_key: {task.template_key}
+                          </code>
+                        )}
                       </div>
-                    )}
-                  </div>
-                )}
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-4">
+                      {/* CHIPS DE REFERENCIAS */}
+                      {references.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {references.map((ref, idx) => (
+                            <span
+                              key={idx}
+                              title={`${ref.document}${ref.chapter ? ` · Cap. ${ref.chapter}` : ''}${ref.paragraphs ? `, párrs. ${ref.paragraphs}` : ''}`}
+                              className="text-[11px] font-black px-3 py-1 rounded-lg bg-blue-600/15 dark:bg-blue-400/20 text-blue-900 dark:text-blue-200 border border-blue-500/30"
+                            >
+                              {ref.displayLabel}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* CITAS DOCUMENTALES TEXTUALES CORTAS */}
+                      {quotes.length > 0 && (
+                        <div className="space-y-2.5 pt-1">
+                          {quotes.map((sq, idx) => (
+                            <div key={idx} className="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-blue-500/20 space-y-1 shadow-xs">
+                              <span className="text-[10px] font-black text-blue-700 dark:text-blue-300 uppercase tracking-widest block">
+                                Cita Documental — {sq.reference}
+                              </span>
+                              <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed italic font-medium">
+                                "{sq.quote}"
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* APLICACIÓN DE LA INSTRUCCIÓN / RESUMEN OPERATIVO */}
+                      {instructionBasis && (
+                        <div className="space-y-1.5 pt-3 border-t border-blue-500/15">
+                          <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                            {classification === 'operational_summary' ? 'Resumen Operativo' : 'Aplicación de la Instrucción'}
+                          </span>
+                          <p className="text-xs sm:text-sm text-(--page-text) leading-relaxed">
+                            {instructionBasis}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* TAREA LOCAL */}
                 {isLocalTask && (
